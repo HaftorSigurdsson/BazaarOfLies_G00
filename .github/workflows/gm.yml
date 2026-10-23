@@ -1,32 +1,33 @@
 name: Game Master
 
 on:
+  workflow_dispatch:          # manual start (arena owner)
   push:
     paths:
       - 'votes/**'
       - 'night/**'
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
+    - cron: '*/5 * * * *'     # every 5 minutes
+
+permissions:
+  contents: write             # GM must push state, graveyard, announcements
 
 jobs:
   gm:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GM_PAT }}  # GM-only write access
-          fetch-depth: 0
+        uses: actions/checkout@v4   # default GITHUB_TOKEN → pushes as github-actions[bot]
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install pynacl
+        run: pip install pynacl==1.6.2
 
       - name: Run Game Master
         env:
-          GM_PRIVATE_KEY: ${{ secrets.GM_PRIVATE_KEY }}  # Base64-encoded private key
+          GM_PRIVATE_KEY: ${{ secrets.GM_PRIVATE_KEY }}
         run: python gm/run.py
