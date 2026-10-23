@@ -6,24 +6,7 @@ on:
       - 'votes/**'
       - 'night/**'
   schedule:
-    - cron: '*/1 * * * *'  # Every 1 minute for testing
-    - cron: '*/5 * * * *'  # Every 5 minutes for real game
-  workflow_dispatch:
-    inputs:
-      action:
-        description: 'Manual GM action'
-        required: true
-        default: 'advance_phase'
-        type: choice
-        options:
-          - advance_phase
-          - reset_match
-          - debug_state
-
-# Prevent race conditions
-concurrency:
-  group: gm
-  cancel-in-progress: false
+    - cron: '*/5 * * * *'  # Every 5 minutes
 
 jobs:
   gm:
@@ -46,17 +29,4 @@ jobs:
       - name: Run Game Master
         env:
           GM_PRIVATE_KEY: ${{ secrets.GM_PRIVATE_KEY }}  # Base64-encoded private key
-          ACTION: ${{ github.event.inputs.action || 'advance_phase' }}
-        run: |
-          if [ "$ACTION" = "advance_phase" ]; then
-            python gm/run.py
-          elif [ "$ACTION" = "reset_match" ]; then
-            python gm/run.py --reset
-          elif [ "$ACTION" = "debug_state" ]; then
-            python gm/run.py --debug
-          else
-            python gm/run.py
-          fi
-
-      - name: Enforce Token Budget
-        run: python gm/utils.py --enforce-token-budget
+        run: python gm/run.py

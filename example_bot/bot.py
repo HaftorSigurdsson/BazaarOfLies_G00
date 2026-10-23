@@ -8,122 +8,83 @@ from mistralai import Mistral
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description="Bazaar of Lies Bot")
 parser.add_argument("--seat", type=str, required=True, help="Seat ID (e.g., seat-01)")
-parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
 args = parser.parse_args()
 
 MODEL = "mistral-small-2409"  # PIN the exact versioned ID
 MY_SEAT = args.seat           # Each bot knows only itself
-VERBOSE = args.verbose        # Verbose logging
-client = Mistral()
+client = Mistral()            # Reads MISTRAL_API_KEY
 
-MODEL = "mistral-small-2409"  # PIN the exact versioned ID
-MY_SEAT = "seat-01"           # Each bot knows only itself
-client = Mistral()             # Reads MISTRAL_API_KEY
 
-# Sub-agent prompts
-ANALYST_SYS = """
-You are the Analyst for {persona}. Your job is to summarize the day's events and flag contradictions.
-- Focus on who accused whom and who defended whom.
-- Keep your summary under 500 tokens.
-- Use bullet points for clarity.
-"""
-
-SPEECHWRITER_SYS = """
-You are the Speechwriter for {persona}. Your job is to write 1-2 public statements per day.
-- Speak in character (use your persona's voice).
-- Keep each statement under 600 characters.
-- Follow your doctrine: {doctrine}
-"""
-
-STRATEGIST_SYS = """
-You are the Strategist for {persona}. Your job is to decide who to vote for.
-- Weigh accusations and defenses.
-- Follow your doctrine: {doctrine}
-- Output only the seat ID of your target (e.g., "seat-02").
-"""
-
-NIGHT_AGENT_SYS = """
-You are the Night Agent for {persona}. Your role is {role}.
-- If Mafia, confer with teammates and submit a kill target.
-- If Detective, submit an investigation target.
-- If Doctor, submit a protection target.
-- Output only the seat ID of your target (e.g., "seat-02").
-"""
-
-def ask(system, user, temperature=0.7, max_tokens=500):
-    """Helper function to query the Mistral API with token limits."""
-    if VERBOSE:
-        print(f"[VERBOSE] System prompt: {system}")
-        print(f"[VERBOSE] User prompt: {user}")
-    
+def ask(system, user, temperature=0.7):
+    """Helper function to query the Mistral API."""
     r = client.chat.complete(
         model=MODEL,
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": user}
         ],
-        temperature=temperature,
-        max_tokens=max_tokens
+        temperature=temperature
     )
-    
-    if VERBOSE:
-        print(f"[VERBOSE] Response: {r.choices[0].message.content}")
-    
-    log_usage(MY_SEAT, r.usage)
     return r.choices[0].message.content
 
-def analyst_phase(cycle_context):
-    """Summarize the day's events."""
-    summary = ask(ANALYST_SYS.format(persona=get_seats()[MY_SEAT]["persona"]), cycle_context, max_tokens=500)
-    return summary
 
-def speechwriter_phase(summary):
-    """Write 1-2 public statements."""
-    statements = []
-    for _ in range(2):
-        statement = ask(SPEECHWRITER_SYS.format(
-            persona=get_seats()[MY_SEAT]["persona"],
-            doctrine=get_doctrine(MY_SEAT)
-        ), summary, max_tokens=300)
-        statements.append(statement)
-    return statements
+def get_persona(seat):
+    """Load the bot's persona from setup/seats.json."""
+    with open("setup/seats.json", "r") as f:
+        seats = json.load(f)["seats"]
+    return seats[seat]["persona"]
 
-def strategist_phase(summary):
-    """Decide who to vote for."""
-    vote = ask(STRATEGIST_SYS.format(
-        persona=get_seats()[MY_SEAT]["persona"],
-        doctrine=get_doctrine(MY_SEAT)
-    ), summary, max_tokens=50)
-    return vote
-
-def night_agent_phase(cycle_context):
-    """Perform night actions based on role."""
-    role = get_role(MY_SEAT)
-    if role == "Mafia":
-        target = ask(NIGHT_AGENT_SYS.format(persona=get_seats()[MY_SEAT]["persona"], role=role), cycle_context, max_tokens=50)
-        return {"type": "kill", "target": target}
-    elif role == "Detective":
-        target = ask(NIGHT_AGENT_SYS.format(persona=get_seats()[MY_SEAT]["persona"], role=role), cycle_context, max_tokens=50)
-        return {"type": "investigate", "target": target}
-    elif role == "Doctor":
-        target = ask(NIGHT_AGENT_SYS.format(persona=get_seats()[MY_SEAT]["persona"], role=role), cycle_context, max_tokens=50)
-        return {"type": "save", "target": target}
-    return None
 
 def get_doctrine(seat):
     """Load the bot's doctrine from a private file."""
     with open(f"doctrines/{seat}.txt", "r") as f:
         return f.read()
 
+
 def get_role(seat):
     """Load the bot's role from its encrypted dossier."""
     # Decrypt the dossier using the bot's private key
-    ...
+    # (Implementation depends on your crypto setup)
+    return "Villager"  # Placeholder
 
-def log_usage(seat, usage):
-    """Log token usage to usage/seat-XX.jsonl."""
-    with open(f"usage/{seat}.jsonl", "a") as f:
-        f.write(json.dumps({"tokens": usage.total_tokens, "timestamp": time.time()}) + "\n")
+
+def push_statement(statement):
+    """Push a public statement to village/day-XXX.jsonl."""
+    state = json.load(open("state.json"))
+    statement_data = {
+        "match": state["match"],
+        "cycle": state["cycle"],
+        "seat": MY_SEAT,
+        "seq": 1,
+        "text": statement,
+        "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    }
+    with open(f"village/day-{state['cycle']:03d}.jsonl", "a") as f:
+        f.write(json.dumps(statement_data) + "\n")
+    subprocess.run(["git", "add", f"village/day-{state['cycle']:03d}.jsonl"], check=True)
+    subprocess.run(["git", "commit", "-m", f"Statement by {MY_SEAT}"], check=True)
+    subprocess.run(["git", "push"], check=True)
+
+
+def push_sealed_ballot(ballot):
+    """Push a sealed ballot to votes/."""
+    filename = f"votes/{MY_SEAT}-{int(time.time())}.enc"
+    with open(filename, "w") as f:
+        f.write(ballot)
+    subprocess.run(["git", "add", filename], check=True)
+    subprocess.run(["git", "commit", "-m", f"Ballot by {MY_SEAT}"], check=True)
+    subprocess.run(["git", "push"], check=True)
+
+
+def push_night_action(action):
+    """Push a night action to night/."""
+    filename = f"night/{MY_SEAT}-{int(time.time())}.enc"
+    with open(filename, "w") as f:
+        f.write(action)
+    subprocess.run(["git", "add", filename], check=True)
+    subprocess.run(["git", "commit", "-m", f"Night action by {MY_SEAT}"], check=True)
+    subprocess.run(["git", "push"], check=True)
+
 
 def main_loop():
     """Main loop for the bot."""
@@ -131,26 +92,29 @@ def main_loop():
         subprocess.run(["git", "pull", "--rebase"], check=True)
         s = json.load(open("state.json"))
         
-        if s["phase"] == "discussion" and is_alive(MY_SEAT):
-            cycle_context = get_cycle_context()
-            summary = analyst_phase(cycle_context)
-            statements = speechwriter_phase(summary)
-            for statement in statements:
-                push_statement(statement)
+        if s["phase"] == "discussion" and MY_SEAT in s["alive"]:
+            statement = ask(
+                f"You are {get_persona(MY_SEAT)}. Speak in character. Doctrine: {get_doctrine(MY_SEAT)}",
+                "Write a public statement (≤ 600 chars)."
+            )
+            push_statement(statement)
         
-        elif s["phase"] == "voting" and is_alive(MY_SEAT):
-            cycle_context = get_cycle_context()
-            summary = analyst_phase(cycle_context)
-            vote = strategist_phase(summary)
-            push_sealed_ballot(seal_for_gm({"match": s["match"], "cycle": s["cycle"], "seat": MY_SEAT, "vote": vote}))
+        elif s["phase"] == "voting" and MY_SEAT in s["alive"]:
+            vote = ask(
+                f"You are {get_persona(MY_SEAT)}. Doctrine: {get_doctrine(MY_SEAT)}",
+                "Who do you vote to banish? (Output only the seat ID, e.g., 'seat-02')"
+            )
+            push_sealed_ballot({"match": s["match"], "cycle": s["cycle"], "seat": MY_SEAT, "vote": vote})
         
-        elif s["phase"] == "night" and is_alive(MY_SEAT):
-            cycle_context = get_cycle_context()
-            action = night_agent_phase(cycle_context)
-            if action:
-                push_night_action(seal_for_gm({"match": s["match"], "cycle": s["cycle"], "seat": MY_SEAT, **action}))
+        elif s["phase"] == "night" and MY_SEAT in s["alive"]:
+            action = ask(
+                f"You are {get_persona(MY_SEAT)}. Your role is {get_role(MY_SEAT)}.",
+                "Submit your night action (Output only the seat ID, e.g., 'seat-02')."
+            )
+            push_night_action({"match": s["match"], "cycle": s["cycle"], "seat": MY_SEAT, "target": action})
         
         time.sleep(30)
+
 
 if __name__ == "__main__":
     main_loop()
