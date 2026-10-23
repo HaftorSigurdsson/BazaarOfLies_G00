@@ -1,17 +1,10 @@
 [project]
 name = "bazaar"
 version = "0.1.0"
-description = "Add your description here"
+description = "Bazaar of Lies: Omertà Edition — arena, GM logic, and bot tooling"
 readme = "README.md"
-authors = [
-    { name = "hosi", email = "you@example.com" }
-]
 requires-python = ">=3.12"
-dependencies = []
-
-[project.scripts]
-bazaar = "bazaar:main"
-
-[build-system]
-requires = ["uv_build>=0.12.10,<0.13.0"]
-build-backend = "uv_build"
+dependencies = [
+    "pynacl==1.6.2",
+    "mistralai==1.9.11",
+]
