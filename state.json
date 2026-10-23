@@ -1,11 +1,11 @@
 {
   "match": 1,
   "cycle": 4,
-  "phase": "discussion",
+  "phase": "voting",
   "clock": {
     "dawn": "2026-10-23T23:24:55.308156+00:00",
     "discussion_deadline": "2026-10-23T23:54:55.308156+00:00",
-    "voting_deadline": null,
+    "voting_deadline": "2026-10-24T00:05:24.645829+00:00",
     "night_deadline": null
   },
   "alive": [
