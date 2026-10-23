@@ -176,22 +176,40 @@ def read_unread_dossiers(journal):
 
 
 def recent_statements(cycle, limit=40):
-    """Public village transcript for the current day, most recent last."""
-    path = f"village/day-{cycle:03d}.jsonl"
-    out = []
-    if not os.path.exists(path):
-        return out
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                rec = json.loads(line)
-            except json.JSONDecodeError:
-                continue  # partial line mid-write by another bot
-            out.append(f"{rec['seat']}: {rec['text']}")
-    return out[-limit:]
+    """Public village transcript for the current day, most recent last.
+
+    Per-seat statement files (no shared write target -> no merge conflicts),
+    plus the legacy single-file transcript if present. Ordered by ts.
+    """
+    recs = {}
+    sources = []
+    legacy = f"village/day-{cycle:03d}.jsonl"
+    if os.path.exists(legacy):
+        sources.append(legacy)
+    sdir = "village/statements"
+    if os.path.isdir(sdir):
+        pref = f"c{cycle:03d}-seat-"
+        sources += [os.path.join(sdir, p) for p in sorted(os.listdir(sdir))
+                    if p.startswith(pref) and p.endswith(".jsonl")]
+    for path in sources:
+        try:
+            fh = open(path)
+        except OSError:
+            continue
+        with fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except json.JSONDecodeError:
+                    continue  # partial line mid-write by another bot
+                key = (rec.get("seat"), rec.get("seq"))
+                if key not in recs:
+                    recs[key] = rec
+    ordered = sorted(recs.values(), key=lambda r: r.get("ts", ""))
+    return [f"{r['seat']}: {r['text']}" for r in ordered][-limit:]
 
 
 def transcript_block(cycle):
@@ -237,7 +255,9 @@ def do_discussion(state, cs, journal):
         f"Write your statement ({STATEMENT_MAX_CHARS} chars max), in character."
     )[:STATEMENT_MAX_CHARS]
 
-    path = f"village/day-{state['cycle']:03d}.jsonl"
+    sdir = "village/statements"
+    os.makedirs(sdir, exist_ok=True)
+    path = f"{sdir}/c{state['cycle']:03d}-seat-{MY_SEAT}.jsonl"
     rec = {
         "match": state["match"], "cycle": state["cycle"], "seat": MY_SEAT,
         "seq": cs["statements"] + 1, "text": statement,
