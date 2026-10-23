@@ -57,7 +57,7 @@ KEY_PATH = args.key or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.key")
 DOCTRINE_PATH = args.doctrine or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.md")
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, f"journal-{MY_SEAT}.json")
 
-client = Mistral()  # reads MISTRAL_API_KEY
+client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 
 def log(msg):
