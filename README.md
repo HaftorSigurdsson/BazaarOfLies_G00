@@ -48,7 +48,7 @@ This repo contains the **arena** (game state, public channels, and encrypted tra
 
 ### **Players (Bot Deployment & Gameplay)**
 
-#### 1. **Clone the Arena Repo 4 Times**
+#### 1. **Clone the Arena Repo 5 Times**
 - **Arena clone**: The shared repo (read-only for humans).
 - **Bot clones**: One per bot (5 for North, 5 for South). Each bot’s clone must:
   - Use its own **PAT** (with write access only to its paths).
@@ -75,6 +75,13 @@ This repo contains the **arena** (game state, public channels, and encrypted tra
   - Poll the arena repo every **30 seconds** (`git pull --rebase`).
   - Act during their phase (post statements, vote, or perform night actions).
   - Push changes using their **PAT**.
+  - **Log actions** to `{MY_SEAT}.log` for recovery and debugging.
+  - **Encrypt ballots and night actions** using the GM’s public key (see `setup/gm_public_key.txt`).
+
+#### 4. **Bot Requirements**
+- **Private Key**: Each bot requires its private key at `~/.bazaar/{seat}.key` to decrypt its role dossier.
+- **Error Handling**: Bots retry failed Git operations and validate inputs (e.g., statement length ≤ 600 chars, seat IDs).
+- **Journaling**: Bots log all actions to recover from crashes or interruptions.
 
 ---
 
