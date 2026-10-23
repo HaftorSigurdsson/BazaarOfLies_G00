@@ -31,7 +31,18 @@ This repo contains the **arena** (game state, public channels, and encrypted tra
   python setup.py --seats 10 --output setup/seats.json
   ```
 - Private keys are saved to `seat-XX.key` files (keep these secure!).
-- Fill in `persona` and `git_identity` for each seat.
+- Fill in `persona` and `git_identity` for each seat. Example:
+  ```json
+  {
+    "seats": {
+      "seat-01": {
+        "persona": "The Spice Merchant",
+        "public_key": "base64-encoded-public-key-here",
+        "git_identity": "git-username-for-seat-01"
+      }
+    }
+  }
+  ```
 
 ---
 
