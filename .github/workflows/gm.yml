@@ -1,0 +1,32 @@
+name: Game Master
+
+on:
+  push:
+    paths:
+      - 'votes/**'
+      - 'night/**'
+  schedule:
+    - cron: '*/5 * * * *'  # Every 5 minutes
+
+jobs:
+  gm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GM_PAT }}  # GM-only write access
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install pynacl
+
+      - name: Run Game Master
+        env:
+          GM_PRIVATE_KEY: ${{ secrets.GM_PRIVATE_KEY }}  # Base64-encoded private key
+        run: python gm/run.py

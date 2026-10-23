@@ -1,0 +1,54 @@
+{
+  "seats": {
+    "seat-01": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    },
+    "seat-02": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    },
+    "seat-03": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    },
+    "seat-04": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    },
+    "seat-05": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    },
+    "seat-06": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    },
+    "seat-07": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    },
+    "seat-08": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    },
+    "seat-09": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    },
+    "seat-10": {
+      "persona": "",
+      "public_key": "",
+      "git_identity": ""
+    }
+  }
+}
