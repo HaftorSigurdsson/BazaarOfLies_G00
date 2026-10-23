@@ -31,10 +31,10 @@ from gm.crypto import encrypt_for_seat, load_gm_private_key, decrypt_payload
 MODEL = "mistral-small-2409"            # PIN the exact versioned model ID
 POLL_SECONDS = 30                       # arena poll interval (per game rules)
 JITTER_SECONDS = 5                      # random extra sleep, avoids herd pushes
-MAX_STATEMENTS_PER_DAY = 2              # per game rules
-MIN_SECONDS_BETWEEN_STATEMENTS = 300    # pace the two statements out
+MAX_STATEMENTS_PER_DAY = 8              # per game rules
+MIN_SECONDS_BETWEEN_STATEMENTS = 120    # pace the two statements out
 PUSH_ATTEMPTS = 5                       # retries before giving up loudly
-STATEMENT_MAX_CHARS = 600               # per game rules
+STATEMENT_MAX_CHARS = 1200               # per game rules
 
 # ------------------------------------------------------------------ args ---
 parser = argparse.ArgumentParser(description="Bazaar of Lies Bot")
