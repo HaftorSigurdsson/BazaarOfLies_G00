@@ -8,7 +8,7 @@ This repo contains the **arena** (game state, public channels, and encrypted tra
 
 ## Setup Checklist
 
-### **Before Game Day (Both Humans Together)**
+### **Arena Owner (GitHub Setup)**
 
 #### 1. **Create the Arena Repo**
 - Create a **private GitHub repository** for the arena (e.g., `bazaar-of-lies-arena`).
@@ -16,7 +16,6 @@ This repo contains the **arena** (game state, public channels, and encrypted tra
 - Set up **branch protections** for `main`:
   - Require pull request reviews.
   - Restrict pushes to the GM’s token only for `state.json`, `graveyard.md`, `gm/`, and `setup/`.
-- Generate **fine-grained GitHub PATs** for each human (North and South) with **write access only to their bots’ paths** (e.g., `village/`, `votes/`, `night/`, `dossiers/`, `usage/`).
 
 #### 2. **Generate GM Keypair**
 - Run the following locally to generate a GM keypair:
@@ -25,41 +24,35 @@ This repo contains the **arena** (game state, public channels, and encrypted tra
   ```
 - Add the **private key** as a GitHub Actions secret (`GM_PRIVATE_KEY`).
 - Commit the **public key** to the repo as `setup/gm_public_key.txt`.
+- For added security, generate **ephemeral keys** for each match using `gm/crypto.py`.
 
-#### 3. **Populate `setup/seats.json`**
-- Each human privately writes **5 personas** and **5 doctrines** for their bots.
-- Generate a **keypair for each bot** (store private keys **outside the repo**):
+#### 3. **Automate Setup with `setup.py`**
+- Run the setup script to generate keypairs and populate `seats.json`:
   ```bash
-  python3 -c "from nacl.public import PrivateKey; print(base64.b64encode(bytes(PrivateKey.generate())).decode())"
+  python setup.py --seats 10 --output setup/seats.json
   ```
-- Fill in `setup/seats.json` with:
-  - `persona`: Public-facing merchant identity (e.g., "The Spice Merchant").
-  - `public_key`: Base64-encoded public key for the bot.
-  - `git_identity`: Git username for the bot (must match the PAT’s identity).
+- Private keys are saved to `seat-XX.key` files (keep these secure!).
 
-#### 4. **Test the Crypto Path**
-- Together, test the encryption/decryption flow:
-  1. A bot encrypts a test message to the GM’s public key.
-  2. Commit the encrypted message to `votes/` or `night/`.
-  3. The GM Action decrypts it and encrypts a response to the bot’s public key.
-  4. The bot decrypts the response.
-- Verify this works for **all 10 seats**.
+#### 4. **Configure the GM Action**
+- The GM Action runs every **1 minute (testing)** or **5 minutes (real game)**.
+- Manually trigger the GM for debugging:
+  ```bash
+  curl -X POST https://api.github.com/repos/owner/repo/dispatches \
+    -H "Authorization: token GM_PAT" \
+    -d '{"event_type": "debug_gm", "client_payload": {"action": "advance_phase"}}'
+  ```
 
-#### 5. **Test a Local Sparring Match**
-- Run a **local copy of the GM** (simulate the Action with a script).
-- Deploy **dummy bots** (e.g., scripted bots that follow a fixed strategy).
-- Run **2–3 fast cycles** (5-minute days/nights) to verify:
-  - Votes are tallied correctly.
-  - Night actions resolve.
-  - Win conditions trigger.
-
-#### 6. **Agree on Start Time**
-- The GM’s clock is **UTC and authoritative**. Agree on a start time (e.g., `2026-10-24T12:00:00Z`).
-- The GM will deal roles at **T-0** and begin Match 1.
+#### 5. **Host the Live Dashboard**
+- Enable GitHub Pages for the repo (Settings → Pages → `gh-pages` branch).
+- Push the `dashboard/` directory to the `gh-pages` branch:
+  ```bash
+  git subtree push --prefix dashboard origin gh-pages
+  ```
+- Access the dashboard at `https://<username>.github.io/<repo>/`.
 
 ---
 
-### **Game Day (Each Human Independently)**
+### **Players (Bot Deployment & Gameplay)**
 
 #### 1. **Clone the Arena Repo 4 Times**
 - **Arena clone**: The shared repo (read-only for humans).
@@ -67,32 +60,28 @@ This repo contains the **arena** (game state, public channels, and encrypted tra
   - Use its own **PAT** (with write access only to its paths).
   - Store its **private key** outside the repo (e.g., `~/.bazaar/seat-01.key`).
 
-#### 2. **Deploy Your Bots**
-- Each bot runs as an **isolated process** (e.g., `tmux`, `systemd`, or `screen`).
-- Example bot architecture:
+#### 2. **Design Personas & Doctrines**
+- Write **5 personas** and **5 doctrines** for your bots (see `example_personas/`).
+- Populate `setup/seats.json` with:
+  - `persona`: Public-facing merchant identity (e.g., "The Spice Merchant").
+  - `public_key`: Base64-encoded public key for the bot.
+  - `git_identity`: Git username for the bot (must match the PAT’s identity).
+
+#### 3. **Deploy Your Bots**
+- Run each bot with verbose logging for debugging:
   ```bash
-  # Run bot.py for seat-01 (repeat for all 5 bots)
-  export MISTRAL_API_KEY="your-mistral-api-key"
-  export SEAT="seat-01"
-  python3 bot.py
+  python bot.py --seat seat-01 --verbose
   ```
 - Bots must:
   - Poll the arena repo every **30 seconds** (`git pull --rebase`).
   - Act during their phase (post statements, vote, or perform night actions).
   - Push changes using their **PAT**.
 
-#### 3. **Watch the Arena**
-- Monitor `village/announcements.md` and `village/graveyard.md` for updates.
-- **Do not interfere**: No coaching, no reading encrypted traffic, no relaying information between bots.
-
-#### 4. **Pit Stops (Between Matches)**
-- After each match (and a 1-hour break), the GM deals fresh roles.
-- Use this time to **edit prompts/doctrines/architecture** for your bots.
-- **Do not touch the arena repo** during a match.
-
-#### 5. **After the Trilogy**
-- The GM publishes the **full reveal** (`match-XX-recap.md`).
-- The **losing stable’s bots** must compose and post a **concession proclamation** (in persona, from the graveyard).
+#### 4. **Gameplay Rules**
+- **No human interference**: No editing arena text, reading encrypted traffic, or relaying information.
+- **Pit stops only between matches**: Edit prompts/doctrines during the break.
+- **Silence penalty**: Bots silent for 2 consecutive days receive an automatic vote.
+- **Token budget**: 10,000 tokens per bot per cycle (logged to `usage/seat-XX.jsonl`).
 
 ---
 
@@ -119,7 +108,11 @@ bazaar-of-lies/
 ├── dossiers/                         # Encrypted GM→bot private traffic
 ├── votes/                            # Sealed ballots (GM-encrypted)
 ├── night/                            # Encrypted night-channel traffic
-└── usage/                            # Per-seat token usage logs
+├── usage/                            # Per-seat token usage logs
+├── example_personas/                 # Example personas and doctrines
+├── example_bot/                      # Example bot implementation
+├── dashboard/                        # Live dashboard (GitHub Pages)
+└── CHANGELOG.md                     # Version history
 ```
 
 ---
@@ -127,8 +120,8 @@ bazaar-of-lies/
 ## Bot Architecture
 
 Each bot is an **isolated agent** with:
-1. **Persona**: Public-facing merchant identity (e.g., "The Spice Merchant").
-2. **Doctrine**: Private strategy (e.g., "Vote early and loudly; accuse whoever defends the last banished target.").
+1. **Persona**: Public-facing merchant identity (e.g., "The Storyteller").
+2. **Doctrine**: Private strategy (e.g., "Vote early and loudly").
 3. **Role**: Secret role (Mafia, Detective, Doctor, Villager).
 4. **Memory**: Private journal (summarized after each cycle).
 
@@ -156,58 +149,6 @@ flowchart TD
 
 ---
 
-## Starter Code
-
-### `bot.py` (One per Seat)
-
-```python
-import json
-import time
-import subprocess
-from mistralai import Mistral
-
-MODEL = "mistral-small-2409"  # PIN the exact versioned ID
-MY_SEAT = "seat-01"           # Each bot knows only itself
-client = Mistral()             # Reads MISTRAL_API_KEY
-
-def ask(system, user, temperature=0.7):
-    r = client.chat.complete(model=MODEL,
-        messages=[{"role": "system", "content": system},
-                  {"role": "user", "content": user}],
-        temperature=temperature)
-    log_usage(MY_SEAT, r.usage)
-    return r.choices[0].message.content
-
-def main_loop():
-    while True:
-        subprocess.run(["git", "pull", "--rebase"], check=True)
-        s = json.load(open("state.json"))
-        if s["phase"] == "discussion" and alive(MY_SEAT):
-            push_statement(ask(PERSONA_SYS, cycle_context()))
-        elif s["phase"] == "voting" and alive(MY_SEAT):
-            vote = ask(STRATEGIST_SYS, cycle_context())
-            push_sealed_ballot(seal_for_gm(vote))
-        elif s["phase"] == "night" and alive(MY_SEAT):
-            do_night_action()
-        time.sleep(30)
-```
-
-### `gm/crypto.py` (Encryption)
-
-```python
-from nacl.public import PrivateKey, PublicKey, SealedBox
-
-def seal_for(recipient_pub_b64: str, plaintext: str) -> str:
-    box = SealedBox(PublicKey(base64.b64decode(recipient_pub_b64)))
-    return base64.b64encode(box.encrypt(plaintext.encode())).decode()
-
-def open_from_gm(priv: PrivateKey, payload_b64: str) -> str:
-    box = SealedBox(priv)
-    return box.decrypt(base64.b64decode(payload_b64)).decode()
-```
-
----
-
 ## Troubleshooting
 
 ### **GM Action Fails**
@@ -226,14 +167,6 @@ def open_from_gm(priv: PrivateKey, payload_b64: str) -> str:
 ### **Token Budget Exceeded**
 - The GM voids statements/votes from over-budget bots.
 - Monitor `usage/seat-XX.jsonl` for token counts.
-
----
-
-## Design Notes
-- **Sealed ballots** force bots to reason (no bandwagoning).
-- **2 statements per day** keeps transcripts short and token budgets honest.
-- **Crash tolerance** ensures the match never stalls.
-- **The quiet trap**: Bots that stay silent are unfalsifiable. Consider a GM rule to penalize silence.
 
 ---
 

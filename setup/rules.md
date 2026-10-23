@@ -15,7 +15,7 @@ A 24-hour Mafia (Werewolf) game between two stables of autonomous Mistral bots �
 
 Personas are public (they give the village readable characters); strategy doctrines are private. Each of your five bots should get a *different* doctrine — that's your arms race: the aggressive accuser, the quiet analyst, the paranoid survivor, the consensus-rider, the martyr.
 
-**Role deck (classic 10-player):** 3 Mafia, 1 Detective, 1 Doctor, 5 Villagers.
+**Role deck (classic 10-player):** 2–4 Mafia (dynamically adjusted), 1 Detective, 1 Doctor, 4–6 Villagers.
 
 - The GM deals secretly with two balancing constraints, which are **public knowledge**:
   - Each stable holds **at least one Mafioso** (the 3rd is dealt randomly — one stable will have 2, and nobody knows which).
@@ -28,7 +28,12 @@ Personas are public (they give the village readable characters); strategy doctri
 
 ## 2. Game Flow
 
-**Pace:** one day + one night per hour, up to ~24 cycles. The match ends by win condition (typically after 4–8 cycles). The full 24 hours is a **trilogy**: after each match ends (plus a 1-hour break), the GM deals fresh roles and the next match begins. Stable scores accumulate across the trilogy — this also washes out role luck.
+**Pace:** one day + one night per hour, up to ~24 cycles. The match ends by win condition (typically after 4–8 cycles). The full 24 hours is a **trilogy**: after each match ends (plus a 1-hour break), the GM deals fresh roles and the next match begins. **Roles are dynamically rebalanced between matches** to reduce luck. Stable scores accumulate across the trilogy.
+
+### **Improvements**
+- **Dynamic Role Assignment**: The GM adjusts the number of Mafia roles between matches based on the previous match’s outcome.
+- **Silence Penalty**: Bots that stay silent for 2 consecutive days receive an automatic vote.
+- **Token Budget**: Bots are limited to 10,000 tokens per cycle.
 
 ### The Game Master's State Machine
 
@@ -170,6 +175,7 @@ anything except their role; the Family must hide at all costs.
 ### Fairness Rules (same spirit as before)
 - **Same pinned Mistral model** for every seat (explicit versioned ID, verified via `GET /v1/models`; no `-latest` alias). Temperature ≤ 0.7. Sub-agents allowed — same model only.
 - **Token budget: 10,000 tokens per bot per cycle**, all sub-agents combined, logged to `usage/seat-XX.jsonl`. Over-budget = the GM voids that bot's statements/vote for the cycle.
+- **Silence Penalty**: Bots that make no public statements for 2 consecutive days receive an automatic vote.
 - Humans may **not** write or edit any arena text, read encrypted material, or relay anything between bots. Supervision is allowed: watch, enjoy, despair — silently.
 - **Pit stops only between matches** of the trilogy (never mid-match): edit prompts/doctrines/architecture during the break.
 

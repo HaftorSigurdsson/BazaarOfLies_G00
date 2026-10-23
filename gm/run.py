@@ -88,13 +88,23 @@ def advance_phase() -> None:
 
 
 def deal_roles() -> None:
-    """Deal roles for the current match and encrypt dossiers."""
+    """Deal roles for the current match and encrypt dossiers. Adjust roles based on the previous match's outcome."""
     state = read_state()
     seats = get_seats()
     living_seats = state["alive"]
     
-    # Classic 10-player roles: 3 Mafia, 1 Detective, 1 Doctor, 5 Villagers
-    roles = ["Mafia", "Mafia", "Mafia", "Detective", "Doctor"] + ["Villager"] * 5
+    # Check previous match outcome to adjust roles
+    previous_match = state.get("previous_match_outcome", {})
+    mafia_count = 3
+    if previous_match.get("mafia_win", False):
+        # Reduce Mafia count if they won too easily
+        mafia_count = max(2, mafia_count - 1)
+    elif previous_match.get("town_win", False) and previous_match.get("cycles", 0) <= 3:
+        # Increase Mafia count if Town won too quickly
+        mafia_count = min(4, mafia_count + 1)
+    
+    # Classic roles: Mafia, Detective, Doctor, Villagers
+    roles = ["Mafia"] * mafia_count + ["Detective", "Doctor"] + ["Villager"] * (len(living_seats) - mafia_count - 2)
     import random
     random.shuffle(roles)
     
@@ -161,12 +171,18 @@ def deal_roles() -> None:
 
 
 def tally_votes() -> None:
-    """Tally votes and banish the plurality target."""
+    """Tally votes and banish the plurality target. Apply penalties for silent bots."""
     state = read_state()
     gm_private_key = load_gm_private_key(os.environ["GM_PRIVATE_KEY"])
     votes_dir = "votes/"
     vote_counts = {seat: 0 for seat in state["alive"]}
     vote_counts["abstain"] = 0
+    
+    # Track silent bots (no statements for 2 consecutive days)
+    silent_bots = get_silent_bots(state)
+    for bot in silent_bots:
+        update_announcements(f"**Penalty!** {bot} has been silent for 2 days and receives an automatic vote.")
+        vote_counts[bot] = 1  # Auto-vote for silent bots
     
     for filename in os.listdir(votes_dir):
         if filename.endswith(".enc"):
@@ -313,6 +329,46 @@ def end_match() -> None:
     update_announcements(
         f"Match {state['match'] - 1} has ended. The bazaar prepares for Match {state['match']}."
     )
+
+
+def enforce_token_budget(seat: str, tokens_used: int) -> bool:
+    """Enforce the 10,000-token limit per bot per cycle."""
+    usage_file = f"usage/{seat}.jsonl"
+    if not os.path.exists(usage_file):
+        return True
+    
+    total_tokens = 0
+    with open(usage_file, "r") as f:
+        for line in f:
+            data = json.loads(line)
+            if data.get("cycle", 0) == read_state()["cycle"]:
+                total_tokens += data["tokens"]
+    
+    return total_tokens + tokens_used <= 10000
+
+
+def get_silent_bots(state: dict) -> List[str]:
+    """Identify bots that have been silent for 2 consecutive days."""
+    silent_bots = []
+    for seat in state["alive"]:
+        statements = get_statements_for_seat(seat, state["cycle"] - 1) + get_statements_for_seat(seat, state["cycle"] - 2)
+        if not statements:
+            silent_bots.append(seat)
+    return silent_bots
+
+
+def get_statements_for_seat(seat: str, cycle: int) -> List[str]:
+    """Get public statements for a seat in a given cycle."""
+    statements = []
+    try:
+        with open(f"village/day-{cycle:03d}.jsonl", "r") as f:
+            for line in f:
+                data = json.loads(line)
+                if data["seat"] == seat:
+                    statements.append(data["text"])
+    except FileNotFoundError:
+        pass
+    return statements
 
 
 if __name__ == "__main__":
