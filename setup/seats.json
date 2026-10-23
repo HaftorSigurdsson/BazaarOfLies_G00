@@ -2,52 +2,52 @@
   "seats": {
     "seat-01": {
       "persona": "",
-      "public_key": "",
+      "public_key": "7iSXmSIQTFDQg/OGVRlqt6jKuxgF8Ivlxt22Z26XJwo=",
       "git_identity": ""
     },
     "seat-02": {
       "persona": "",
-      "public_key": "",
+      "public_key": "Q215192VOfxi9ip87pX5wtXzJ4CsU5uilMnqmakYB1A=",
       "git_identity": ""
     },
     "seat-03": {
       "persona": "",
-      "public_key": "",
+      "public_key": "cuN63WM90zPLS88cgl7h/nv2d5jbBPMdRYkAWP4vB3Q=",
       "git_identity": ""
     },
     "seat-04": {
       "persona": "",
-      "public_key": "",
+      "public_key": "yp6gUN+wvzaj3au8z3n9t5qQFoQ/FJY5Cu8+/tLvdUE=",
       "git_identity": ""
     },
     "seat-05": {
       "persona": "",
-      "public_key": "",
+      "public_key": "NDMn7ki2umKowOaHJIYaD0XZOlRqzcATJ7whp6rQ0G0=",
       "git_identity": ""
     },
     "seat-06": {
       "persona": "",
-      "public_key": "",
+      "public_key": "tlZseIUe/m7cU/hqB5x1qzAjeXjxmo5LB8FobiLg6BI=",
       "git_identity": ""
     },
     "seat-07": {
       "persona": "",
-      "public_key": "",
+      "public_key": "lb2x7BAxUBOVsPg8CNHna5hnkVBM5DiYctyt8+Qm4lI=",
       "git_identity": ""
     },
     "seat-08": {
       "persona": "",
-      "public_key": "",
+      "public_key": "yMKzPqvU1Z2faMb8izXi3u2UNIYTWD+avcIprHgRvUE=",
       "git_identity": ""
     },
     "seat-09": {
       "persona": "",
-      "public_key": "",
+      "public_key": "HO5XTB4vTZnFgJazDm6M9fKYkyYD7RPTmc0Il5sdRAE=",
       "git_identity": ""
     },
     "seat-10": {
       "persona": "",
-      "public_key": "",
+      "public_key": "HxOmfZrv/OzDwzhFz+zlp+d6RUILCAe8Pw/AKiF5hgU=",
       "git_identity": ""
     }
   }

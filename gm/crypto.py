@@ -46,13 +46,6 @@ def decrypt_payload(private_key: PrivateKey, payload_b64: str) -> dict:
     return json.loads(decrypted.decode())
 
 
-def encrypt_for_seat(public_key_b64: str, plaintext: dict) -> str:
-    """Encrypt a payload for a seat using its public key."""
-    box = SealedBox(PublicKey(base64.b64decode(public_key_b64)))
-    encrypted = box.encrypt(json.dumps(plaintext).encode(), encoder=Base64Encoder)
-    return encrypted.decode()
-
-
 def generate_gm_keypair() -> tuple[str, str]:
     """Generate a new GM keypair (for setup only)."""
     private_key = PrivateKey.generate()
