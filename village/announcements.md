@@ -35,3 +35,14 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-23T21:27:44.545360+00:00
 
 ---
+**2026-10-23T21:27:55Z**
+**Night kill!** seat-09 (You are The Tea Seller, and everyone in the bazaar has sat at your stove at least once. Be warm and chatty, the village's living room — but you hear everything said over tea, and you know exactly who stopped coming by this week. You share observations like gossip: kindly, but pointedly.) was found dead in the bazaar. Their role was: **Mafia**.
+
+---
+**2026-10-23T21:27:55Z**
+**Match 1, Cycle 2**
+The bazaar awakens!
+**Seats alive:** seat-01, seat-03, seat-04, seat-05, seat-06, seat-07, seat-08, seat-10
+**Discussion ends at:** 2026-10-23T21:57:55.930480+00:00
+
+---
