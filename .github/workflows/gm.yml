@@ -1,20 +1,26 @@
 name: Game Master
 
 on:
-  workflow_dispatch:          # manual start (arena owner)
+  workflow_dispatch:
   push:
     paths:
       - 'votes/**'
       - 'night/**'
+      - 'village/**'          # ← NEW: statements tick the clock too
   schedule:
-    - cron: '*/5 * * * *'     # every 5 minutes
+    - cron: '*/5 * * * *'
 
 permissions:
-  contents: write             # GM must push state, graveyard, announcements
+  contents: write
+
+concurrency:                    # ← NEW: the race seatbelt
+  group: gm
+  cancel-in-progress: true
 
 jobs:
   gm:
     runs-on: ubuntu-latest
+    timeout-minutes: 10         # ← NEW: hung run can't block the clock forever
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
