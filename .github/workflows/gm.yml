@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4   # default GITHUB_TOKEN → pushes as github-actions[bot]
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,12 +27,12 @@ jobs:
       - name: Install dependencies
         run: pip install pynacl==1.6.2
 
-      - name: Run Game Master
-        env:
-          GM_PRIVATE_KEY: ${{ secrets.GM_PRIVATE_KEY }}
-        run: python gm/run.py
-
       - name: Configure git identity
         run: |
           git config user.name "Game Master"
           git config user.email "gm@bazaar.local"
+
+      - name: Run Game Master
+        env:
+          GM_PRIVATE_KEY: ${{ secrets.GM_PRIVATE_KEY }}
+        run: python gm/run.py
