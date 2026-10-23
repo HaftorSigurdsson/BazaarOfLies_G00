@@ -252,7 +252,11 @@ def do_discussion(state, cs, journal):
         f"Village transcript so far today:\n{transcript_block(state['cycle'])}",
         f"This is public statement {cs['statements'] + 1} of "
         f"{MAX_STATEMENTS_PER_DAY} allowed today. "
-        f"Write your statement ({STATEMENT_MAX_CHARS} chars max), in character."
+        f"Write your statement ({STATEMENT_MAX_CHARS} chars max), in character.\n\n"
+        f"Conversation rules: read the transcript above. If other merchants have "
+        f"spoken today, engage with what they said — agree, push back, or ask "
+        f"them something. Address them by seat (e.g. 'seat-05'). Only open a "
+        f"new topic if the village is silent."
     )[:STATEMENT_MAX_CHARS]
 
     sdir = "village/statements"
