@@ -1,18 +1,17 @@
 {
   "match": 1,
   "cycle": 2,
-  "phase": "voting",
+  "phase": "night",
   "clock": {
     "dawn": "2026-10-23T21:27:55.930480+00:00",
     "discussion_deadline": "2026-10-23T21:57:55.930480+00:00",
     "voting_deadline": "2026-10-23T22:08:44.004411+00:00",
-    "night_deadline": null
+    "night_deadline": "2026-10-23T22:28:44.788934+00:00"
   },
   "alive": [
     "seat-01",
     "seat-03",
     "seat-04",
-    "seat-05",
     "seat-06",
     "seat-07",
     "seat-08",
