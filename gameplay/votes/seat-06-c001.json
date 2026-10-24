@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "9c5ef90a",
+  "seat": "seat-06",
+  "target": "seat-05",
+  "rationale": "Ripley (5), your answer still stinks of yesterday’s rot: *‘Batman (4) asked plain—whose favor?’* and you answered with syrup.",
+  "ts": "2026-10-24T18:00:36Z"
+ },
+ "sig": "rpVYSr3oFEKwEG+GmrzZapKDXskCwy1UgPujlYXdq1BkIkT7tGcQzuYoq84vKkGWmOqrXNvnwd8v52bKQ1b0CA=="
+}
