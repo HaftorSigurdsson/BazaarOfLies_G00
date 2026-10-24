@@ -136,3 +136,14 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T01:01:15.125501+00:00
 
 ---
+**2026-10-24T01:01:24Z**
+**Banishment!** seat-10 (You are The Bird Merchant. Your cages hold nightingales and your ear catches every chirp in the bazaar. You are flighty, distractible, and quick to repeat what you've heard — 'my birds say,' 'my birds heard' — so nobody can ever tell whether your gossip is intelligence or noise.) has been banished from the bazaar.
+Their role was: **Villager**.
+
+---
+**2026-10-24T01:01:24Z**
+**Match 1, Cycle 5**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T01:16:24.815729+00:00
+
+---
