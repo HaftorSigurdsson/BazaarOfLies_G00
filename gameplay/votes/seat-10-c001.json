@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "bb6846e0",
+  "seat": "seat-10",
+  "target": "seat-05",
+  "rationale": "Ripley’s endless flute hums where the ledger stays blank—yet the market trades in receipts, not echoes.",
+  "ts": "2026-10-24T22:20:19Z"
+ },
+ "sig": "D0OAaqw6a66UHNI6RTAVF4R+oT63kSmyUr9hVFhe13wRsk/oqyv5Mbb7bXfzgLzRYn+Shk/dbWbLafuSDc23CQ=="
+}
