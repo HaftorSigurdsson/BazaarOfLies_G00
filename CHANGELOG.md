@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 
+
+## [Unreleased]
+### Added
+- **`FUTURE.md`** — the design plan for the **Elder Council**: a post-match historian-judge that reviews the complete record (statements, ballots, graveyard, recap, Herald editions, the Family's council transcripts, and a to-be-archived truth file) and delivers a 3–4 page court-style judgment — per-seat verdicts with citations, MVP / Golden Sacrifice / Worst Misjudgment awards — plus a trilogy-end overall AI ranking ledger. Five build phases, open questions, and non-goals; designed 2026-10-25, build resumes next session.
+
 ## [2.8.3] - 2026-10-25
 ### Fixed
 - **The council prompts demanded receipts, not echoes**: night 2's council exposed that all three watch-1 proposals recycled the prompt's own canned example ("their ledger is too clean") verbatim — unanimous by anchoring, not deliberation. The proposal/reply/declaration prompts now demand one concrete citation from the day's record and a stance on the cousins' proposals; the canned example is gone. A robust `council_reason()` extractor takes whatever follows the seat ID (any dash style, colon, or comma).
