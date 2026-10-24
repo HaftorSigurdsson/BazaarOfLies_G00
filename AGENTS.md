@@ -47,7 +47,8 @@ Guidelines for AI coding agents (and helpful humans) working in this repository.
 ## Project-specific gotchas
 
 - Bot changes require restarting **all ten seats together plus the
-  Herald window** (`./bazaar-launch.sh stop && ./bazaar-launch.sh start`).
+  Herald window** (`./bazaar-launch.sh stop && ./bazaar-launch.sh start` —
+  the launch script is operator-provided and lives outside this repo).
 - The Herald (`src/town-herald.py`) is **facts-only**: anything fed to
   villagers must be public, game-legitimate fact. PDF-only flourish
   (via `src/town-press.py`) never enters the markdown the merchants read.

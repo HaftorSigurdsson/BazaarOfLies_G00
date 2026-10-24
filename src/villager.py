@@ -59,9 +59,9 @@ args = parser.parse_args()
 
 MY_SEAT = args.seat
 # ../bazaar/ — a sibling of the bot clone's root, so git can never see it.
-# Anchored to bot.py's own location (not the current working directory), so
+# Anchored to villager.py's own location (not the cwd), so
 # the paths hold no matter where the bot is launched from.
-# src/bot.py -> REPO_ROOT is the parent of src/ (the clone root).
+# src/villager.py -> REPO_ROOT is the parent of src/ (the clone root).
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BAZAAR_DIR = os.path.join(os.path.dirname(REPO_ROOT), "bazaar")
 KEY_PATH = args.key or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.key")

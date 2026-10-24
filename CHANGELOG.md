@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.2] - 2026-10-24
+### Fixed
+- **Full documentation/code alignment pass**. Removed or corrected every stale claim found in a repo-wide scan:
+  - Ballots are **public plaintext `.json` with an Ed25519 signature**, not encrypted `.enc` — fixed the examples and file tables in `rules.md`, `README.md`, `bot_deployment.md`, `bot_architecture.md`, and `encryption.md`.
+  - `encrypt_for_gm` does not exist — docs now use the real `encrypt_for_seat` (`docs/setup.md`, `encryption.md`, `bot_architecture.md`, `bot_deployment.md`).
+  - Night-action payload examples now match the real shape (`role`, `ts`; no `action` key).
+  - Statement limit is **1200 chars** (was documented as 600 in three places); push retries are **5 with growing backoff** (was "3 times / 5 seconds"); recovery/journaling uses `~/.bazaar/journal-<seat>.json` (was a nonexistent `{MY_SEAT}.log`).
+  - Repo trees: `news/` → `herald/`, `usage/` marked reserved (no writer), `statements/` added, setup scripts listed.
+  - Removed the unimplemented "token usage logging" rule; README key features now describe signed public votes and display names.
+  - Stale code comments fixed (`src/editor.py`, `src/bot.py` → current names; Herald docstring version tag dropped); `bazaar-launch.sh` marked as operator-provided (outside this repo).
+
 ## [1.6.1] - 2026-10-24
 ### Changed
 - **Display labels use bare numbers**: the seat bracket is now the seat *number* — `Gandalf (1)` … `Sherlock (10)` (was `Gandalf (seat-01)`). All parsers updated to accept every form (`seat-01`, `Gandalf (1)`, `(10)`, and the legacy `(seat-01)` rows): graveyard rolls, ballot tables, banishment lines, and the bots' vote/night-action output. Vote and night prompts now accept both `seat-02` and `7` as targets. Samples re-pressed.

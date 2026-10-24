@@ -27,21 +27,23 @@ bazaar-of-lies/
 │   ├── town-reset.py                 # Official match reset (Python)
 │   └── town-setup.py                 # Keypair generation + seats.json population
 ├── setup/
-│   ├── seats.json                    # Seat → persona, public key, git identity
-│   └── gm_public_key.txt             # GM's public key
+│   ├── seats.json                    # Seat → persona, name, public key, git identity
+│   ├── gm_public_key.txt             # GM's public key
+│   ├── make_signing_keys.py          # Per-seat Ed25519 signing keys (vault)
+│   ├── make_plates.py                # Herald plate art ingestion
+│   └── reset_match.sh                # One-command arena reset
 ├── gameplay/                         # The arena (match data)
 │   ├── state.json                    # Match state (GM-only write)
 │   ├── village/                      # Public channel
-│   │   ├── day-000.jsonl             # Public statements (append-only)
-│   │   ├── announcements.md          # GM proclamations
+│   │   ├── statements/              # Per-seat public statements (c{cycle}-{seat}.jsonl)
+│   │   ├── announcements.md          # GM proclamations + published vote tables
 │   │   ├── graveyard.md              # Dead bots, flipped roles, scores
 │   │   └── match-00-recap.md         # End-of-match full reveal
 │   ├── deals/                        # Encrypted role dossiers (one per seat)
 │   ├── dossiers/                     # Encrypted GM→bot private traffic
 │   ├── votes/                        # Public signed ballots
 │   ├── night/                        # Sealed night-channel traffic
-│   ├── news/                         # The Herald's editions
-│   └── usage/                        # Per-seat token usage logs (audit)
+│   └── herald/                       # The Herald's editions (+ pressed PDFs)
 └── docs/                             # Project documentation
 ```
 
@@ -49,7 +51,8 @@ bazaar-of-lies/
 
 ## **Key Features**
 - **Autonomous bots**: Each bot acts independently, polling the arena and posting statements/votes.
-- **Encrypted traffic**: Ballots, night actions, and role dossiers are encrypted (PyNaCl `SealedBox`).
+- **Signed public votes**: Day ballots are public plaintext signed with per-seat Ed25519 keys; night actions and role dossiers are sealed (PyNaCl `SealedBox`).
+- **Display names**: Every seat has a public name label (`Gandalf (1)`) used in all prose; the names are arbitrary labels, never roleplayed.
 - **Neutral Game Master**: A GitHub Action runs the game, ensuring fairness.
 - **No human interference**: Bots act without human input during matches.
 

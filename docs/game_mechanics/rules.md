@@ -101,12 +101,12 @@ bazaar-of-lies/
 │   │   ├── announcements.md         # GM proclamations + published vote tables
 │   │   ├── graveyard.md             # Dead bots, flipped roles, scores
 │   │   └── match-00-recap.md        # End-of-match full reveal
-│   ├── news/                        # The Herald's editions (herald-cXXX-{morning,evening}.md)
+│   ├── herald/                      # The Herald's editions (herald-cXXX-{morning,evening}.md + pressed .pdf)
 │   ├── deals/                       # Encrypted role dossiers (one per seat)
 │   ├── dossiers/                    # Encrypted GM→bot private traffic (e.g., Detective results)
 │   ├── votes/                       # Public signed ballots (Ed25519, epoch-scoped)
 │   ├── night/                       # Sealed night-channel traffic (Mafia/Detective/Doctor)
-│   └── usage/                       # Per-seat token usage logs (audit)
+│   └── usage/                       # Reserved (no writer at present; cleared by the reset tools)
 └── docs/                            # Project documentation (MkDocs)
 ```
 
@@ -118,7 +118,7 @@ bazaar-of-lies/
 | `gameplay/village/announcements.md` | GM proclamations and the published vote table. |
 | `gameplay/village/graveyard.md` | Banished bots, revealed roles, and scores. |
 | `gameplay/deals/{seat}.enc` | Encrypted role dossier (GM → bot). |
-| `gameplay/votes/{seat}-{cycle}.enc` | Public signed ballots (verified by the GM, epoch-scoped). |
+| `gameplay/votes/{seat}-{cycle}.json` | Public signed ballots (plaintext payload + Ed25519 signature, epoch-scoped). |
 | `gameplay/night/{seat}-{cycle}.enc` | Sealed night actions (kill, investigate, protect). |
 | `gameplay/herald/herald-cXXX-*.md` | The Herald's morning/evening editions. |
 
@@ -141,7 +141,6 @@ For the full architecture — polling loop, error handling, journaling, recovery
 - **Pit Stops Only**: Adjust personas/doctrines **only during the 1-hour break between matches**.
 
 ### **5.2 Auditability**
-- **Token Usage**: Logged in `gameplay/usage/{seat}.log` for transparency.
 - **Git History**: All actions are committed to the repo (public or encrypted).
 - **Full Reveal**: After each match, the GM publishes `match-{n}-recap.md` with all roles and scores.
 
@@ -167,14 +166,14 @@ See the **[Setup Guide](../setup.md)** for step-by-step instructions on:
 2. **Bot Statements**:
    - `seat-01` posts:
      ```json
-     {"match": 1, "cycle": 1, "seat": "seat-01", "text": "The spice stall stands unshaken...", "ts": "2026-10-24T20:25:39Z"}
+     {"match": 1, "cycle": 1, "seat": "seat-01", "seq": 1, "epoch": "a1b2c3d4", "text": "The spice stall stands unshaken...", "ts": "2026-10-24T20:25:39Z"}
      ```
    - Appended to `gameplay/village/statements/c001-seat-01.jsonl`.
 
 3. **Voting**:
-   - `seat-01` signs and submits a **public ballot** to `gameplay/votes/seat-01-c001.enc`:
+   - `seat-01` signs and submits a **public ballot** envelope to `gameplay/votes/seat-01-c001.json`:
      ```json
-     {"seat": "seat-01", "cycle": 1, "epoch": "a1b2c3d4", "target": "seat-02", "rationale": "The river bends around every question.", "ts": "2026-10-24T20:55:00Z"}
+     {"payload": {"match": 1, "cycle": 1, "epoch": "a1b2c3d4", "seat": "seat-01", "target": "seat-02", "rationale": "The river bends around every question.", "ts": "2026-10-24T20:55:00Z"}, "sig": "<Ed25519 signature of the payload>"}
      ```
 
 4. **Resolution**:
@@ -184,14 +183,14 @@ See the **[Setup Guide](../setup.md)** for step-by-step instructions on:
 1. **Mafia Kill**:
    - `seat-02` (Mafia) seals and submits:
      ```json
-     {"match": 1, "cycle": 1, "epoch": "a1b2c3d4", "seat": "seat-02", "action": "kill", "target": "seat-05"}
+     {"match": 1, "cycle": 1, "epoch": "a1b2c3d4", "seat": "seat-02", "role": "Mafia", "target": "seat-05", "ts": "2026-10-24T21:15:00Z"}
      ```
-   - Sealed to `gameplay/night/seat-02-c001.enc`.
+   - Sealed to the GM's public key and written to `gameplay/night/seat-02-c001.enc`.
 
 2. **Detective Investigation**:
    - `seat-07` (Detective) seals and submits:
      ```json
-     {"match": 1, "cycle": 1, "epoch": "a1b2c3d4", "seat": "seat-07", "action": "investigate", "target": "seat-03"}
+     {"match": 1, "cycle": 1, "epoch": "a1b2c3d4", "seat": "seat-07", "role": "Detective", "target": "seat-03", "ts": "2026-10-24T21:15:00Z"}
      ```
    - GM responds with "Family" or "not Family" in an encrypted dossier (`gameplay/dossiers/seat-07-c001-result.enc`).
 

@@ -55,9 +55,10 @@ uv run src/villager.py --seat seat-01
 - Sealed to the **GM’s public key** (from `setup/gm_public_key.txt`).
 - Example:
   ```python
-  from gm.crypto import encrypt_for_gm
-  encrypted = encrypt_for_gm({"match": 1, "cycle": 1, "epoch": epoch,
-                               "seat": "seat-01", "action": "kill", "target": "seat-03"})
+  from gm.crypto import encrypt_for_seat
+  encrypted = encrypt_for_seat(gm_public_key_b64,
+                               {"match": 1, "cycle": 1, "epoch": epoch,
+                                "seat": "seat-01", "role": "Mafia", "target": "seat-03", "ts": "..."})
   ```
 
 ### **Dossiers**
@@ -88,13 +89,12 @@ uv run src/villager.py --seat seat-01
 
 ## **5. Error Handling**
 ### **Git Operations**
-- Bots retry failed Git operations (e.g., `git pull`, `git push`) up to 3 times.
-- If a push fails, the bot logs the error and retries after 5 seconds.
+- Bots retry rejected pushes up to 5 times, rebasing and backing off a little longer each attempt.
 
 ### **Input Validation**
 - **Statements**: Truncated to 1200 characters (max 8 per day).
 - **Votes/Night Actions**: Validated for seat ID format (e.g., `seat-02`).
-- **Encryption**: All ballots and night actions are encrypted to the GM’s public key.
+- **Ballots** are public plaintext with an Ed25519 signature (not encrypted); **night actions** are sealed to the GM’s public key.
 
 ---
 
@@ -146,4 +146,4 @@ def main_loop():
 - Verify the GM’s public key in `setup/gm_public_key.txt`.
 - Test encryption locally:
   ```bash
-  python3 -c "from gm.crypto import encrypt_for_gm; print(encrypt_for_gm({'test': 'payload'}))"
+  python3 -c "from gm.crypto import encrypt_for_seat; print(encrypt_for_seat(open('setup/gm_public_key.txt').read(), {'test': 'payload'}))"

@@ -105,7 +105,7 @@ Pick a **profession or role** that fits the bazaar theme. Examples:
 ## **6. Testing a Persona**
 ### **Simulate Statements**
 - Write **2-3 example statements** in the bot’s voice.
-- Ensure they fit the **600-character limit** and **persona tone**.
+- Ensure they fit the **1200-character limit** and **persona tone**.
 
 ### **Check Alignment**
 - Does the persona’s voice match its doctrine?

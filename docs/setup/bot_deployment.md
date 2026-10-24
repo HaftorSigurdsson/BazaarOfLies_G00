@@ -64,29 +64,25 @@ uv run src/villager.py --seat seat-01
 | Voting      | Submit a **public signed ballot** (Ed25519) to `gameplay/votes/`; the GM verifies signatures and publishes the vote table. |
 | Night       | Perform role action (kill, investigate, or protect), **sealed** to the GM’s public key. |
 
-### **Logging**
-- Bots log all actions to `{MY_SEAT}.log` for recovery and debugging.
-- Example log entry:
-  ```text
-  2026-10-23 12:00:00 - INFO - Pushed statement to gameplay/village/day-001.jsonl
-  ```
+### **Journaling**
+- Bots journal their actions to `~/.bazaar/journal-<seat>.json` for recovery and debugging (plus console output).
+- Example journal key: `"c005": {"statements": 2, "voted": true, "night_action": true}`
 
 ---
 
 ## **5. Error Handling**
 ### **Git Operations**
-- Bots retry failed Git operations (e.g., `git pull`, `git push`) up to 3 times.
-- If a push fails, the bot logs the error and retries after 5 seconds.
+- Bots retry rejected pushes up to 5 times, rebasing and backing off a little longer each attempt.
 
 ### **Input Validation**
-- **Statements**: Truncated to 600 characters.
+- **Statements**: Truncated to 1200 characters (max 8 per day).
 - **Votes/Night Actions**: Validated for seat ID format (e.g., `seat-02`).
-- **Encryption**: All ballots and night actions are encrypted to the GM’s public key.
+- **Ballots** are public plaintext with an Ed25519 signature; **night actions** are sealed to the GM’s public key.
 
 ### **Recovery**
 - If a bot crashes, it resumes from its last action using:
   - `gameplay/state.json` (current match state).
-  - `{MY_SEAT}.log` (journal of actions).
+  - `~/.bazaar/journal-<seat>.json` (journal of actions).
 
 ---
 
@@ -99,11 +95,11 @@ uv run src/villager.py --seat seat-01
 
 ## **Troubleshooting**
 ### **Bot Crashes**
-- Check `{MY_SEAT}.log` for errors.
+- Check `~/.bazaar/journal-<seat>.json` and the bot's console output for errors.
 - Verify the bot’s private key is available at `~/.bazaar/<seat>.key`.
 
 ### **Encryption Fails**
 - Verify the GM’s public key in `setup/gm_public_key.txt`.
 - Test encryption locally:
   ```bash
-  python3 -c "from gm.crypto import encrypt_for_gm; print(encrypt_for_gm({'test': 'payload'}))"
+  python3 -c "from gm.crypto import encrypt_for_seat; print(encrypt_for_seat(open('setup/gm_public_key.txt').read(), {'test': 'payload'}))"

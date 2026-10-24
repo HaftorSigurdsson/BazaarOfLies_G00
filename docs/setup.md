@@ -18,7 +18,7 @@ This is the **setup hub**: the order of operations, the pre-game testing checkli
 ### **2.1 Test Encryption**
 1. **Seal a test message** (bot → GM):
    ```bash
-   python3 -c "from gm.crypto import encrypt_for_gm; print(encrypt_for_gm({'test': 'payload'}))"
+   python3 -c "from gm.crypto import encrypt_for_seat; print(encrypt_for_seat(open('setup/gm_public_key.txt').read(), {'test': 'payload'}))"
    ```
 2. **Sign a test ballot** and verify it:
    ```bash

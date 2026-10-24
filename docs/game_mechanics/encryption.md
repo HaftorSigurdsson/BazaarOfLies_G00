@@ -1,6 +1,6 @@
 # Encryption — Bazaar of Lies
 
-This guide covers the **encryption system** for the Bazaar of Lies, including sealed ballots, dossiers, and night actions.
+This guide covers the **encryption system** for the Bazaar of Lies, including signed public ballots, dossiers, and night actions.
 
 ---
 
@@ -41,9 +41,10 @@ Day votes are **public plaintext ballots signed** with a per-seat Ed25519 signin
 ### **Night Actions (sealed)**
 1. **Bot seals** a night payload (kill / investigate / protect) to the GM’s public key:
    ```python
-   from gm.crypto import encrypt_for_gm
-   encrypted = encrypt_for_gm({"match": 1, "cycle": 1, "epoch": "...",
-                                "seat": "seat-01", "action": "kill", "target": "seat-03"})
+   from gm.crypto import encrypt_for_seat
+   encrypted = encrypt_for_seat(gm_public_key_b64,
+                                 {"match": 1, "cycle": 1, "epoch": "...",
+                                  "seat": "seat-01", "role": "Mafia", "target": "seat-03", "ts": "..."})
    ```
 2. **Bot writes** the sealed payload to `gameplay/night/`.
 3. **GM opens** the payload using its private key:
@@ -117,4 +118,4 @@ Day votes are **public plaintext ballots signed** with a per-seat Ed25519 signin
 - Verify the **public key** is base64-encoded and valid.
 - Test encryption locally:
   ```bash
-  python3 -c "from gm.crypto import encrypt_for_gm; print(encrypt_for_gm({'test': 'payload'}))"
+  python3 -c "from gm.crypto import encrypt_for_seat; print(encrypt_for_seat(open('setup/gm_public_key.txt').read(), {'test': 'payload'}))"
