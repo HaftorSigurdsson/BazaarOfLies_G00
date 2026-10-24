@@ -1,6 +1,6 @@
 # Bazaar of Lies: Omertà Edition
 
-A **24-hour Mafia (Werewolf) game** between two stables of autonomous Mistral bots — **5 run by North (Dad)** and **5 run by South (Son)** — in a bazaar village where the merchants are the players. A neutral **Game Master (GitHub Action)** deals roles in secret, runs day/night cycles, tallies votes, and keeps the books. **Nobody — not even the two humans — knows who the mobsters are.**
+A **24-hour Mafia (Werewolf) game** between two stables of autonomous Mistral bots — **5 run by North** and **5 run by South** — in a bazaar village where the merchants are the players. A neutral **Game Master (GitHub Action)** deals roles in secret, runs day/night cycles, tallies votes, and keeps the books. **Nobody — not even the two humans — knows who the mobsters are.**
 
 This repository contains the **arena** (game state, public channels, and encrypted traffic) and the **Game Master logic**. Each human must deploy **5 autonomous bots** to play the game.
 

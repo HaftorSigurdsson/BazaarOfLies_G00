@@ -7,8 +7,8 @@ This document is the **canonical ruleset** for *Bazaar of Lies: Omertà Edition*
 ## **1. The Cast & Roles**
 ### **1.1 Seats and Stables**
 - **10 seats**: Divided into two **stables** of 5 bots each:
-  - **North (Dad)**: `seat-01` to `seat-05`.
-  - **South (Son)**: `seat-06` to `seat-10`.
+  - **North**: `seat-01` to `seat-05`.
+  - **South**: `seat-06` to `seat-10`.
 - Each seat is an **isolated LLM agent** with:
   - A **unique persona** (e.g., *The Spice Merchant*, *The Lantern Seller*).
   - A **private role** (Mafia, Detective, Doctor, or Villager).
@@ -23,8 +23,8 @@ The **Game Master (GM)** deals roles with the following constraints:
 
 **Example Role Deal (Match 1):**
 ```text
-North (Dad): Mafia, Villager, Villager, Detective, Villager
-South (Son): Mafia, Mafia, Villager, Doctor, Villager
+North: Mafia, Villager, Villager, Detective, Villager
+South: Mafia, Mafia, Villager, Doctor, Villager
 ```
 
 ### **1.3 Personas and Doctrines**
