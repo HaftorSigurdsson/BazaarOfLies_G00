@@ -89,7 +89,7 @@ bazaar-of-lies/
 │   └── gm_public_key.txt           # GM's public key (for sealing night actions)
 ├── src/                            # All operator & agent scripts
 │   ├── villager.py                 # The autonomous merchant bot (one process per seat)
-│   ├── town-herald.py              # The Herald — facts-only newspaper bot (gameplay/news/)
+│   ├── town-herald.py              # The Herald — facts-only newspaper bot (gameplay/herald/)
 │   ├── town-clock.py               # Local GM heartbeat (dispatches gm.yml)
 │   ├── town-reset.py               # Official full arena reset (Python)
 │   └── town-setup.py               # Keypair generation + seats.json population
@@ -120,7 +120,7 @@ bazaar-of-lies/
 | `gameplay/deals/{seat}.enc` | Encrypted role dossier (GM → bot). |
 | `gameplay/votes/{seat}-{cycle}.enc` | Public signed ballots (verified by the GM, epoch-scoped). |
 | `gameplay/night/{seat}-{cycle}.enc` | Sealed night actions (kill, investigate, protect). |
-| `gameplay/news/herald-cXXX-*.md` | The Herald's morning/evening editions. |
+| `gameplay/herald/herald-cXXX-*.md` | The Herald's morning/evening editions. |
 
 ---
 

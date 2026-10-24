@@ -6,10 +6,10 @@ the front page of an old newspaper, for the humans watching the arena.
 The merchants themselves read the plain markdown — the PDF is pleasure,
 not game input.
 
-    uv run src/town-press.py gameplay/news/herald-c001-morning.md
+    uv run src/town-press.py gameplay/herald/herald-c001-morning.md
 
 The Herald calls compile_edition() automatically after printing an
-edition, so every gameplay/news/herald-cXXX-{morning,evening}.md gets a
+edition, so every gameplay/herald/herald-cXXX-{morning,evening}.md gets a
 .pdf twin committed next to it.
 
 Two engines, tried in order:

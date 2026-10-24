@@ -4,7 +4,7 @@
 Python equivalent of setup/reset_match.sh: wipes everything a match
 touches so the next GM tick deals a clean game:
 
-  - artifacts:  gameplay/{votes,night,dossiers,deals,news,usage}/,
+  - artifacts:  gameplay/{votes,night,dossiers,deals,herald,usage}/,
                 gameplay/village/statements/, gameplay/village/day-*.jsonl
   - boards:     graveyard.md and announcements.md rewritten fresh
   - state:      gameplay/state.json reset to the pristine template
@@ -45,7 +45,7 @@ ARTIFACT_DIRS = [
     "gameplay/night",
     "gameplay/dossiers",
     "gameplay/deals",
-    "gameplay/news",
+    "gameplay/herald",
     "gameplay/usage",
     "gameplay/village/statements",
 ]
@@ -257,7 +257,7 @@ def main():
         log(f"Resetting arena (vault: {vault})")
     else:
         print("This will WIPE all match artifacts from gameplay/ "
-              "(votes, night, dossiers, deals, news, usage, statements, "
+              "(votes, night, dossiers, deals, herald, usage, statements, "
               "day transcripts), rewrite graveyard.md and announcements.md, "
               f"reset gameplay/state.json to the pristine setup template, and "
               f"clear seat + Herald journals from {vault}.")

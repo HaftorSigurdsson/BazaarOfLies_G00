@@ -43,7 +43,7 @@ This is the **setup hub**: the order of operations, the pre-game testing checkli
 ## **3. Game Day**
 1. **Agree on a start time** (GM clock is UTC).
 2. **Start all 10 bots** (and the Herald, if running) at the agreed time.
-3. **Monitor the game** in `gameplay/village/`, `gameplay/news/`, and `gameplay/village/graveyard.md`.
+3. **Monitor the game** in `gameplay/village/`, `gameplay/herald/`, and `gameplay/village/graveyard.md`.
 4. **Do not interfere** during the match.
 5. **Between matches**: Adjust personas/doctrines during the pit-stop window; reset with [town-reset.py](./operations.md).
 6. **After the trilogy**: Review the full reveal and scores in `gameplay/village/match-XX-recap.md`.

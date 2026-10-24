@@ -246,7 +246,7 @@ def herald_paper(cycle, part, limit=4000):
     """The Herald's printed edition — public, facts-only reading for the
     merchants: over tea when they wake (morning), by lamplight before
     they sleep (evening). Returns '' if today's paper hasn't been printed."""
-    path = f"gameplay/news/herald-c{cycle:03d}-{part}.md"
+    path = f"gameplay/herald/herald-c{cycle:03d}-{part}.md"
     try:
         with open(path) as f:
             text = f.read().strip()

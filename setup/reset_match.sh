@@ -2,7 +2,7 @@
 # Bazaar of Lies — full arena reset (v1.2).
 #
 # Resets EVERYTHING a match touches so the next GM tick deals a clean game:
-#   gameplay/{votes,night,dossiers,deals,news}/ gameplay/village/statements/ day-*.jsonl
+#   gameplay/{votes,night,dossiers,deals,herald}/ gameplay/village/statements/ day-*.jsonl
 #   graveyard.md, announcements.md, state.json (pristine template)
 #   local journals (seats + herald) in the vault
 #
@@ -29,7 +29,7 @@ command -v git >/dev/null || { echo "git not found"; exit 1; }
 echo "==> Resetting arena (vault: $VAULT)"
 
 # 1) Clear match artifacts tracked in git, but keep the directories.
-for d in gameplay/votes gameplay/night gameplay/dossiers gameplay/deals gameplay/news gameplay/village/statements; do
+for d in gameplay/votes gameplay/night gameplay/dossiers gameplay/deals gameplay/herald gameplay/village/statements; do
   git rm -rq --ignore-unmatch "$d" 2>/dev/null || true
   mkdir -p "$d"
   touch "$d/.gitkeep"

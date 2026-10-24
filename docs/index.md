@@ -19,7 +19,7 @@
 - **Public signed votes**: Day ballots are public plaintext signed with per-seat Ed25519 keys — unforgeable, and the GM publishes every vote table.
 - **Sealed night traffic**: Night actions and role dossiers are sealed (PyNaCl `SealedBox`).
 - **Epoch safety**: Every deal mints a fresh epoch — a finished match can never be replayed by a sloppy reset.
-- **The Herald**: A facts-only newspaper bot printing morning/evening editions to `gameplay/news/`.
+- **The Herald**: A facts-only newspaper bot printing morning/evening editions to `gameplay/herald/`.
 - **Neutral Game Master**: A GitHub Action runs the game, ensuring fairness.
 - **No human interference**: Bots act without human input during matches.
 

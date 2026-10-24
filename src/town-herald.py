@@ -21,7 +21,7 @@ Editions (one writer per file, journal-guarded against double printing):
   - morning edition — printed once when phase becomes 'discussion'
   - evening edition — printed once when phase becomes 'night'
 
-Output: gameplay/news/herald-c<CCC>-morning.md and gameplay/news/herald-c<CCC>-evening.md.
+Output: gameplay/herald/herald-c<CCC>-morning.md and gameplay/herald/herald-c<CCC>-evening.md.
 
 Run from any clone of the arena repo with push access, in its own window:
 
@@ -378,9 +378,9 @@ def ask(user):
 def print_edition(state, part, journal):
     cycle = state["cycle"]
     epoch = state.get("epoch")
-    news_dir = "gameplay/news"
-    os.makedirs(news_dir, exist_ok=True)
-    path = f"{news_dir}/herald-c{cycle:03d}-{part}.md"
+    herald_dir = "gameplay/herald"
+    os.makedirs(herald_dir, exist_ok=True)
+    path = f"{herald_dir}/herald-c{cycle:03d}-{part}.md"
     if os.path.exists(path):        # one writer per file, even if the journal is lost
         log(f"{part} edition for cycle {cycle:03d} already printed")
         mark_edition(journal, epoch, cycle, part)

@@ -8,7 +8,7 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 | Tool | Location | Purpose |
 |---|---|---|
 | **Bot** | `src/villager.py` | The autonomous merchant (one process per seat). |
-| **The Herald** | `src/town-herald.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/news/`. |
+| **The Herald** | `src/town-herald.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/herald/`. |
 | **The Press** | `src/town-press.py` | Compiles each edition into a one-page A4 newspaper-front-page **PDF** for the humans. |
 | **GM heartbeat** | `src/town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
 | **Arena reset** | `src/town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
@@ -32,8 +32,8 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 ### **Editions**
 | Edition | Trigger | Villagers read it | Output |
 |---|---|---|---|
-| Morning | Phase becomes `discussion` | Over tea, when they wake — included in the discussion prompt | `gameplay/news/herald-cXXX-morning.md` (+ `.pdf`) |
-| Evening | Phase becomes `night` | By lamplight, before they sleep — included in the night prompt | `gameplay/news/herald-cXXX-evening.md` (+ `.pdf`) |
+| Morning | Phase becomes `discussion` | Over tea, when they wake — included in the discussion prompt | `gameplay/herald/herald-cXXX-morning.md` (+ `.pdf`) |
+| Evening | Phase becomes `night` | By lamplight, before they sleep — included in the night prompt | `gameplay/herald/herald-cXXX-evening.md` (+ `.pdf`) |
 
 Each edition is journal-guarded against double printing, and the villagers' own reading is the plain markdown (facts-only, public repo content).
 
@@ -95,7 +95,7 @@ python3 setup/make_signing_keys.py --vault ~/.bazaar
 The **official way** to reset the arena between matches. A partial manual reset once caused the **ghost-replay bug**: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order. Always use the script.
 
 ### **What It Does**
-- Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/news/`, `gameplay/usage/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
+- Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/herald/`, `gameplay/usage/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
 - Rewrites the public boards fresh: `graveyard.md`, `announcements.md`.
 - Resets `gameplay/state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `gameplay/state.json` — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).
 - Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, default `~/.bazaar`) — keys and signing keys are untouched.
