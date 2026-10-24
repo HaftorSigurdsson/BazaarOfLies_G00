@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-"""bazaar_launch.py — start/stop/status the bazaar bots (+ the Herald).
+"""bazaar-launch.py — start/stop/status the bazaar bots (+ the Herald).
 
-The cross-platform launcher core. Thin wrappers live next to it:
-    tools/bazaar-launch.sh   (macOS/Linux)
-    tools/bazaar-launch.bat  (Windows)
+The cross-platform launcher core. Thin wrapper: tools/bazaar-launch.sh
+(macOS/Linux; the retired .bat wrapper lives in tools/STORE/).
 
 Usage:
-    python3 tools/bazaar_launch.py start            # all default seats + Herald
-    python3 tools/bazaar_launch.py start 01 03 05   # a subset of seats
-    python3 tools/bazaar_launch.py start --no-herald
-    python3 tools/bazaar_launch.py stop
-    python3 tools/bazaar_launch.py status
+    python3 tools/bazaar-launch.py start            # all default seats + Herald
+    python3 tools/bazaar-launch.py start 01 03 05   # a subset of seats
+    python3 tools/bazaar-launch.py start --no-herald
+    python3 tools/bazaar-launch.py stop
+    python3 tools/bazaar-launch.py status
 
 How it runs, by platform (auto-detected):
     macOS/Linux: one tmux session ("bazaar"), one window per seat, one
@@ -25,7 +24,7 @@ How it runs, by platform (auto-detected):
 
 Environment:
     MISTRAL_API_KEY   required for start (the bots and the Herald need it)
-    BAZAAR_GAME_DIR   seat clones (default ~/Desktop/GAME/seat-XX)
+    BAZAAR_GAME_DIR   seat clones (default ~/Desktop/Game/seat-XX)
     BAZAAR_HERALD_DIR Herald clone (default: this repo)
 """
 import argparse
@@ -41,7 +40,7 @@ IS_WINDOWS = platform.system() == "Windows"
 IS_MAC = platform.system() == "Darwin"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 GAME_DIR = Path(os.environ.get("BAZAAR_GAME_DIR")
-                or Path.home() / "Desktop" / "GAME")
+                or Path.home() / "Desktop" / "Game")
 HERALD_DIR = Path(os.environ.get("BAZAAR_HERALD_DIR") or REPO_ROOT)
 PID_FILE = GAME_DIR / ".bazaar-launch.json"
 SEATS_DEFAULT = [f"{i:02d}" for i in range(1, 11)]

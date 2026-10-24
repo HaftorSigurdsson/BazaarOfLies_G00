@@ -109,7 +109,7 @@ The **official way** to reset the arena between matches. A partial manual reset 
 - Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/herald/`, `gameplay/usage/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
 - Rewrites the public boards fresh: `graveyard.md`, `announcements.md`.
 - Resets `gameplay/state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `gameplay/state.json` — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).
-- Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, default `~/.bazaar`) — keys and signing keys are untouched.
+- Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, else the sibling vault `../bazaar` the bots use, else `~/.bazaar`) — keys and signing keys are untouched.
 - Repairs the arena's shape: every folder that is supposed to exist is recreated if missing and gets a **`.gitkeep`** if it doesn't have one.
 - Commits the reset — **only after asking**: the script confirms before removing anything, before committing, and before pushing (`--push`).
 

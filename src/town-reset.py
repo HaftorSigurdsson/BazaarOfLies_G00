@@ -10,7 +10,8 @@ touches so the next GM tick deals a clean game:
   - state:      gameplay/state.json reset to the pristine template
                 (phase=setup — do NOT delete it: the GM crashes without it)
   - journals:   seat + Herald journals cleared from the vault
-                ($VAULT or ~/.bazaar)
+                ($VAULT, else the sibling vault ../bazaar the bots use,
+                else ~/.bazaar)
 
 Match recaps (gameplay/village/match-XX-recap.md) are KEPT by default —
 they are history and cannot interfere with a fresh match (the new epoch
@@ -265,7 +266,12 @@ def main():
     args = ap.parse_args()
 
     os.chdir(REPO_ROOT)
-    vault = os.environ.get("VAULT", os.path.expanduser("~/.bazaar"))
+    # Journal vault resolution, in order: $VAULT, the sibling vault the bots
+    # use (../bazaar — see villager.py BAZAAR_DIR), then ~/.bazaar.
+    vault = os.environ.get("VAULT")
+    if not vault:
+        sibling = os.path.join(os.path.dirname(REPO_ROOT), "bazaar")
+        vault = sibling if os.path.isdir(sibling) else os.path.expanduser("~/.bazaar")
 
     if args.dry_run:
         log("DRY RUN — no files will be touched")

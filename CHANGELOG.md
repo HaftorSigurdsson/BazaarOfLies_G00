@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.3] - 2026-10-24
+### Fixed
+- **`tools/bazaar-launch.py` default seat-clone path** was `~/Desktop/GAME` (wrong case on case-sensitive filesystems) — now `~/Desktop/Game`, matching `seats-pull.py`; docstring refreshed for the kebab-case name and the retired `.bat` wrapper.
+- **`src/town-reset.py` journal vault** defaulted to `~/.bazaar`, so resets silently cleared **0 journals** while the bots' real journals live in the sibling vault `../bazaar` (see `villager.py`'s `BAZAAR_DIR`). Resolution order is now `$VAULT`, the sibling vault, then `~/.bazaar` — stale journals can no longer survive a reset and make restarted bots replay old actions.
+### Changed
+- **Signing keys regenerated** for all ten seats (`setup/seats.json` now carries each seat's `signing_public_key`): the vault had lost its `seat-XX.sign` files, and `villager.py` refuses to cast a vote without them — ballots were impossible until this. Private `.sign` keys live only in the vault; only public keys are committed.
+
 ## [2.3.2] - 2026-10-24
 ### Changed
 - **Docs: game-start procedure brought up to date with the current `tools/` and `src/`** — kebab-cased tool names (`tools/bazaar-launch.py`, `tools/statements-assemble.py`), the removed JSONL repair tool dropped from the docs, the retired Windows/`bazaar-pull.sh` wrappers noted as living in `tools/STORE/` (Windows now invokes the launcher core directly), `src/town-press.py` added to the file tree, the Game Day section in `docs/setup.md` now spells out the launcher commands (subsets, `--no-herald`), the neutral side (`tools/run.sh`) with its one-GM-driver warning, and the `--wipe-recaps` reset flag.
