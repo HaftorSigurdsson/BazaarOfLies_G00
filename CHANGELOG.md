@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.1] - 2026-10-24
+### Fixed
+- **The automatic PDF press has never actually run**: `town-herald.py` tried `from town_press import ...`, but the press lives in the kebab-cased `src/town-press.py`, which Python cannot import by name — every edition logged `press skipped: ModuleNotFoundError` and went out PDF-less. The Herald now loads the press from its file (importlib), and the missing PDFs get a `.pdf` twin committed next to each edition again. (Manual CLI pressing always worked; only the automatic in-Herald call was broken.)
+
 ## [2.4.0] - 2026-10-24
 ### Changed
 - **Vault layout**: private files now live in **`../.bazaar/`** (seat keys, signing keys, journals — a sibling of the clone, resolved from `villager.py`/`town-herald.py`'s own location) and **doctrines in `../villagers/<seat>.md`**. The old `../bazaar/` sibling is no longer read. `town-reset.py` and `setup/reset_match.sh` resolve journals as `$VAULT` → `../.bazaar` → `~/.bazaar`; `make_signing_keys.py` examples use `--vault ../.bazaar`. All docs (`docs/`, `AGENTS.md`) swept to the new paths.

@@ -554,8 +554,15 @@ def print_edition(state, part, journal):
     # the markdown edition is what the merchants actually read).
     pdf_path = None
     try:
-        from town_press import compile_edition
-        pdf_path = compile_edition(path)
+        # The press lives in town-press.py — kebab-cased, so Python cannot
+        # import it by name; load it from its file instead.
+        import importlib.util
+        _press_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                   "town-press.py")
+        _spec = importlib.util.spec_from_file_location("town_press", _press_file)
+        _press = importlib.util.module_from_spec(_spec)
+        _spec.loader.exec_module(_press)
+        pdf_path = _press.compile_edition(path)
         log(f"pressed {os.path.basename(pdf_path)}")
     except Exception as e:  # a press failure must never stop the paper
         log(f"press skipped: {type(e).__name__}: {e}")
