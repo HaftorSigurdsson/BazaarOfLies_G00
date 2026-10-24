@@ -284,38 +284,66 @@ def parse_edition(md_text, md_path):
         match_no = mm.group(1)
 
     headline, blocks = None, []
-    in_code, code_lines = False, []
-    for line in md_text.splitlines():
-        s = line.strip()
-        if s.startswith("```"):
-            if in_code:                   # end of a fenced block
-                text = "\n".join(code_lines)
-                kind = ("chart" if "\u2593" in text or "\u2588" in text
-                        else "code")
-                blocks.append((kind, text))
-                in_code, code_lines = False, []
+
+    def body_line(s):
+        """One line of edition prose → headline / subhead / paragraph."""
+        nonlocal headline
+        if s.startswith("# "):            # edition title → masthead covers it
+            t = sanitize(s[2:].strip())
+            if re.match(r"the herald\b", t, re.I):
+                return                     # the duplicate inner masthead
+            if headline is None:          # first section heading = headline
+                headline = t
             else:
-                in_code, code_lines = True, []
-            continue
-        if in_code:
-            code_lines.append(s)
-            continue
-        if not s:
-            continue
-        if s.startswith("# "):            # edition title — masthead covers it
-            continue
+                blocks.append(("subhead", t))
+            return
         if s.startswith("## "):
             text = sanitize(s[3:].strip().strip("*"))
             if headline is None:          # first section heading = headline
                 headline = text
             else:
                 blocks.append(("subhead", text))
-        elif re.fullmatch(r"\*[^*]+\*", s):   # *Match 1, Cycle 001* → dateline
-            continue
-        elif s.startswith("- "):
+            return
+        if re.fullmatch(r"\*[^*]+\*", s):   # *Match 1, Cycle 001* → dateline
+            if re.match(r"\*Match\b", s, re.I):
+                return
+            blocks.append(("subhead", sanitize(s.strip("*"))))
+            return
+        if s == "---":
+            return
+        if s.startswith("- "):
             blocks.append(("para", "\u2022 " + sanitize(s[2:])))
         else:
             blocks.append(("para", sanitize(s.strip())))
+
+    in_code, code_lines, fence_kind = False, [], None
+    for line in md_text.splitlines():
+        s = line.strip()
+        if s.startswith("```"):
+            if in_code:                   # end of a fenced block
+                text = "\n".join(code_lines)
+                if fence_kind in ("markdown", "md"):
+                    # the Herald wraps the edition proper in a ```markdown
+                    # fence; its headings and prose are real content, not
+                    # monospaced code — parse them as edition blocks.
+                    for cl in code_lines:
+                        if cl.strip():
+                            body_line(cl.strip())
+                else:
+                    kind = ("chart" if "\u2593" in text or "\u2588" in text
+                            else "code")
+                    blocks.append((kind, text))
+                in_code, code_lines, fence_kind = False, [], None
+            else:
+                in_code, code_lines = True, []
+                fence_kind = s[3:].strip().lower()
+            continue
+        if in_code:
+            code_lines.append(s)
+            continue
+        if not s:
+            continue
+        body_line(s)
     return {
         "match": match_no,
         "cycle": cycle,

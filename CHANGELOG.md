@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.4] - 2026-10-24
+### Fixed
+- **The press ignored the Herald's section headings**: the Herald wraps each edition in a ` ```markdown ` fence, and `parse_edition` classified *any* fenced block as monospaced code — so `##` subheads printed as literal text in a typewriter block, the real headline was swallowed (the masthead fell back to "The Tally"), and the dateline rules misfired. A ` ```markdown `/` ```md ` fence is now parsed as the edition proper: its `#` line becomes the masthead headline, `##` lines become ruled section heads in both engines, italic-only lines become subheads (the Letter to the Editor gets its heading back), and `---` rules are skipped. All in-flight editions re-pressed; still one A4 page, verified by text extraction.
+
 ## [2.4.3] - 2026-10-24
 ### Changed
 - **GM keypair rotated** (`setup/gm_public_key.txt` replaced): the original private key only ever existed as a `/tmp` file piped into the GitHub secret and is lost with `/tmp`. The new private half is vaulted outside the repo (`../.bazaar/gm_private_key.txt`, chmod 600) where the local cron GM reads it. Everything sealed to the old key (role registry, dossiers, night results) is unreadable by design, so the in-flight match is reset and re-dealt with the new key — the GitHub-Actions GM is retired in favour of the operator's own cron-driven GM.
