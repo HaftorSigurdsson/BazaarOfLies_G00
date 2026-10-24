@@ -91,7 +91,7 @@ bazaar-of-lies/
 ├── editor.py                       # The Herald — facts-only newspaper bot (gameplay/news/)
 ├── town-clock.py                   # Local GM heartbeat (dispatches gm.yml)
 ├── town-reset.py                   # Official full arena reset (Python)
-├── setup.py                        # Keypair generation + seats.json population
+├── town-setup.py                   # Keypair generation + seats.json population
 ├── gameplay/                        # The arena (match data)
 │   ├── state.json                   # Match state (GM-only write)
 │   ├── village/                     # Public channel

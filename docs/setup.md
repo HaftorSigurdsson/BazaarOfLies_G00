@@ -69,9 +69,9 @@ This file maps **seats to personas, public keys, signing keys, and Git identitie
 ```
 
 ### **2.1 Generate Encryption Keypairs for Seats**
-1. Use the `setup.py` script to generate keypairs and populate `seats.json`:
+1. Use the `town-setup.py` script to generate keypairs and populate `seats.json`:
    ```bash
-   python setup.py --seats 10 --output setup/seats.json
+   uv run town-setup.py --seats 10 --output setup/seats.json
    ```
 2. Private keys are saved to `seat-XX.key` files (keep these secure!).
 

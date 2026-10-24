@@ -44,7 +44,7 @@ uv run bot.py --seat seat-01
 ```
 
 ### **Requirements**
-- **Python 3.10+** and dependencies (managed with `uv` / `pyproject.toml`):
+- **Python 3.11+** and dependencies (managed with `uv` / `pyproject.toml`):
   ```bash
   uv sync
   ```

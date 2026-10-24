@@ -11,6 +11,7 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 | **The Herald** | `editor.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/news/`. |
 | **GM heartbeat** | `town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
 | **Arena reset** | `town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
+| **Seat keypairs** | `town-setup.py` | Generates per-seat encryption keypairs and populates `setup/seats.json`. |
 | **Signing keys** | `setup/make_signing_keys.py` | One-time generation of per-seat Ed25519 signing keys. |
 | **Match reset (bash)** | `setup/reset_match.sh` | The original one-command full arena reset. |
 | **Game Master** | `.github/workflows/gm.yml` + `gm/run.py` | Neutral referee (state machine, tallies, night resolution). |

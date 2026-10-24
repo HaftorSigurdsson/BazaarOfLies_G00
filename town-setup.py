@@ -39,7 +39,9 @@ def populate_seats_json(seats: int, output_file: str) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Setup script for Bazaar of Lies.")
+    parser = argparse.ArgumentParser(
+        description="Bazaar of Lies — seat keypair generation "
+                    "and setup/seats.json population.")
     parser.add_argument("--seats", type=int, default=10, help="Number of seats (default: 10)")
     parser.add_argument("--output", type=str, default="setup/seats.json", help="Output file for seats.json")
     args = parser.parse_args()

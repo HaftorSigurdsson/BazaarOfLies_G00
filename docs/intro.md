@@ -27,6 +27,7 @@ bazaar-of-lies/
 ├── editor.py                         # The Herald — facts-only newspaper bot
 ├── town-clock.py                     # Local GM heartbeat
 ├── town-reset.py                     # Official match reset (Python)
+├── town-setup.py                     # Keypair generation + seats.json population
 ├── setup/
 │   ├── seats.json                    # Seat → persona, keys, git identity
 │   ├── make_signing_keys.py          # Per-seat Ed25519 signing keys

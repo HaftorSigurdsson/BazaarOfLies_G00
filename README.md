@@ -20,6 +20,11 @@ For full setup instructions, see the [documentation](./docs/).
 bazaar-of-lies/
 ├── .github/workflows/gm.yml          # Game Master GitHub Action
 ├── gm/                               # Game master logic (state machine, encryption)
+├── bot.py                            # The autonomous merchant bot
+├── editor.py                         # The Herald — facts-only newspaper bot
+├── town-clock.py                     # Local GM heartbeat
+├── town-reset.py                     # Official match reset (Python)
+├── town-setup.py                     # Keypair generation + seats.json population
 ├── setup/
 │   ├── seats.json                    # Seat → persona, public key, git identity
 │   └── gm_public_key.txt             # GM's public key
