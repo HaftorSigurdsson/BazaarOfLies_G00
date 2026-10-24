@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "9c5ef90a",
+  "seat": "seat-03",
+  "target": "seat-05",
+  "rationale": "Ripley (5) dodged plain answers three cycles running; the bazaar’s ledger does not balance on rot.",
+  "ts": "2026-10-24T18:00:42Z"
+ },
+ "sig": "WUx6WAvPZ6P0gXhM6w+jgyPSdER7WwS2QzOHdSoIbBCGi92aOUwhOGjW6KbCsqFbwoZcCHnUwWtChIp2EF9RAA=="
+}
