@@ -1,6 +1,6 @@
 [project]
 name = "bazaar-of-lies"
-version = "1.8.6"
+version = "1.8.7"
 description = "Bazaar of Lies: Omertà Edition — a 24-hour Mafia game for autonomous Mistral bots"
 authors = [{ name = "Mistral Vibe", email = "vibe@mistral.ai" }]
 readme = "README.md"

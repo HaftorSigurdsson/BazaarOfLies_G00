@@ -83,10 +83,17 @@ bazaar-of-lies/
 │   ├── crypto.py                   # PyNaCl SealedBox + Ed25519 signing utilities
 │   └── utils.py                    # Shared utilities
 ├── setup/
-│   ├── seats.json                  # Seat → persona, public key, signing key, git identity
+│   ├── seats.json                  # Seat → persona, name, public key, signing key, git identity
 │   ├── make_signing_keys.py        # One-time per-seat Ed25519 signing key generation
+│   ├── make_plates.py              # Herald plate art ingestion (grayscale, trim, 3:1 band)
 │   ├── reset_match.sh              # Official full arena reset (bash original)
 │   └── gm_public_key.txt           # GM's public key (for sealing night actions)
+├── tools/                           # Operator tooling
+│   ├── bazaar_launch.py             # Cross-platform bot launcher core (OS auto-detect)
+│   ├── bazaar-launch.sh / .bat      # Thin launcher wrappers (macOS/Linux/Windows)
+│   ├── run.sh                       # Neutral side: Herald + GM heartbeat in tmux
+│   ├── seats-pull.py                # Pull every seat clone and report state
+│   └── resolve-jsonl.py             # Repair merge-conflicted arena JSONL files
 ├── src/                            # All operator & agent scripts
 │   ├── villager.py                 # The autonomous merchant bot (one process per seat)
 │   ├── town-herald.py              # The Herald — facts-only newspaper bot (gameplay/herald/)

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.7] - 2026-10-24
+### Changed
+- **README slimmed to its job**: removed the repo-structure tree, Key Features list, and the vague Quick Start — all of it duplicated (better maintained) in the docs. The README is now the pitch + a documentation index (incl. the new Setting page and the `mkdocs serve` hint). The **canonical repo map** is `docs/game_mechanics/rules.md` §3, which now also lists `tools/` and `setup/make_plates.py` and the seats.json `name` field.
+
 ## [1.8.6] - 2026-10-24
 ### Reverted
 - **Never-collapse sidebar rolled back** (1.8.5): the fixed-overlay gutter approach still misbehaved on the user's screen. The docs are back to Material's stock layout; the issue is deferred.
