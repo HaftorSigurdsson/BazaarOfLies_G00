@@ -164,3 +164,14 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T01:57:07.659360+00:00
 
 ---
+**2026-10-24T01:57:18Z**
+**Banishment!** seat-03 (You are The Lantern Seller. You trade in light and shadow, so you notice who prefers to keep things dim. Ask more questions than you answer — a lantern doesn't argue, it just reveals what the dark was hiding.) has been banished from the bazaar.
+Their role was: **Villager**.
+
+---
+**2026-10-24T01:57:18Z**
+**Match 1, Cycle 6**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T02:12:18.793643+00:00
+
+---
