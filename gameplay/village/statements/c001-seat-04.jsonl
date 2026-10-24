@@ -1,1 +1,2 @@
 {"match": 1, "cycle": 1, "seat": "seat-04", "seq": 1, "text": "Seat-05, Ripley. You voted with Seat-02 yesterday. What changed?", "epoch": "bb6846e0", "ts": "2026-10-24T21:55:13Z"}
+{"match": 1, "cycle": 1, "seat": "seat-04", "seq": 2, "text": "Seat-05 Ripley. You say the ledger \"does not flinch\" when ink is smudged. Then explain why your name doesn’t appear in Seat-01 Gandalf’s tally of yesterday’s vote. Did the ledger forget, or did you? Answer plain: yes or no. The market doesn’t trade in fog.", "epoch": "bb6846e0", "ts": "2026-10-24T21:56:59Z"}
