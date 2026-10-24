@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "bb6846e0",
+  "seat": "seat-09",
+  "target": "seat-05",
+  "rationale": "Ripley’s bronze coin rings hollow where yesterday’s tally should rest.",
+  "ts": "2026-10-24T23:10:24Z"
+ },
+ "sig": "zB4CRHl87vFjf/dEqD6QTpOAs0AB+6IoNBXg9P8xOwmCtcNO6BHN6q5h3tcUdKurqHU6Yym+lvnpToFsoRCiBg=="
+}
