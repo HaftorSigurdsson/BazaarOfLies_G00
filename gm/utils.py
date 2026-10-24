@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
 
@@ -99,3 +99,76 @@ def is_alive(seat: str) -> bool:
 def get_living_seats() -> List[str]:
     """Get a list of living seats."""
     return read_state()["alive"]
+
+
+# ------------------------------------------------------------- tea clock ---
+# The bazaar's day is divided into named regions — flavour computed from
+# the arena clock, not new mechanics. Bots get the current region as
+# context and speak of tea naturally; the Herald states the time of
+# print. Fractions are of the phase's own duration.
+DAY_REGIONS = [
+    (0.00, 0.20, "Dawn",
+     "the bazaar is waking — braziers lit, shutters opening one by one"),
+    (0.20, 0.40, "Morning tea",
+     "the first tea of the day; quiet talk over small glasses"),
+    (0.40, 0.60, "Midday",
+     "the stalls quiet for lunch; the talk moves to the tea house"),
+    (0.60, 0.80, "Afternoon tea",
+     "the market thins; the afternoon glasses are poured"),
+    (0.80, 1.01, "Dusk",
+     "merchants count the day's takings; the vote is coming"),
+]
+
+NIGHT_REGIONS = [
+    (0.00, 0.35, "The first watch",
+     "the night guards brew their tea and make their rounds"),
+    (0.35, 0.70, "The middle watch",
+     "the braziers burn low; even the guards' tea has gone cold"),
+    (0.70, 1.01, "The last watch",
+     "the darkest hour; the lamps gutter and the bazaar holds its breath"),
+]
+
+
+def _parse_ts(value):
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (ValueError, TypeError):
+        return None
+
+
+def day_region(state: dict):
+    """(label, flavour) for the current in-theme time of day, from the
+    arena clock. Falls back to a neutral region if the clock is missing."""
+    now = datetime.now(timezone.utc)
+    clock = state.get("clock", {})
+    phase = state.get("phase")
+
+    if phase in ("discussion", "voting"):
+        if phase == "voting":               # the vote rides the dusk
+            return "Dusk", "the lamps are lit and the vote is on"
+        dawn = _parse_ts(clock.get("dawn"))
+        end = _parse_ts(clock.get("discussion_deadline"))
+        if dawn and end and end > dawn:
+            frac = min(max((now - dawn) / (end - dawn), 0.0), 0.99)
+            for lo, hi, label, flavour in DAY_REGIONS:
+                if lo <= frac < hi:
+                    return label, flavour
+        return "Morning", "the bazaar hums between dawn and dusk"
+
+    if phase == "night":
+        end = _parse_ts(clock.get("night_deadline"))
+        if end:
+            # The clock only records the night's END (set when night fell),
+            # so measure the elapsed fraction backwards over the nominal
+            # span (gm/run.py NIGHT_MINUTES, overridable for exotic tests).
+            import os
+            night_len = timedelta(
+                minutes=int(os.environ.get("BAZAAR_NIGHT_MINUTES", "15")))
+            elapsed = night_len - (end - now)
+            frac = min(max(elapsed / night_len, 0.0), 0.99)
+            for lo, hi, label, flavour in NIGHT_REGIONS:
+                if lo <= frac < hi:
+                    return label, flavour
+        return "The night", "the bazaar sleeps, more or less"
+
+    return "The small hours", "the bazaar waits for the next bell"

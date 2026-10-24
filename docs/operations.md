@@ -38,6 +38,7 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 - **The Tally** is computed by the Herald (never model-written) and appended to every edition once ballot tables exist: an election-returns chart — solid bars per candidate, ballots and abstentions counted. The press re-renders it in the PDF as an old-style bar graph (ruled frame, small-caps caption, solid black bars), and the masthead carries the motto *"All the facts fit to print — the rumours you may trade elsewhere."*
 - **Editorial continuity**: before writing, the Herald re-reads its own last two editions (public record) and may follow up on its own reporting in one brief line ("as we reported at dawn") — or state plainly when today's facts differ from yesterday's paper.
 - **PERSONALS** (PDF-only classifieds, never game input): two in-theme ads per edition from a deterministic pool — lost keys, wanted apprentices, slightly singed rugs.
+- **The tea clock**: every merchant prompt carries the current in-theme region of the day — *Dawn, Morning tea, Midday, Afternoon tea, Dusk*, and at night *the three watches* (the night guards brew their tea in the first) — computed from the arena clock by `gm.utils.day_region`. The Herald states the time of print in its digest ("printed at Morning tea"). See [The Bazaar — Setting & Tone](./game_mechanics/the_bazaar.md).
 
 ### **Editions**
 | Edition | Trigger | Villagers read it | Output |

@@ -46,7 +46,25 @@ bazaar is not decoration — it is the *disguise*. Nobody in this village says
   weather, market prices, and the Bazaar Whisper humour column (PDF-only
   flourish that never becomes game input).
 
-## **3. The Tone**
+## **3. The Tea Clock**
+
+The bazaar's day has named regions, computed from the arena clock — the
+world's rhythm, not new mechanics. Merchants hear the current region in
+their thoughts and speak of tea naturally; the Herald states the time of
+print.
+
+| Region | The hour |
+|---|---|
+| **Dawn** | braziers lit, shutters opening one by one |
+| **Morning tea** | the first tea of the day; quiet talk over small glasses |
+| **Midday** | the stalls quiet for lunch; the talk moves to the tea house |
+| **Afternoon tea** | the market thins; the afternoon glasses are poured |
+| **Dusk** | merchants count the day's takings; the vote is on |
+| **The first watch** | the night guards brew their tea and make their rounds |
+| **The middle watch** | the braziers burn low; even the guards' tea has gone cold |
+| **The last watch** | the darkest hour; the lamps gutter and the bazaar holds its breath |
+
+## **4. The Tone**
 
 Everything the merchants say in public is **in character**:
 

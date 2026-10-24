@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2026-10-24
+### Added
+- **The tea clock (in-theme day regions)** — `gm.utils.day_region(state)`, computed from the arena clock; no new mechanics, pure flavour as prompt context:
+  - Day (discussion): **Dawn → Morning tea → Midday → Afternoon tea → Dusk**; the voting window rides Dusk ("the lamps are lit and the vote is on").
+  - Night: **The first watch** (the night guards brew their tea and make their rounds) → **The middle watch** (even the guards' tea has gone cold) → **The last watch** (the darkest hour).
+  - Every merchant prompt (discussion, vote, night) carries "Time of day: {region} — {flavour}"; the Herald's digest states the time of print ("printed at Morning tea" / evening editions print at the first watch). Graceful fallbacks when the clock is missing; the setting page documents the full tea clock.
+  - Verified: all eight regions at their boundaries, voting, night watches, both fallbacks, villager prompt block, and Herald digest for morning and evening.
+
 ## [2.1.0] - 2026-10-24
 ### Added
 - **PERSONALS** (press, PDF-only): a classifieds box between the Weather & Market and the Whisper — two in-theme ads per edition from a 14-item deterministic pool ("LOST: one brass key, opens nothing the owner will admit", "SEEKING WORK: scribe, discreet, remembers nothing by morning"). Never enters the markdown the merchants read. Rendered in both engines; samples re-pressed, still one A4 page.

@@ -38,9 +38,15 @@ import os
 import random
 import re
 import subprocess
+import sys
 import time
 
 from mistralai import Mistral
+
+# gm/ sits at the arena root — the tea clock (day regions) lives there.
+_ARENA_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _ARENA_ROOT)
+from gm.utils import day_region
 
 # ---------------------------------------------------------------- config ---
 MODEL = "mistral-large-latest"
@@ -438,7 +444,9 @@ def tally_chart():
 def facts_digest(state, part):
     """Public facts only. Morning: what happened overnight + today's plan.
     Evening: the day's banishment + what was said."""
-    digest = [f"Match {state['match']}, cycle {state['cycle']} ({part} edition)."]
+    label, flavour = day_region(state)
+    digest = [f"Match {state['match']}, cycle {state['cycle']} ({part} edition) "
+              f"— printed at {label} ({flavour})."]
     digest.append("Seats alive: "
                   + ", ".join(display_name(s) for s in sorted(state["alive"])) + ".")
     roll = graveyard_roll()
