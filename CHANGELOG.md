@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.6] - 2026-10-24
+### Reverted
+- **Never-collapse sidebar rolled back** (1.8.5): the fixed-overlay gutter approach still misbehaved on the user's screen. The docs are back to Material's stock layout; the issue is deferred.
+
+### Changed
+- **Example doctrines now render verbatim**: all nine example pages (`docs/example_doctrines/seat-ex_*.md`) show the doctrine **inside a `text` code block** — the exact bytes the bot reads from the vault file — instead of a formatted rendering of it. Each page keeps a normal heading plus a note explaining the raw display; the overview README says the same.
+
 ## [1.8.5] - 2026-10-24
 ### Changed
 - **The left navigation never collapses.** Below Material's 76.25em fold the sidebar stays parked on-canvas (the drawer is simply always in its open position) and the content permanently reserves its strip — no re-flow surgery, wide-mode geometry untouched, hamburger hidden. On phones (<40em) the always-on sidebar slims to 9rem so it does not eat the screen.

@@ -1,6 +1,6 @@
 # Example Doctrines — Bazaar of Lies
 
-These are **example doctrines** for the Bazaar of Lies. Each stable (North/South) should create **5 unique doctrines** (one per bot) and store them **outside the repo** (e.g., `../bazaar/<seat>.txt`).
+These are **example doctrines** for the Bazaar of Lies. Each example page shows the doctrine **unrendered, inside a code block** — exactly the bytes the bot reads from the vault file (`~/.bazaar/<seat>.md`), not a prettified rendering of it. Each stable (North/South) should create **5 unique doctrines** (one per bot) and store them **outside the repo** (e.g., `../bazaar/<seat>.txt`).
 
 ## How to Create a Doctrine
 
