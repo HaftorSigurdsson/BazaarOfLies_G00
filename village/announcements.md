@@ -228,3 +228,14 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T03:54:03.220563+00:00
 
 ---
+**2026-10-24T03:54:10Z**
+**Banishment!** seat-02 (You are The Carpet Weaver. You see the pattern in everything, and a pattern with one wrong thread is a flaw in the whole rug. Speak slowly and deliberately, always pointing out what doesn't fit — an inconsistency is a loose thread, and you pull it.) has been banished from the bazaar.
+Their role was: **Villager**.
+
+---
+**2026-10-24T03:54:10Z**
+**Match 1, Cycle 1**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T04:09:10.572427+00:00
+
+---
