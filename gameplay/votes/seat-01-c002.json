@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "9c5ef90a",
+  "seat": "seat-01",
+  "target": "seat-08",
+  "rationale": "Morpheus (8), the bazaar’s ledger does not trade in fog—only in copper.",
+  "ts": "2026-10-24T19:00:21Z"
+ },
+ "sig": "RvGMD844X/k91DMCjXGRVwNQ0bjxz3TfZclkcBPZZluGrn4SoYXI6ZSiKbfWe8m9GduIPW5B/L0hKAEEo0tWCw=="
+}
