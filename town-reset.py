@@ -10,7 +10,7 @@ touches so the next GM tick deals a clean game:
   - state:      gameplay/state.json reset to the pristine template
                 (phase=setup — do NOT delete it: the GM crashes without it)
   - journals:   seat + Herald journals cleared from the vault
-                (default ~/.bazaar, override with --vault or VAULT env)
+                ($VAULT or ~/.bazaar)
 
 Match recaps (gameplay/village/match-XX-recap.md) are KEPT — they are
 history and cannot interfere with a fresh match (the new epoch namespaces
@@ -19,11 +19,14 @@ everything).
 Every folder that is supposed to exist gets a .gitkeep if it is missing
 one, so the arena keeps its shape even when a directory is emptied.
 
+Nothing destructive happens without confirmation: the script asks
+"Are you sure?" before removing anything, and again before committing
+(pushing asks once more). --dry-run never prompts and touches nothing.
+
 Usage (from the arena repo root):
-    python3 town-reset.py             # reset + commit the wipe (no push)
+    python3 town-reset.py             # reset + commit (asks y/n at each step)
     python3 town-reset.py --dry-run   # show what would happen, touch nothing
-    python3 town-reset.py --push      # also push the reset commit
-    python3 town-reset.py --vault ~/.bazaar
+    python3 town-reset.py --push      # also push the reset commit (asks first)
 """
 import argparse
 import json
@@ -77,6 +80,16 @@ def rel(path):
 
 def log(msg):
     print(f"==> {msg}")
+
+
+def confirm(question):
+    """Ask a yes/no question. Returns True only on an explicit yes."""
+    try:
+        answer = input(f"{question} [y/N] ").strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return False
+    return answer in ("y", "yes")
 
 
 def remove(path, dry):
@@ -193,6 +206,9 @@ def ensure_gitkeeps(dry):
 
 def commit_reset(dry, push):
     """Commit the wipe so the GM's next tick sees a clean arena."""
+    if not dry and not confirm("Commit the reset to git?"):
+        log("Reset left uncommitted — commit manually with: git add -A && git commit")
+        return
     git = lambda *args: subprocess.run(
         ["git", *args], cwd=REPO_ROOT, capture_output=True, text=True)
     r = git("add", "-A")
@@ -212,6 +228,9 @@ def commit_reset(dry, push):
         return
     log("Committed reset.")
     if push:
+        if not confirm("Push the reset commit to the remote?"):
+            log("Not pushed — push manually with: git push")
+            return
         r = git("push")
         if r.returncode != 0:
             log(f"git push failed: {r.stderr.strip()[:200]}")
@@ -225,19 +244,27 @@ def main():
                     "(Python equivalent of setup/reset_match.sh).")
     ap.add_argument("--dry-run", action="store_true",
                     help="Show what would be removed; touch nothing.")
-    ap.add_argument("--vault", default=os.environ.get("VAULT",
-                    os.path.expanduser("~/.bazaar")),
-                    help="Secrets folder holding the journals "
-                         "(default $VAULT or ~/.bazaar).")
     ap.add_argument("--push", action="store_true",
                     help="Push the reset commit to the remote after committing.")
     args = ap.parse_args()
 
     os.chdir(REPO_ROOT)
+    vault = os.environ.get("VAULT", os.path.expanduser("~/.bazaar"))
+
     if args.dry_run:
         log("DRY RUN — no files will be touched")
-
-    log(f"Resetting arena (vault: {args.vault})")
+        log(f"Resetting arena (vault: {vault})")
+    else:
+        print("This will WIPE all match artifacts from gameplay/ "
+              "(votes, night, dossiers, deals, news, usage, statements, "
+              "day transcripts), rewrite graveyard.md and announcements.md, "
+              f"reset gameplay/state.json to the pristine setup template, and "
+              f"clear seat + Herald journals from {vault}.")
+        print("Match recaps are kept. There is no undo.")
+        if not confirm("Are you sure you want to reset the arena?"):
+            log("Aborted — nothing was touched.")
+            return 1
+        log(f"Resetting arena (vault: {vault})")
 
     n = clear_artifact_dirs(args.dry_run)
     log(f"Cleared {n} artifact entries from {len(ARTIFACT_DIRS)} directories")
@@ -247,7 +274,7 @@ def main():
     log(f"Rewrote {n} public board(s) to template")
     n = reset_state(args.dry_run)
     log(f"Reset {n} state file")
-    n = clear_vault_journals(args.vault, args.dry_run)
+    n = clear_vault_journals(vault, args.dry_run)
     log(f"Cleared {n} journal(s) from vault")
     n = ensure_gitkeeps(args.dry_run)
     log(f"Folder/.gitkeep repairs: {n}")

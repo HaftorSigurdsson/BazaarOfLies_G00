@@ -84,18 +84,18 @@ The **official way** to reset the arena between matches. A partial manual reset 
 - Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/news/`, `gameplay/usage/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
 - Rewrites the public boards fresh: `graveyard.md`, `announcements.md`.
 - Resets `gameplay/state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `gameplay/state.json` — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).
-- Clears **local journals** (seat journals + Herald journal) from the vault (`--vault` or `$VAULT`, default `~/.bazaar`) — keys and signing keys are untouched.
+- Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, default `~/.bazaar`) — keys and signing keys are untouched.
 - Repairs the arena's shape: every folder that is supposed to exist is recreated if missing and gets a **`.gitkeep`** if it doesn't have one.
-- Commits the reset (push only with `--push`).
+- Commits the reset — **only after asking**: the script confirms before removing anything, before committing, and before pushing (`--push`).
 
 **Match recaps (`gameplay/village/match-XX-recap.md`) are kept** — they are history and cannot interfere with a fresh match (the new epoch namespaces everything).
 
 ### **Usage**
 ```bash
 ./bazaar-launch.sh stop            # bots must be down first
-python3 town-reset.py              # reset + commit (from the arena repo root)
-python3 town-reset.py --dry-run    # preview: show what would be wiped, touch nothing
-python3 town-reset.py --push       # also push the reset commit
+python3 town-reset.py              # asks "Are you sure?" (y/n) before wiping
+python3 town-reset.py --dry-run    # preview: show what would be wiped, touch nothing, no prompts
+python3 town-reset.py --push       # after committing, asks before pushing
 ./bazaar-launch.sh start           # bots + Herald back up
 gh workflow run gm.yml             # optional: immediate GM tick
 ```
