@@ -340,3 +340,18 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T09:09:40.680079+00:00
 
 ---
+**2026-10-24T10:16:39Z**
+No banishment this cycle (tie or no votes).
+
+**Ballots cast this cycle (signed and public):**
+
+| Seat | Voted for | Reason |
+|---|---|---|
+
+---
+**2026-10-24T10:16:39Z**
+**Match 1, Cycle 5**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T10:31:39.916584+00:00
+
+---
