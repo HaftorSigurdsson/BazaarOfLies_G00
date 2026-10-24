@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.5] - 2026-10-24
+### Changed
+- **The left navigation never collapses.** Below Material's 76.25em fold the sidebar stays parked on-canvas (the drawer is simply always in its open position) and the content permanently reserves its strip — no re-flow surgery, wide-mode geometry untouched, hamburger hidden. On phones (<40em) the always-on sidebar slims to 9rem so it does not eat the screen.
+
 ## [1.8.4] - 2026-10-24
 ### Reverted
 - **Sidebar/CSS layout experiments rolled back** (1.8.2–1.8.3): the drawer override broke the header/sidebar layout (banner overlap, vanishing sidebar). Material's default behaviour restored — the docs use the stock layout with only the bazaar palette from 1.8.1 kept (palette lives in `mkdocs.yml`, not CSS, and is unaffected).
