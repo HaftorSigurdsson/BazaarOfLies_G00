@@ -518,6 +518,15 @@ def end_match():
 
 if __name__ == "__main__":
     try:
+        # Local/cron GMs must start from the arena's latest state; the
+        # GitHub Action always had a fresh checkout, but a long-lived
+        # cron clone would otherwise read stale state (e.g. missing
+        # ballots pushed since the last tick) and act on it.
+        r = subprocess.run(["git", "pull", "--rebase", "--autostash"],
+                           capture_output=True, text=True)
+        if r.returncode != 0:
+            log(f"startup pull failed: {r.stderr.strip()[:200]}")
+            sys.exit(1)
         advance_phase()
     except Exception as e:
         log(f"ERROR: {type(e).__name__}: {e}")
