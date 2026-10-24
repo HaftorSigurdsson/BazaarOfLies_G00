@@ -14,7 +14,7 @@ the lamps, and the bazaar holds its breath for what the dark may bring.
 
 - 4 merchants alive, 6 in the graveyard.
 - Statements this cycle: 9 (Gandalf (1): 3, Yoda (3): 2, Elsa (7): 2, Morpheus (8): 1, Sherlock (10): 1).
-- Banished by vote so far: 5. Revealed Mafia among the dead: 2.
+- Banished by vote so far: 5. Revealed Mafia among the departed: 2.
 - Quiet nights in a row: 1.
 
 ## The Voting Record

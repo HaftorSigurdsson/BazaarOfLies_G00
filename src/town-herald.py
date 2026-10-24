@@ -176,7 +176,7 @@ def seat_from_label(text):
 
 
 def graveyard_roll():
-    """Public obituaries: seat, merchant name, role revealed at death, cause."""
+    """Public obituaries: seat, merchant name, role revealed on departure, cause."""
     entries = []
     try:
         text = open("gameplay/village/graveyard.md").read()
@@ -393,7 +393,7 @@ def facts_digest(state, part):
     digest.append("Seats alive: "
                   + ", ".join(display_name(s) for s in sorted(state["alive"])) + ".")
     roll = graveyard_roll()
-    digest.append("Official obituaries (roles revealed at death): "
+    digest.append("Official obituaries (roles revealed on departure): "
                   + ("; ".join(roll) if roll else "none so far."))
     clock = state.get("clock", {})
     for label in ("discussion_deadline", "voting_deadline", "night_deadline"):

@@ -13,7 +13,7 @@ business before the sun had fully cleared the minarets.
 
 - 5 merchants alive, 5 in the graveyard.
 - Statements this cycle: 6 (Gandalf (1): 2, Yoda (3): 2, Elsa (7): 1, Sherlock (10): 1); Morpheus (8) has said nothing yet.
-- Banished by vote so far: 4. Revealed Mafia among the dead: 2.
+- Banished by vote so far: 4. Revealed Mafia among the departed: 2.
 - The village has banished one Villager for every Mafia — a ledger several
   merchants were heard recounting aloud.
 

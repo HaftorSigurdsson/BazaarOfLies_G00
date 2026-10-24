@@ -227,7 +227,7 @@ def update_notebook(state, journal, events, instruction):
 def maybe_digest(state, journal):
     """Once per new cycle, fold the finished day(s) into the notebook.
     Epoch-scoped via last_digest_cycle (reset by ensure_notebook), so a
-    stale journal can never re-digest a dead match. Back-digests at most
+    stale journal can never re-digest a finished match. Back-digests at most
     three missed cycles, to bound tokens after a long bot outage."""
     if not NOTEBOOK_ENABLED:
         return
@@ -438,7 +438,7 @@ def herald_paper(cycle, part, limit=4000):
 
 def graveyard_roll():
     """Public obituaries from village/graveyard.md — facts the whole village
-    knows: seat, merchant name, role revealed at death, cause. Nothing else."""
+    knows: seat, merchant name, role revealed on departure, cause. Nothing else."""
     entries = []
     try:
         text = open("gameplay/village/graveyard.md").read()
@@ -478,7 +478,7 @@ def public_facts_block(state):
     roll = graveyard_roll()
     return (f"Seats alive: "
             f"{', '.join(display_name(s) for s in sorted(state['alive']))}\n"
-            f"The graveyard (roles revealed at death): "
+            f"The graveyard (roles revealed on departure): "
             f"{'; '.join(roll) if roll else 'empty so far'}")
 
 

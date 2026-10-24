@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.1] - 2026-10-24
+### Added
+- **`shuttered-stall` plate**: dedicated night-result motif (closed stall, padlock, single lamp — ingested in final grayscale 3:1 format). A stall-shuttered edition now earns it instead of the interim sunset plate.
+### Fixed
+- **Vocabulary alignment residuals**: win conditions now read "Town wins if all the Mafia have left the bazaar" (rules + index); the graveyard tree entry says "Departed merchants, revealed roles"; "roles revealed at death" → "revealed on departure" everywhere (Herald digest, villagers' public facts, docstrings); "seats alive/dead" → "alive/departed"; the sample papers say "among the departed". Full sweep re-run: no violence terms remain outside the accepted exceptions (historical CHANGELOG, legacy `Night kill` parsers, tmux/taskkill process terms).
+
 ## [1.9.0] - 2026-10-24
 ### Changed
 - **Family-friendly vocabulary** (full sweep, code and docs): nobody is ever killed, murdered, or found dead.

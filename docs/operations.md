@@ -33,7 +33,7 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 - It **never speculates** about the roles of living merchants.
 - It **never invents** statements, deaths, or events.
 - Roles may only be restated from **official obituaries** (the GM reveals roles at death).
-- Every edition carries a **"By the Numbers"** section (machine-counted public figures: seats alive/dead, per-seat statement counts, who is silent this cycle, the quiet-night streak, and per-seat vote participation once ballot tables exist) and, when the GM has published ballot tables, a **"The Voting Record"** section (the last two tallies, exactly as published — no editorialising).
+- Every edition carries a **"By the Numbers"** section (machine-counted public figures: seats alive/departed, per-seat statement counts, who is silent this cycle, the quiet-night streak, and per-seat vote participation once ballot tables exist) and, when the GM has published ballot tables, a **"The Voting Record"** section (the last two tallies, exactly as published — no editorialising).
 - When public statements exist, the paper closes with a **"Letter to the Editor"**: one statement quoted verbatim, attributed to its seat, with at most a one-line neutral introduction.
 
 ### **Editions**

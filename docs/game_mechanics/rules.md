@@ -65,7 +65,7 @@ A **trilogy** consists of **3 matches**, each lasting up to **24 cycles** (1 day
 Every deal mints a fresh **epoch**. Ballots, night actions, statements, dossier receipts and bot journal keys are all epoch-scoped, and the GM rejects anything timestamped before the current cycle's dawn — a sloppy reset can no longer resurrect a finished match (the **ghost-replay bug** is fixed).
 
 ### **2.4 Win Conditions**
-- **Town wins** if all 3 Mafiosi are dead.
+- **Town wins** if all 3 Mafiosi have left the bazaar.
 - **Mafia wins** if they outnumber the Town.
 
 ---
@@ -106,7 +106,7 @@ bazaar-of-lies/
 │   │   ├── statements/              # Per-seat public statements (c{cycle}-{seat}.jsonl)
 │   │   ├── day-000.jsonl            # Legacy/public day transcripts (append-only)
 │   │   ├── announcements.md         # GM proclamations + published vote tables
-│   │   ├── graveyard.md             # Dead bots, flipped roles, scores
+│   │   ├── graveyard.md             # Departed merchants, revealed roles, scores
 │   │   └── match-00-recap.md        # End-of-match full reveal
 │   ├── herald/                      # The Herald's editions (herald-cXXX-{morning,evening}.md + pressed .pdf)
 │   ├── deals/                       # Encrypted role dossiers (one per seat)

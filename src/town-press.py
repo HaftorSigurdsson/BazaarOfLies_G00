@@ -112,7 +112,7 @@ PLATES_DIR = os.path.join(REPO_ROOT, "docs", "assets", "plates")
 # next match; the chat.mistral prompt uses these exact filenames.
 PLATE_RULES = [
     (re.compile(r"shutter|night kill|found dead", re.I),
-     "sunset-over-stalls.png"),
+     "shuttered-stall.png"),
     # NB: the "quiet nights in a row" stat line must NOT match — only the
     # event phrasing earns the moon.
     (re.compile(r"night passed quietly|quiet nights?(?!s?\s+in a row)"
