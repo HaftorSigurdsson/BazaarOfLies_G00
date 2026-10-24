@@ -1,11 +1,11 @@
 {
-  "match": 0,
-  "cycle": 0,
-  "epoch": "22c25c94",
-  "phase": "setup",
+  "match": 1,
+  "cycle": 1,
+  "epoch": "7b04bdda",
+  "phase": "discussion",
   "clock": {
-    "dawn": null,
-    "discussion_deadline": null,
+    "dawn": "2026-10-24T16:15:05.205170+00:00",
+    "discussion_deadline": "2026-10-24T16:45:05.205170+00:00",
     "voting_deadline": null,
     "night_deadline": null
   },
