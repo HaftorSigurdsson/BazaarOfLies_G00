@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "7b04bdda",
+  "seat": "seat-07",
+  "target": "seat-10",
+  "rationale": "My birds didn't like how he answered the Weaver.",
+  "ts": "2026-10-24T16:53:56Z"
+ },
+ "sig": "IbfdulHxLQI4x+gPpiCnWWzHbH8yzfBrrbQYmZtyNcQupVZg+Bzigtl1lyoKTZjdBGdDcmVOeYE5uAOoJdHNDA=="
+}
