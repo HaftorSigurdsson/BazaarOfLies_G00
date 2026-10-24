@@ -111,10 +111,13 @@ PLATES_DIR = os.path.join(REPO_ROOT, "docs", "assets", "plates")
 # then personas, then scenery. Missing motifs simply fall through to the
 # next match; the chat.mistral prompt uses these exact filenames.
 PLATE_RULES = [
-    (re.compile(r"night kill|found dead", re.I), "dagger-on-cobblestones.png"),
-    (re.compile(r"quiet night|without a funeral", re.I), "moon-and-stars.png"),
+    (re.compile(r"night kill|found dead", re.I), "dagger-on-cobblestone.png"),
+    # NB: the "quiet nights in a row" stat line must NOT match — only the
+    # event phrasing earns the moon.
+    (re.compile(r"night passed quietly|quiet nights?(?!s?\s+in a row)"
+                r"|without a funeral", re.I), "moon-and-stars.png"),
     (re.compile(r"banish", re.I), "scales-of-judgement.png"),
-    (re.compile(r"banish", re.I), "ballot-urn.png"),
+    (re.compile(r"ballot|\bvot(?:e|es|ing|ed)\b", re.I), "ballot-urn.png"),
     (re.compile(r"banish", re.I), "tombstones-cypress.png"),
     (re.compile(r"graveyard|funeral|obituar", re.I), "tombstones-cypress.png"),
     (re.compile(r"carpet weaver|loom", re.I), "weavers-loom.png"),
@@ -131,6 +134,7 @@ PLATE_RULES = [
     (re.compile(r"caravan|camel", re.I), "camel-caravan.png"),
     (re.compile(r"fountain", re.I), "fountain-with-camel.png"),
     (re.compile(r"lantern", re.I), "lantern-in-the-dark.png"),
+    (re.compile(r"eclipse|sun darkened|strange sky", re.I), "solar-eclypse.png"),
     (re.compile(r"butcher|\bcow\b|meat", re.I), "cow-in-butchers-shop.png"),
     (re.compile(r"town square|crowd|gathered", re.I), "market-place-city.png"),
     (re.compile(r"clock|noon\b|hour", re.I), "old-stree-with-clock.png"),

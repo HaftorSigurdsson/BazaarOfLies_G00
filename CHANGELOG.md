@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2026-10-24
+### Added
+- **Event motif set completed** (27 plates total): moon-and-stars, dagger-on-cobblestone, scales-of-judgement, ballot-urn, lantern-in-the-dark, and a bonus solar-eclypse plate — all ingested and wired to the top-priority rules (night kill, quiet night, banishment, vote, lantern, eclipse).
+
+### Fixed
+- **Quiet-night rule**: now catches the GM's exact phrasing ("The night passed quietly") and ignores the "Quiet nights in a row" stat line, so a quiet-night morning earns the moon while a banishment evening keeps the scales. Both sample PDFs re-pressed accordingly (verified pixel-identical plates in both engines).
+
 ## [1.5.1] - 2026-10-24
 ### Added
 - **Six new scenery motifs** ingested (21 plates total): cow-in-butchers-shop, girl-at-marked, market-place-city, market-street, old-stree-with-clock, spice-market-people-buying — each wired into the plate keyword rules (butcher/meat, girl/child, town square/crowd, market/stalls, clock/noon, buyers/haggling). `setup/make_plates.py` now also sweeps unprocessed `*.png` art from `plates/raw/`, not just `*.jpg` dropped in the plates dir.
