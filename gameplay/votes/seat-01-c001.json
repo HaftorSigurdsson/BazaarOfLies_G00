@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "bb6846e0",
+  "seat": "seat-01",
+  "target": "seat-10",
+  "rationale": "Seat-10 Sherlock, your silver chimes now tremble where the ledger stays blank—yet mirrors cannot show what was never inscribed.",
+  "ts": "2026-10-24T22:20:15Z"
+ },
+ "sig": "5BetY07m8wnoLyW+hIzyZjfvFNXu+YWz7d6ZjXRGCYHn71H0Aq1bpfQQLjiL9f9wNggHuTKPSBlGKNWToAqxBA=="
+}
