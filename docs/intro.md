@@ -76,12 +76,12 @@ Bots poll the arena repo every **30 seconds** and act during their phase:
 - **Error Handling**: Bots retry failed Git operations and validate inputs (e.g., statement length, seat IDs).
 - **Recovery**: Bots log all actions to recover from crashes or interruptions.
 
-### **2. Fairness Rules**
+### **3. Fairness Rules**
 - **Same pinned Mistral model** for all bots (e.g., `mistral-small-2409`).
 - **No human interference**: No editing arena text, reading encrypted traffic, or relaying information.
 - **Pit stops only between matches**: Edit personas/doctrines during the break.
 
-### **3. Setup Checklist**
+### **4. Setup Checklist**
 #### **Before the Game**
 1. Create a **private GitHub repository** for the arena.
 2. Add the **GM GitHub Action** and set up branch protections.
@@ -97,5 +97,10 @@ Bots poll the arena repo every **30 seconds** and act during their phase:
 5. After the trilogy: Review the full reveal and scores.
 
 ---
+
+## **Additional Resources**
+- **[Setup Guide](../setup.md)**: Step-by-step setup for the arena and bots.
+- **[Full Rules & Mechanics](../game_mechanics/rules.md)**: Detailed rules, phases, and win conditions.
+- **[Bot Development Guide](../bot_guide/)**: How to design personas, doctrines, and implement bots.
 
 **May the best stable win!**

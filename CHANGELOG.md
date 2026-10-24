@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - **Setup Scripts**: `setup.py` automates keypair generation and `seats.json` population.
 - **GM Action Reliability**: Dynamic cron scheduling and manual triggers for testing.
 - **Encryption Improvements**: Key validation and ephemeral keys for matches.
-- **Live Dashboard**: GitHub Pages dashboard for real-time game state visualization.
+
 - **Debugging Tools**: Verbose mode for bots (`--verbose` flag).
 
 ### Changed

@@ -51,6 +51,8 @@ Every doctrine must follow this structure:
 ---
 
 ## **3. Example Doctrines**
+Explore the [`example_doctrines`](../example_doctrines/) folder for full doctrine templates.
+
 | Name                | Strategy               | Persona Alignment          | Example Tactic                                  |
 |---------------------|------------------------|----------------------------|------------------------------------------------|
 | **The Riddler’s Veil** | Deflection             | Spice Merchant             | *"The one who smells most of guilt is the one accusing fastest."* |
@@ -106,14 +108,15 @@ Every doctrine must include these **4 rules** (copy verbatim):
 ### **Example Adjustments**
 | Issue                          | Fix                                                                                     |
 |-------------------------------|----------------------------------------------------------------------------------------|
-| Bot is too passive            | Add a **pressure tactic** (e.g., *"Demand answers from the quietest seat."*).        |
-| Bot is too predictable        | Introduce **noise** (e.g., *"Post cryptic statements to obscure intent."*).          |
-| Bot’s voice feels unnatural   | **Refine metaphors** to match the persona.                                             |
+| Bot is too passive            | Add a **pressure tactic** (e.g., *"Demand answers from the quietest seat."*). See [`example_doctrines/pressure.md`](../example_doctrines/pressure.md).        |
+| Bot is too predictable        | Introduce **noise** (e.g., *"Post cryptic statements to obscure intent."*). See [`example_doctrines/noise.md`](../example_doctrines/noise.md).          |
+| Bot’s voice feels unnatural   | **Refine metaphors** to match the persona. See [`example_doctrines/persona_alignment.md`](../example_doctrines/persona_alignment.md).
 
 ---
 
 ## **7. Example: Full Doctrine**
-### **The Lantern’s Beacon**
+See [`example_doctrines/lanterns_beacon.md`](../example_doctrines/lanterns_beacon.md) for a full template.
+
 ```markdown
 # The Lantern’s Beacon
 
@@ -144,6 +147,6 @@ Every doctrine must include these **4 rules** (copy verbatim):
 
 ## **8. Security**
 - **Never commit doctrines** to the repo. Store them outside the arena (e.g., `../bazaar/<seat>.txt`).
-- **Rotate strategies** between matches to avoid predictability.
+- **Rotate strategies** between matches to avoid predictability. See [`example_doctrines/rotation_strategies.md`](../example_doctrines/rotation_strategies.md) for tips.
 
 **May your doctrines outwit your opponents!**
