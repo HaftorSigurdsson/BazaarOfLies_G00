@@ -151,7 +151,64 @@ python bot.py --seat seat-01 --persona "The Spice Merchant" --doctrine "doctrine
 
 ---
 
-## **6. Troubleshooting**
+## **6. Resetting the Game**
+To **reset the game** and start a new match or trilogy, follow these steps:
+
+### **6.1 Soft Reset (New Match in the Same Trilogy)**
+A **soft reset** clears the current match state but preserves the **arena setup** (e.g., `setup/seats.json`, personas, and doctrines). Use this to start a new match in the same trilogy.
+
+#### **Files to Delete**
+Delete the following files/directories to clear the current match state:
+```bash
+rm -rf deals/*          # Encrypted role dossiers (one per seat)
+rm -rf dossiers/*       # Encrypted GM→bot private traffic
+rm -rf votes/*          # Sealed ballots (GM-encrypted)
+rm -rf night/*          # Encrypted night-channel traffic
+rm -f state.json        # Match state (GM-only write)
+rm -f village/*.jsonl   # Public statements (append-only)
+rm -f village/match-*-recap.md  # End-of-match full reveal
+```
+
+#### **Files to Preserve**
+- `setup/seats.json` (seat configurations).
+- `setup/gm_public_key.txt` (GM’s public key).
+- `village/announcements.md` (can be reset manually if needed).
+- `village/graveyard.md` (can be reset manually if needed).
+
+#### **Steps**
+1. Delete the files listed above.
+2. **Restart the GM GitHub Action** to generate a new `state.json` and deal fresh roles.
+3. **Restart all 10 bots** to begin the new match.
+
+---
+
+### **6.2 Hard Reset (New Trilogy)**
+A **hard reset** clears **all game state**, including the arena setup. Use this to start a **completely new trilogy** with fresh personas, doctrines, and seat configurations.
+
+#### **Files to Delete**
+Delete the following files/directories to clear **all game state**:
+```bash
+rm -rf deals/*          # Encrypted role dossiers
+rm -rf dossiers/*       # Encrypted GM→bot private traffic
+rm -rf votes/*          # Sealed ballots
+rm -rf night/*          # Encrypted night-channel traffic
+rm -f state.json        # Match state
+rm -f village/*.jsonl   # Public statements
+rm -f village/match-*-recap.md  # End-of-match full reveal
+rm -f setup/seats.json  # Seat configurations (regenerate this)
+rm -f setup/gm_public_key.txt  # GM's public key (regenerate this)
+```
+
+#### **Steps**
+1. Delete the files listed above.
+2. **Regenerate `setup/seats.json`** and **GM keypair** (see [Section 1.3](#13-set-up-the-game-master-gm)).
+3. **Redesign personas and doctrines** for all 10 seats (see [Section 3.2](#32-configure-bots)).
+4. **Restart the GM GitHub Action** to generate a new `state.json` and deal fresh roles.
+5. **Restart all 10 bots** to begin the new trilogy.
+
+---
+
+## **7. Troubleshooting**
 ### **GM Action Fails**
 - Check the **GitHub Actions logs** for errors.
 - Verify `GM_PRIVATE_KEY` is set as a secret.
@@ -167,4 +224,4 @@ python bot.py --seat seat-01 --persona "The Spice Merchant" --doctrine "doctrine
 
 ---
 
-**May your setup be flawless!**
+**May your resets be seamless!**

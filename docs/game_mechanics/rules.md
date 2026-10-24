@@ -155,8 +155,10 @@ flowchart TD
 
 ---
 
-## **6. Setup Guide**
-See the **[Setup Guide](../setup.md)** for step-by-step instructions on configuring the arena and deploying bots.
+## **6. Setup & Reset Guide**
+See the **[Setup Guide](../setup.md)** for step-by-step instructions on:
+- Configuring the arena and deploying bots.
+- **Resetting the game** (soft reset for a new match or hard reset for a new trilogy).
 
 ---
 

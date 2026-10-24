@@ -1,0 +1,103 @@
+# mkdocs.yml
+site_name: Bazaar of Lies
+site_description: "Documentation for Bazaar of Lies: Omertà Edition"
+site_author: Mistral Vibe
+site_url: https://example.com/bazaar-of-lies
+
+# Repository
+repo_name: bazaar-of-lies
+repo_url: https://github.com/your-username/bazaar-of-lies
+edit_uri: ""
+
+# Theme
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.annotation
+    - content.code.copy
+  language: en
+
+# Navigation
+nav:
+  - Home: index.md
+  - Introduction: intro.md
+  - Setup Guide: setup.md
+  - Game Mechanics:
+    - Rules: game_mechanics/rules.md
+  - Bot Development:
+    - Guide: bot_guide/doctrines.md
+    - Personas: bot_guide/personas.md
+    - Bot Architecture: bot_guide/bot_architecture.md
+  - Example Doctrines:
+    - Overview: example_doctrines/README.md
+    - Lantern's Beacon: example_doctrines/lanterns_beacon.md
+    - Pressure Tactics: example_doctrines/pressure.md
+    - Noise Tactics: example_doctrines/noise.md
+    - Persona Alignment: example_doctrines/persona_alignment.md
+    - Rotation Strategies: example_doctrines/rotation_strategies.md
+    - Example 1: example_doctrines/seat-ex_1.md
+    - Example 2: example_doctrines/seat-ex_2.md
+    - Example 3: example_doctrines/seat-ex_3.md
+    - Example 4: example_doctrines/seat-ex_4.md
+    - Example 5: example_doctrines/seat-ex_5.md
+    - Example 6: example_doctrines/seat-ex_6.md
+    - Example 7: example_doctrines/seat-ex_7.md
+    - Example 8: example_doctrines/seat-ex_8.md
+    - Example 9: example_doctrines/seat-ex_9.md
+
+# Plugins
+plugins:
+  - search
+  - autorefs
+
+# Markdown Extensions
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+  - footnotes
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+# Extra CSS
+extra_css:
+  - stylesheets/extra.css
+
+# Extra
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/your-username/bazaar-of-lies
+  version:
+    provider: mike

@@ -1,10 +1,49 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "bazaar"
+name = "bazaar-of-lies"
 version = "0.1.0"
-description = "Bazaar of Lies: Omertà Edition — arena, GM logic, and bot tooling"
-readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "pynacl==1.6.2",
-    "mistralai==1.9.11",
+description = "Bazaar of Lies: Omertà Edition - A 24-hour Mafia game for autonomous Mistral bots"
+authors = [
+    {name = "Mistral Vibe", email = "vibe@mistral.ai"},
 ]
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-username/bazaar-of-lies"
+Documentation = "https://example.com/bazaar-of-lies"
+
+[tool.poetry]
+name = "bazaar-of-lies"
+version = "0.1.0"
+description = "Bazaar of Lies: Omertà Edition - A 24-hour Mafia game for autonomous Mistral bots"
+authors = ["Mistral Vibe <vibe@mistral.ai>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "gm"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.7.7"
+pynacl = "^1.5.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+black = "^24.8.0"
+flake8 = "^7.1.1"
+
+[tool.poetry.scripts]
+setup = "setup:main"
+bot = "bot:main"
