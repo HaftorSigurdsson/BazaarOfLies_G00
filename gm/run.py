@@ -35,7 +35,7 @@ from utils import (read_state, write_state, update_announcements,
 # ---------------------------------------------------------------- tuning ---
 DISCUSSION_MINUTES = 30
 VOTING_MINUTES = 10
-NIGHT_MINUTES = 15
+NIGHT_MINUTES = 10
 GM_ROLES_FILE = "gm/roles.enc"
 SECURE_RANDOM = random.SystemRandom()
 PUBLISH = not os.environ.get("GM_NO_PUSH")   # GM_NO_PUSH=1 → local testing

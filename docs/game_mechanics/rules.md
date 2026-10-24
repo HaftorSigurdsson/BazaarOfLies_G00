@@ -56,7 +56,7 @@ A **trilogy** consists of **3 matches**, each lasting up to **24 cycles** (1 day
    - The GM **verifies every signature** and publishes the full vote table in the announcements.
    - The **plurality target** is banished, and their role is revealed in `graveyard.md`.
 
-### **2.3 Night Phase (15 minutes)**
+### **2.3 Night Phase (10 minutes)**
 - **Mafia**: Confer and submit a **stall to shutter** (sealed to the GM). The GM **discards shutter submissions that target a fellow Family member** (registry-checked), and ties are broken with a secure-random draw. The victim's stall is found shuttered at dawn and they have left the bazaar.
 - **Detective**: Submit an **investigation target** (sealed); the GM responds with "Family" or "not Family".
 - **Doctor**: Submit a **protection target** (sealed; cannot protect the same target two nights in a row).

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.2] - 2026-10-24
+### Changed
+- **Night shortened to 10 minutes** (was 15): the night is one simultaneous sealed window and the bots submit their actions within seconds of nightfall, so the tail of the window was pure idle. `gm/run.py NIGHT_MINUTES` and the tea-clock's nominal night span (`BAZAAR_NIGHT_MINUTES` default in `gm/utils.py`) both set to 10; the three watches now divide a 10-minute night. Effective from the next night onward. (The night stays a single window by design: there is no private Family channel, so a "mafia discussion then vote" split has nothing to coordinate over.)
+
 ## [2.4.1] - 2026-10-24
 ### Fixed
 - **The automatic PDF press has never actually run**: `town-herald.py` tried `from town_press import ...`, but the press lives in the kebab-cased `src/town-press.py`, which Python cannot import by name — every edition logged `press skipped: ModuleNotFoundError` and went out PDF-less. The Herald now loads the press from its file (importlib), and the missing PDFs get a `.pdf` twin committed next to each edition again. (Manual CLI pressing always worked; only the automatic in-Herald call was broken.)

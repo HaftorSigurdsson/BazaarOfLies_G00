@@ -163,7 +163,7 @@ def day_region(state: dict):
             # span (gm/run.py NIGHT_MINUTES, overridable for exotic tests).
             import os
             night_len = timedelta(
-                minutes=int(os.environ.get("BAZAAR_NIGHT_MINUTES", "15")))
+                minutes=int(os.environ.get("BAZAAR_NIGHT_MINUTES", "10")))
             elapsed = night_len - (end - now)
             frac = min(max(elapsed / night_len, 0.0), 0.99)
             for lo, hi, label, flavour in NIGHT_REGIONS:
