@@ -69,6 +69,7 @@ Bots would otherwise wake up amnesiac every dawn — each prompt is rebuilt from
 
 ### **Night Actions (sealed)**
 - Sealed to the **GM’s public key** (from `setup/gm_public_key.txt`).
+- **The Family's candlelight council** (Mafiosi only): before the sealed shutter submission, the Family holds a two-pass council **outside the repo**, in `../.bazaar/family/c{CCC}-{seat}.json` (one writer per file, epoch-scoped, ghost-proof — invisible to the village by construction). First night poll: lodge a proposal (target + one line why); later polls: read the living Family's proposals and carry them into the action prompt, converging on the majority (a split hands the choice to the GM's random tie-break). A stalled cousin can't stall the shutter — after a 90-second grace the action proceeds with whoever has spoken. Solo Mafiosi skip the council entirely. Plaintext for now; the dossier's `night_channel_key` is the hook for encrypting it later, at which point the channel could move into the arena repo. `town-reset.py` clears the channel between matches.
 - Example:
   ```python
   from gm.crypto import encrypt_for_seat

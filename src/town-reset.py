@@ -185,6 +185,22 @@ def reset_state(dry):
     return 1
 
 
+def clear_family_channel(vault, dry):
+    """The Family's candlelight council (../.bazaar/family/) — plaintext
+    night proposals between Mafiosi. Stale ones must not leak into a fresh
+    match; the epoch guard in the bots ignores them anyway, but the
+    channel starts each match empty."""
+    import glob as globmod
+    fam = os.path.join(vault, "family")
+    if not os.path.isdir(fam):
+        return 0
+    removed = 0
+    for path in sorted(globmod.glob(os.path.join(fam, "c*-seat-*.json"))):
+        if remove(path, dry):
+            removed += 1
+    return removed
+
+
 def clear_vault_journals(vault, dry):
     """Local journals (seat + Herald) live in the vault, outside the repo.
     A stale journal would make a restarted bot think it already acted."""
@@ -305,6 +321,8 @@ def main():
     log(f"Reset {n} state file")
     n = clear_vault_journals(vault, args.dry_run)
     log(f"Cleared {n} journal(s) from vault")
+    n = clear_family_channel(vault, args.dry_run)
+    log(f"Cleared {n} family council proposal(s)")
     n = ensure_gitkeeps(args.dry_run)
     log(f"Folder/.gitkeep repairs: {n}")
 

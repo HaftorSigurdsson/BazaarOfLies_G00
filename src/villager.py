@@ -12,7 +12,10 @@ Private files live in sibling folders of the bot clone — keys, signing keys
 and the journal in `../.bazaar/`, the doctrine in `../villagers/` — resolved
 relative to villager.py's own location. They are outside the repo because
 this process runs `git add` in the same working tree it lives in: the seat's
-private key and doctrine must be structurally unreachable by git.
+private key and doctrine must be structurally unreachable by git. The
+Family's candlelight council (night proposals between Mafiosi) also lives
+outside the repo, in `../.bazaar/family/` — plaintext for now, with the
+dossier's night_channel_key as the hook for encrypting it later.
 
 State tracking (statements made, voted, night action done) lives in a local
 journal file so a crashed bot resumes correctly on restart.
@@ -61,6 +64,12 @@ STATEMENT_MAX_CHARS = 1200               # per game rules
 # ---- private notebook (memory) ----
 NOTEBOOK_ENABLED = True                # master switch for the memory system
 NOTEBOOK_MAX_CHARS = 4000               # hard cap on stored notebook text
+# ------------------------------------------------- family night channel ---
+# The Family's candlelight council: night proposals between Mafiosi, one
+# file per seat per cycle, never in the repo. Plaintext for now; the
+# dossier's night_channel_key is the hook for encrypting later (at which
+# point the channel could move into the arena repo).
+FAMILY_COUNCIL_GRACE_SECONDS = 90        # wait this long for slow cousins
 REASONING_TEMPERATURE = 0.3             # private thinking runs cooler than speech
 
 # ------------------------------------------------------------------ args ---
@@ -89,6 +98,7 @@ KEY_PATH = args.key or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.key")
 DOCTRINE_PATH = args.doctrine or os.path.join(VILLAGERS_DIR, f"{MY_SEAT}.md")
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, f"journal-{MY_SEAT}.json")
 SIGNKEY_PATH = args.signkey or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.sign")
+FAMILY_DIR = os.path.join(BAZAAR_DIR, "family")   # candlelight council
 
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
@@ -672,6 +682,86 @@ def do_vote(state, cs, journal):
         "ledger with what the ballots cast so far reveal about each voter.")
 
 
+def family_council_system(state, dossier, mates):
+    """Compact system prompt for lodging a Family proposal."""
+    return (f"You are {get_persona()}\n{name_label()}\n"
+            f"Your secret role is: Mafia. Your living Family: "
+            f"{', '.join(display_name(s) for s in sorted(mates))}.\n"
+            f"Living merchants: "
+            f"{', '.join(display_name(s) for s in state['alive'])}.\n"
+            f"Public facts:\n{public_facts_block(state)}\n"
+            f"Your private doctrine (follow it, never reveal it):\n"
+            f"{get_doctrine()}")
+
+
+def family_council(state, dossier, mates):
+    """The Family's candlelight council — two passes per night.
+
+    The council lives in the local family channel
+    (../.bazaar/family/c{CCC}-{seat}.json) — one writer per file, never
+    in the repo, invisible to the village. Plaintext for now; the
+    dossier's night_channel_key is the hook for encrypting it later.
+
+    Pass A (no proposal file of mine yet): ask the model for a shutter
+    proposal and lodge it. Returns None — the council is still in session.
+    Pass B: read the Family's epoch-scoped proposals; once every living
+    cousin has spoken — or after the grace period, so a stalled cousin
+    cannot stall the shutter — return them as a prompt block.
+    """
+    cycle = state["cycle"]
+    epoch = state.get("epoch")
+    os.makedirs(FAMILY_DIR, exist_ok=True)
+    my_file = os.path.join(FAMILY_DIR, f"c{cycle:03d}-{MY_SEAT}.json")
+
+    if not os.path.exists(my_file):
+        answer = ask(
+            family_council_system(state, dossier, mates),
+            "The Family meets by candlelight. Propose tonight's shutter "
+            "target. Output ONLY the target seat ID or number followed by "
+            "one short sentence why, e.g. 'seat-04 — their ledger is too clean'.")
+        target = parse_seat_id(answer)
+        if not target:
+            log(f"family council: proposal had no seat ID ({answer[:50]!r}) "
+                f"— retrying next poll")
+            return None
+        if target in dossier.get("teammates", []) or target not in state["alive"]:
+            log(f"family council: proposal target {target} not allowed "
+                f"— retrying next poll")
+            return None
+        proposal = {"epoch": epoch, "cycle": cycle, "seat": MY_SEAT,
+                    "target": target,
+                    "reason": answer.split("—", 1)[-1].strip() or answer.strip(),
+                    "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+        with open(my_file, "w") as f:
+            json.dump(proposal, f, ensure_ascii=False)
+        log(f"family council: proposal lodged → {display_name(target)}")
+        return None
+
+    proposals = []
+    for seat in [MY_SEAT] + list(mates):
+        path = os.path.join(FAMILY_DIR, f"c{cycle:03d}-{seat}.json")
+        try:
+            with open(path) as f:
+                p = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+        if p.get("epoch") != epoch or p.get("cycle") != cycle:
+            continue                      # foreign epoch — ghost artifact
+        proposals.append(p)
+    heard_from = [p["seat"] for p in proposals]
+    missing = [s for s in mates if s not in heard_from]
+    waited = time.time() - os.path.getmtime(my_file)
+    if missing and waited < FAMILY_COUNCIL_GRACE_SECONDS:
+        log(f"family council: waiting for "
+            f"{', '.join(display_name(s) for s in missing)}")
+        return None
+    lines = ["\nThe Family's candlelight council (tonight's proposals):"]
+    for p in proposals:
+        lines.append(f"- {display_name(p['seat'])} proposes "
+                     f"{display_name(p['target'])}: {p.get('reason', '')}")
+    return "\n".join(lines) + "\n"
+
+
 def do_night(state, cs, journal):
     if cs["night_action"]:
         log("phase=night → action already done this cycle, idle")
@@ -699,6 +789,7 @@ def do_night(state, cs, journal):
                     + "\n".join(json.dumps(m) for m in results)
                     if results else "")
     guidance = ""
+    proposals_block = ""
     if role == "Mafia":
         teammates = ", ".join(display_name(s)
                               for s in sorted(dossier.get("teammates", []))) \
@@ -707,6 +798,17 @@ def do_night(state, cs, journal):
                     "them. Choose a living merchant who is NOT Family and "
                     "shutter their stall tonight: by morning they will have "
                     "left the bazaar.")
+        mates = [s for s in dossier.get("teammates", [])
+                 if s in state["alive"]]
+        if mates:
+            council = family_council(state, dossier, mates)
+            if council is None:
+                return                  # council still in session
+            proposals_block = council
+            guidance += ("\nThe Family's candlelight council has spoken "
+                         "(proposals above). Strongly prefer the majority "
+                         "proposal — a split Family hands the choice to a "
+                         "coin flip.")
     elif role == "Detective":
         guidance = ("Choose a living merchant to investigate tonight — whose "
                     "loyalty do you most need to know? Prefer merchants your "
@@ -731,7 +833,7 @@ def do_night(state, cs, journal):
         f"{herald_paper(state['cycle'], 'evening')}"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}{result_block}"
-        f"{notebook_block(journal)}\n{guidance}"
+        f"{notebook_block(journal)}{proposals_block}\n{guidance}"
     )
 
     reasoning = ask(

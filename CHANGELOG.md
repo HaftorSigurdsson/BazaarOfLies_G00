@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.5.0] - 2026-10-24
+### Added
+- **The Family's candlelight council**: Mafiosi can now coordinate at night — a two-pass conclave held **outside the repo**, in `../.bazaar/family/c{CCC}-{seat}.json` (one writer per file, epoch-scoped, ghost-proof; invisible to the village by construction). First night poll: each Mafioso lodges a shutter proposal (target + one line why); later polls: the Family's proposals are read into the sealed-action prompt with instruction to converge on the majority (a split hands the choice to the GM's random tie-break). A 90-second grace keeps a stalled cousin from stalling the shutter; solo Mafiosi skip the council. Plaintext for now — the dossier's `night_channel_key` (dealt but previously unused) is the hook for encrypting it later, at which point the channel could move into the arena repo. `town-reset.py` and `setup/reset_match.sh` clear the channel between matches; documented in the bot architecture guide.
+
 ## [2.4.5] - 2026-10-24
 ### Fixed
 - **Seat keys re-aligned mid-match (surgery, no reset)**: the vault's original seat private keys had been overwritten by the accidental `town-setup.py` re-run's regenerated keypairs, so nothing the GM sealed to a seat could be decrypted — every bot failed with `CryptoError` at night and **no night actions were ever submitted** (no kills, no saves, no investigations; the town played blind). The vault keypairs are now canonical: `setup/seats.json` public keys re-derived from them, and the live match's dossiers re-sealed from the GM's registry (same roles and teammates; fresh shared Family night key — the old one was locked inside undecryptable dossiers). Verified: all ten re-sealed dossiers decrypt with the vault keys.
