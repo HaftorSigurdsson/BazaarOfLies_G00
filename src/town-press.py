@@ -12,48 +12,45 @@ The Herald calls compile_edition() automatically after printing an
 edition, so every gameplay/news/herald-cXXX-{morning,evening}.md gets a
 .pdf twin committed next to it.
 
-Layout (A4 portrait, Times):
-    masthead  THE BAZAAR HERALD, double rules
-    dateline  Vol/No | edition | date | price
-    headline  from the edition's first heading (or a default per edition)
-    body      two justified columns; auto-shrinks until it fits one page
-    footer    rule + colophon
+Two engines, tried in order:
+  1. LaTeX (tectonic or pdflatex) — real newspaper typography in the
+     style of the classic Overleaf "Newspaper / News-letter" template:
+     Times-like type, hyphenation + microtype, drop cap, thin column
+     rule, ruled section heads, double-rule masthead.
+  2. fpdf2 fallback — pure-Python, no system deps; plainer but always
+     available. Used only when no LaTeX engine is on PATH.
 
-FUTURE (deliberately not built yet, hooks in place):
-    - a woodcut-style engraving between headline and columns
-      (reserve ~30mm with pdf.image(...) when artwork exists);
-    - "The Bazaar Whisper": a narrow third column of non-game humour,
-      routed from a `## Bazaar Whisper` section of the markdown.
+FUTURE (deliberately not built yet, hooks in place in build_tex()):
+    - a woodcut-style engraving under the headline (commented
+      \\includegraphics slot);
+    - "The Bazaar Whisper": a humour column with nothing to do with the
+      game (commented slot at the foot of the columns).
 """
 import argparse
 import os
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 
-from fpdf import FPDF
-
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-PAGE_W, PAGE_H = 210.0, 297.0          # A4, mm
-MARGIN = 15.0                          # left/right
-GUTTER = 6.0
-COL_W = (PAGE_W - 2 * MARGIN - GUTTER) / 2.0
-BODY_TOP = 62.0                        # first baseline area under dateline
-BODY_BOTTOM = PAGE_H - 18.0            # above the footer
-LEAD = 0.46                            # leading as a fraction of font size
 
 DEFAULT_HEADLINE = {
     "morning": "The Bazaar Awakens",
     "evening": "Night Falls on the Bazaar",
 }
+COLOPHON = ("Printed by the arena press for the humans watching the "
+            "merchants. The merchants themselves read the plain markdown "
+            "\u2014 this page is pleasure, not game input.")
 
 
+# ------------------------------------------------------------- parsing ----
 def sanitize(text):
-    """Core fonts speak cp1252 — keep everything else from exploding."""
-    return (text.replace("\u2019", "'").replace("\u201c", '"')
-                .replace("\u201d", '"')
-                .encode("cp1252", errors="replace").decode("cp1252"))
+    """Keep typographic quotes/dashes that LaTeX likes; drop the rest."""
+    return (text.replace("\u2019", "'").replace("\u201c", "``")
+                .replace("\u201d", "''"))
 
 
 def parse_edition(md_text, md_path):
@@ -95,13 +92,188 @@ def parse_edition(md_text, md_path):
     }
 
 
-class Paper(FPDF):
-    def footer(self):  # auto page break footer only (overflow pages)
-        pass
+# ---------------------------------------------------------------- latex ----
+def latex_escape(text):
+    return (text.replace("\\", r"\textbackslash{}")
+                .replace("&", r"\&").replace("%", r"\%")
+                .replace("#", r"\#").replace("_", r"\_")
+                .replace("{", r"\{").replace("}", r"\}")
+                .replace("~", r"\textasciitilde{}")
+                .replace("^", r"\textasciicircum{}"))
+
+
+def latex_inline(text):
+    """Light markdown → LaTeX: **bold**, *italic*."""
+    text = latex_escape(text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"\\textbf{\1}", text)
+    text = re.sub(r"\*(.+?)\*", r"\\emph{\1}", text)
+    return text
+
+
+def build_tex(meta, date_str, size, linespread):
+    """A one-page newspaper front page, Overleaf-template style."""
+    body, first_para_done = [], False
+    for kind, text in meta["blocks"]:
+        if kind == "subhead":
+            body.append(r"\section*{%s}" % latex_escape(text))
+        else:
+            if not first_para_done:          # drop cap on the opening paragraph
+                words = text.split()
+                if len(words) >= 2:
+                    body.append(
+                        r"\lettrine[lines=2,findent=2pt,nindent=0pt]{%s}{%s}%s "
+                        % (latex_escape(words[0][0]),
+                           latex_escape(words[0][1:]),
+                           latex_inline(" ".join(words[1:]))))
+                else:
+                    body.append(latex_inline(text))
+                first_para_done = True
+            else:
+                body.append(latex_inline(text))
+        body.append("\n")
+
+    # FUTURE: "The Bazaar Whisper" humour column (append a ruled, narrow,
+    # entirely non-game sidebar section at the foot of the columns).
+
+    return r"""\documentclass[{size}pt]{{extarticle}}
+\usepackage[a4paper,left=14mm,right=14mm,top=13mm,bottom=16mm]{{geometry}}
+\usepackage{{newtxtext}}
+\usepackage{{microtype}}
+\usepackage{{multicol}}
+\usepackage{{titlesec}}
+\usepackage{{lettrine}}
+\linespread{{{linespread}}}
+
+\setlength{{\parindent}}{{0pt}}
+\setlength{{\parskip}}{{3pt}}
+\setlength{{\columnsep}}{{7mm}}
+\setlength{{\columnseprule}}{{0.3pt}}
+
+% section heads: ruled, bold, centred — the newspaper look
+\titleformat{{\section}}[block]
+  {{\normalsize\bfseries\centering\MakeUppercase}}{{}}{{0pt}}{{}}
+  [{{\vspace{{1pt}}\titlerule[0.5pt]}}]
+\titlespacing*{{\section}}{{0pt}}{{9pt}}{{5pt}}
+
+\newcommand{{\doubleRule}}{{%
+  \par\nointerlineskip\vspace{{3pt}}\hrule height .9pt
+  \vspace{{2.5pt}}\hrule height .3pt\vspace{{5pt}}}}
+
+\begin{{document}}
+\thispagestyle{{empty}}
+
+% ---- masthead ------------------------------------------------------------
+\begin{{center}}
+{{\fontsize{{33}}{{37}}\selectfont\bfseries THE BAZAAR HERALD\par}}
+\doubleRule
+{{\small\itshape Vol. {match} --- No. {cycle} \quad|\quad {edition} Edition
+  \quad|\quad {date} \quad|\quad Price: one spiced date\par}}
+\vspace{{2pt}}\hrule height .3pt
+\end{{center}}
+
+% ---- headline ------------------------------------------------------------
+\begin{{center}}
+{{\fontsize{{19}}{{23}}\selectfont\bfseries {headline}\par}}
+\end{{center}}
+% FUTURE: woodcut engraving here, e.g.
+% \includegraphics[width=0.92\linewidth]{{engraving.jpg}}
+
+\vspace{{2pt}}
+\begin{{multicols}}{{2}}
+{body}
+\end{{multicols}}
+
+% ---- colophon ------------------------------------------------------------
+\vfill
+\begin{{center}}
+\rule{{0.35\linewidth}}{{0.3pt}}\\[3pt]
+{{\footnotesize\itshape {colophon}}}
+\end{{center}}
+\end{{document}}
+""".format(size=size, linespread=linespread,
+           match=latex_escape(meta["match"]), cycle=latex_escape(meta["cycle"]),
+           edition=latex_escape(meta["part"].capitalize()),
+           date=latex_escape(date_str),
+           headline=latex_escape(meta["headline"]),
+           body="".join(body), colophon=latex_escape(sanitize(COLOPHON)))
+
+
+def find_engine():
+    for exe in ("tectonic", "pdflatex"):
+        if shutil.which(exe):
+            return exe
+    return None
+
+
+def run_engine(engine, tex_path, outdir, timeout=180):
+    if engine == "tectonic":
+        cmd = [engine, "-o", outdir, tex_path]
+    else:
+        cmd = [engine, "-interaction=nonstopmode",
+               "-output-directory", outdir, tex_path]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    pdf = os.path.join(outdir, os.path.splitext(os.path.basename(tex_path))[0]
+                       + ".pdf")
+    if r.returncode != 0 or not os.path.exists(pdf):
+        raise RuntimeError(f"{engine} failed:\n{r.stdout[-500:]}\n{r.stderr[-300:]}")
+    return pdf
+
+
+def count_pages(pdf_path):
+    try:
+        from pypdf import PdfReader
+        return len(PdfReader(pdf_path).pages)
+    except Exception:
+        return 1     # cannot count — assume it fit
+
+
+def compile_latex(meta, date_str, out_path):
+    """Ladder down in type size until the edition fits one A4 page.
+    If nothing fits (an overlong edition), print the smallest one anyway —
+    two pages beat no paper."""
+    engine = find_engine()
+    ladder = [(10, 1.06), (9, 1.06), (9, 1.0), (8, 1.0), (8, 0.94)]
+    last_bytes = None
+    for size, spread in ladder:
+        tex = build_tex(meta, date_str, size, spread)
+        with tempfile.TemporaryDirectory() as tmp:
+            tex_path = os.path.join(tmp, "herald.tex")
+            with open(tex_path, "w") as f:
+                f.write(tex)
+            try:
+                pdf = run_engine(engine, tex_path, tmp)
+            except Exception:
+                continue
+            if count_pages(pdf) <= 1:
+                shutil.move(pdf, out_path)
+                return out_path, 1
+            if last_bytes is None:      # keep the biggest type as the fallback
+                with open(pdf, "rb") as f:
+                    last_bytes = f.read()
+    if last_bytes is None:
+        raise RuntimeError(f"{engine} could not compile the edition")
+    with open(out_path, "wb") as f:
+        f.write(last_bytes)
+    return out_path, count_pages(out_path)
+
+
+# --------------------------------------------------------------- fpdf2 ----
+PAGE_W, PAGE_H = 210.0, 297.0          # A4, mm
+MARGIN = 15.0
+GUTTER = 6.0
+COL_W = (PAGE_W - 2 * MARGIN - GUTTER) / 2.0
+BODY_TOP = 62.0
+BODY_BOTTOM = PAGE_H - 18.0
+LEAD = 0.46
+
+
+def fpdf_sanitize(text):
+    return (text.replace("\u2019", "'").replace("\u201c", '"')
+                .replace("\u201d", '"')
+                .encode("cp1252", errors="replace").decode("cp1252"))
 
 
 def _wrap_lines(pdf, w, text):
-    """Number of text lines a justified block needs at the current font."""
     lines, current = 0, ""
     for word in text.split():
         trial = (current + " " + word).strip()
@@ -113,16 +285,20 @@ def _wrap_lines(pdf, w, text):
     return lines + (1 if current else 0)
 
 
-def render(meta, date_str, size):
-    """Render one candidate layout. Returns the FPDF and whether it fit
-    on a single page."""
+def render_fpdf(meta, date_str, size):
+    """The fpdf2 fallback: plainer, but dependency-free."""
+    from fpdf import FPDF
+
+    class Paper(FPDF):
+        def footer(self):
+            pass
+
     pdf = Paper("P", "mm", "A4")
     pdf.core_fonts_encoding = "cp1252"
     pdf.set_auto_page_break(True, margin=15)
     pdf.add_page()
     pdf.set_margins(MARGIN, 15, MARGIN)
 
-    # ---- masthead ----------------------------------------------------
     pdf.set_font("Times", "B", 40)
     pdf.cell(0, 16, "The Bazaar Herald", align="C")
     pdf.set_y(pdf.get_y() + 1)
@@ -132,75 +308,83 @@ def render(meta, date_str, size):
     pdf.line(MARGIN, pdf.get_y() + 1.2, PAGE_W - MARGIN, pdf.get_y() + 1.2)
     pdf.set_y(pdf.get_y() + 2.0)
 
-    # ---- dateline bar -------------------------------------------------
     pdf.set_font("Times", "I", 9.5)
     dateline = (f"Vol. {meta['match']} \u2014 No. {meta['cycle']}"
                 f"   |   {meta['part'].capitalize()} Edition"
                 f"   |   {date_str}   |   Price: one spiced date")
-    pdf.cell(0, 5, sanitize(dateline), align="C")
-    pdf.set_line_width(0.25)
+    pdf.cell(0, 5, fpdf_sanitize(dateline), align="C")
     pdf.line(MARGIN, pdf.get_y() + 1.2, PAGE_W - MARGIN, pdf.get_y() + 1.2)
 
-    # ---- headline ------------------------------------------------------
     pdf.set_y(pdf.get_y() + 5)
     pdf.set_font("Times", "B", 22)
-    pdf.multi_cell(0, 10, meta["headline"], align="C")
+    pdf.multi_cell(0, 10, fpdf_sanitize(meta["headline"]), align="C")
     pdf.set_y(pdf.get_y() + 1.5)
 
-    # FUTURE: woodcut engraving here — pdf.image(...), ~30mm tall.
-
-    # ---- body: two justified columns ------------------------------------
     leading = size * LEAD
     col_x = [MARGIN, MARGIN + COL_W + GUTTER]
     col, y = 0, BODY_TOP
-
     for kind, text in meta["blocks"]:
         pdf.set_font("Times", "B" if kind == "subhead" else "", size)
-        w = COL_W
-        n_lines = _wrap_lines(pdf, w, text)
-        block_h = n_lines * leading + (3.0 if kind == "subhead" else 1.6)
+        block_h = (_wrap_lines(pdf, COL_W, text) * leading
+                   + (3.0 if kind == "subhead" else 1.6))
         if y + block_h > BODY_BOTTOM:
             if col == 0:
                 col, y = 1, BODY_TOP
-            else:                        # ran past column two → page two
+            else:
                 return pdf, False
         pdf.set_xy(col_x[col], y)
         if kind == "subhead":
             pdf.set_font("Times", "B", size + 1)
-            pdf.multi_cell(w, leading, text.upper(), align="L")
+            pdf.multi_cell(COL_W, leading, text.upper(), align="L")
         else:
-            pdf.multi_cell(w, leading, text, align="J")
+            pdf.multi_cell(COL_W, leading, text, align="J")
         y = pdf.get_y() + (1.8 if kind == "subhead" else 1.2)
 
-    # ---- footer ---------------------------------------------------------
-    pdf.set_auto_page_break(False)   # colophon lives in the bottom margin
-    pdf.set_line_width(0.25)
+    pdf.set_auto_page_break(False)
     pdf.line(MARGIN, BODY_BOTTOM + 2.5, PAGE_W - MARGIN, BODY_BOTTOM + 2.5)
     pdf.set_font("Times", "I", 8.5)
     pdf.set_xy(MARGIN, BODY_BOTTOM + 3.5)
-    pdf.multi_cell(0, 4,
-                   sanitize("Printed by the arena press for the humans watching the "
-                            "merchants. The merchants themselves read the plain "
-                            "markdown \u2014 this page is pleasure, not game input."),
-                   align="C")
-    # FUTURE: "The Bazaar Whisper" humour column (third narrow column).
-
+    pdf.multi_cell(0, 4, fpdf_sanitize(COLOPHON), align="C")
     return pdf, True
 
 
-def compile_edition(md_path, out_path=None):
-    """Compile one edition markdown into its one-page A4 PDF twin."""
+def compile_fpdf(meta, date_str, out_path):
+    for size in (10.0, 9.5, 9.0, 8.5, 8.0, 7.5):
+        pdf, fits = render_fpdf(meta, date_str, size)
+        if fits:
+            pdf.output(out_path)
+            return out_path
+    raise RuntimeError("edition does not fit on one A4 page (fpdf2)")
+
+
+# --------------------------------------------------------------- entry ----
+def compile_edition(md_path, out_path=None, quiet=False):
+    """Compile one edition markdown into its one-page A4 PDF twin.
+    Prefers LaTeX (tectonic/pdflatex); falls back to fpdf2."""
     with open(md_path) as f:
         meta = parse_edition(f.read(), md_path)
     date_str = datetime.now(timezone.utc).strftime("%d %B %Y")
     out_path = out_path or os.path.splitext(md_path)[0] + ".pdf"
 
-    for size in (10.0, 9.5, 9.0, 8.5, 8.0, 7.5):   # auto-fit: one page or bust
-        pdf, fits = render(meta, date_str, size)
-        if fits:
-            pdf.output(out_path)
+    engine = find_engine()
+    if engine:
+        try:
+            out_path, pages = compile_latex(meta, date_str, out_path)
+            if not quiet:
+                note = "" if pages == 1 else f" ({pages} pages — a long edition)"
+                print(f"==> pressed {out_path} (LaTeX/{engine}){note}")
             return out_path
-    raise RuntimeError("edition does not fit on one A4 page")
+        except Exception as e:
+            if not quiet:
+                print(f"==> LaTeX press failed, using fpdf2 fallback: {e}")
+    else:
+        if not quiet:
+            print("==> no LaTeX engine (install tectonic for the fine "
+                  "edition); using fpdf2 fallback")
+    compile_fpdf(meta, date_str, out_path)
+    if not quiet:
+        print(f"==> pressed {out_path} (fpdf2 fallback)")
+    return out_path
 
 
 def main():
@@ -212,12 +396,11 @@ def main():
                     help="Output PDF path (default: same stem, .pdf)")
     args = ap.parse_args()
 
-    out = compile_edition(os.path.join(REPO_ROOT, args.edition)
-                          if not os.path.isabs(args.edition) else args.edition,
-                          os.path.join(REPO_ROOT, args.output)
-                          if args.output and not os.path.isabs(args.output)
-                          else args.output)
-    print(f"==> pressed {out}")
+    compile_edition(args.edition if os.path.isabs(args.edition)
+                    else os.path.join(REPO_ROOT, args.edition),
+                    os.path.join(REPO_ROOT, args.output)
+                    if args.output and not os.path.isabs(args.output)
+                    else args.output)
     return 0
 
 

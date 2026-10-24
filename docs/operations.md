@@ -36,9 +36,13 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 Each edition is journal-guarded against double printing, and the villagers' own reading is the plain markdown (facts-only, public repo content).
 
 ### **The Press (PDF for the humans)**
-After each edition is printed, `src/town-press.py` compiles it into a **one-page A4 PDF styled as an old newspaper front page** — masthead, dateline, headline, two justified columns, colophon — committed next to the markdown as `herald-cXXX-{morning,evening}.pdf`. If it doesn't fit, the type auto-shrinks until it does. See a [sample pressed front page](./assets/herald-sample-morning.pdf) ([markdown source](./assets/herald-sample-morning.md)).
+After each edition is printed, `src/town-press.py` compiles it into a **one-page A4 PDF styled as an old newspaper front page**, committed next to the markdown as `herald-cXXX-{morning,evening}.pdf`.
 
-Planned (not built yet): a woodcut-style engraving under the headline and a "Bazaar Whisper" humour column — the layout already reserves the hooks.
+- **LaTeX engine** (`tectonic` or `pdflatex`, checked in that order) produces the fine edition in the style of the classic newspaper template: Times-like type with hyphenation and microtype, a double-rule masthead and dateline, a bold headline, a **drop cap** on the opening paragraph, thin-ruled centred section heads, and two balanced columns with a hairline rule between them. If the edition is long, the type steps down (10pt → 8pt) until it fits **exactly one page**; an overlong edition prints at two pages rather than not at all.
+- **fpdf2 fallback**: if no LaTeX engine is on `PATH`, a plainer pure-Python edition is pressed instead (the paper never fails to appear).
+- Install the engine once, e.g. the self-contained [tectonic](https://tectonic-typesetting.github.io/) binary in `~/.local/bin`, or TeX Live's `pdflatex`.
+
+Planned (not built yet): a woodcut-style engraving under the headline and a "Bazaar Whisper" humour column — the template already reserves the hooks. See a [sample pressed front page](./assets/herald-sample-morning.pdf) ([markdown source](./assets/herald-sample-morning.md)).
 
 ### **Run It**
 Run from any clone of the arena repo with push access, in its own window:

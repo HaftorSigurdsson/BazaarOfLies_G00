@@ -17,6 +17,7 @@ dependencies = [
     "mkdocs-material>=9.7.7",
     "mkdocs-autorefs>=1.4.5",
     "fpdf2>=2.8.9",
+    "pypdf>=6.21.2",
 ]
 
 [dependency-groups]
