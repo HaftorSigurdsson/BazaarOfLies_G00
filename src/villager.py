@@ -8,11 +8,11 @@ Run from inside a bot clone of the arena repo:
 Day votes are PUBLIC: a plaintext ballot (seat, target, rationale) signed
 with the seat's Ed25519 signing key. Night actions stay sealed to the GM.
 
-Private files (seat key, doctrine, journal) live in a sibling folder of the
-bot clone — `../bazaar/` by default, resolved relative to villager.py's own
-location. It is outside the repo because this process runs `git add` in the
-same working tree it lives in: the seat's private key and doctrine must be
-structurally unreachable by git.
+Private files live in sibling folders of the bot clone — keys, signing keys
+and the journal in `../.bazaar/`, the doctrine in `../villagers/` — resolved
+relative to villager.py's own location. They are outside the repo because
+this process runs `git add` in the same working tree it lives in: the seat's
+private key and doctrine must be structurally unreachable by git.
 
 State tracking (statements made, voted, night action done) lives in a local
 journal file so a crashed bot resumes correctly on restart.
@@ -67,24 +67,26 @@ REASONING_TEMPERATURE = 0.3             # private thinking runs cooler than spee
 parser = argparse.ArgumentParser(description="Bazaar of Lies Villager")
 parser.add_argument("--seat", required=True, help="Seat ID (e.g., seat-01)")
 parser.add_argument("--key", default=None,
-                    help="Seat private key path (default ../bazaar/<seat>.key)")
+                    help="Seat private key path (default ../.bazaar/<seat>.key)")
 parser.add_argument("--doctrine", default=None,
-                    help="Doctrine file path (default ../bazaar/<seat>.md)")
+                    help="Doctrine file path (default ../villagers/<seat>.md)")
 parser.add_argument("--journal", default=None,
-                    help="Journal path (default ../bazaar/journal-<seat>.json)")
+                    help="Journal path (default ../.bazaar/journal-<seat>.json)")
 parser.add_argument("--signkey", default=None,
-                    help="Seat signing key path (default ../bazaar/<seat>.sign)")
+                    help="Seat signing key path (default ../.bazaar/<seat>.sign)")
 args = parser.parse_args()
 
 MY_SEAT = args.seat
-# ../bazaar/ — a sibling of the bot clone's root, so git can never see it.
+# Siblings of the bot clone's root, so git can never see them: the vault
+# ../.bazaar/ (keys, signing keys, journals) and ../villagers/ (doctrines).
 # Anchored to villager.py's own location (not the cwd), so
 # the paths hold no matter where the bot is launched from.
 # src/villager.py -> REPO_ROOT is the parent of src/ (the clone root).
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BAZAAR_DIR = os.path.join(os.path.dirname(REPO_ROOT), "bazaar")
+BAZAAR_DIR = os.path.join(os.path.dirname(REPO_ROOT), ".bazaar")
+VILLAGERS_DIR = os.path.join(os.path.dirname(REPO_ROOT), "villagers")
 KEY_PATH = args.key or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.key")
-DOCTRINE_PATH = args.doctrine or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.md")
+DOCTRINE_PATH = args.doctrine or os.path.join(VILLAGERS_DIR, f"{MY_SEAT}.md")
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, f"journal-{MY_SEAT}.json")
 SIGNKEY_PATH = args.signkey or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.sign")
 

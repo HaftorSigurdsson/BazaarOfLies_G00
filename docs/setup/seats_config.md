@@ -75,11 +75,11 @@ Use the `src/town-setup.py` script to generate keypairs for all seats:
 
 ## **5. Save Private Keys**
 ### **Steps**
-1. Save each private key to `~/.bazaar/<seat>.key`:
+1. Save each private key to `../.bazaar/<seat>.key`:
    ```bash
-   mkdir -p ~/.bazaar
-   echo "<PRIVATE_KEY>" > ~/.bazaar/seat-01.key
-   chmod 600 ~/.bazaar/seat-01.key
+   mkdir -p ../.bazaar
+   echo "<PRIVATE_KEY>" > ../.bazaar/seat-01.key
+   chmod 600 ../.bazaar/seat-01.key
    ```
 2. **Never commit private keys** to the repo.
 

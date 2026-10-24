@@ -90,14 +90,14 @@ python3 src/town-clock.py 120      # custom interval, e.g. 2 minutes
 Day votes are **public plaintext ballots signed** with a per-seat Ed25519 signing key — nobody can forge another merchant's ballot. This one-time script:
 
 1. Generates a signing keypair for each seat in `setup/seats.json`.
-2. Writes the **private key** to `<vault>/<seat>.sign` (outside the repo — the vault is the operator's secrets folder, e.g. `~/.bazaar`).
+2. Writes the **private key** to `<vault>/<seat>.sign` (outside the repo — the vault is the operator's secrets folder, e.g. `../.bazaar`).
 3. Records the **public key** in `setup/seats.json` as `signing_public_key` (commit that change).
 
 It **refuses to overwrite** existing keys and is safe to re-run.
 
 ### **Run It (once, before the next match)**
 ```bash
-python3 setup/make_signing_keys.py --vault ~/.bazaar
+python3 setup/make_signing_keys.py --vault ../.bazaar
 ```
 
 ---
@@ -109,7 +109,7 @@ The **official way** to reset the arena between matches. A partial manual reset 
 - Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/herald/`, `gameplay/usage/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
 - Rewrites the public boards fresh: `graveyard.md`, `announcements.md`.
 - Resets `gameplay/state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `gameplay/state.json` — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).
-- Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, else the sibling vault `../bazaar` the bots use, else `~/.bazaar`) — keys and signing keys are untouched.
+- Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, else the sibling vault `../.bazaar` the bots use, else `~/.bazaar`) — keys and signing keys are untouched.
 - Repairs the arena's shape: every folder that is supposed to exist is recreated if missing and gets a **`.gitkeep`** if it doesn't have one.
 - Commits the reset — **only after asking**: the script confirms before removing anything, before committing, and before pushing (`--push`).
 

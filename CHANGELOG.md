@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.0] - 2026-10-24
+### Changed
+- **Vault layout**: private files now live in **`../.bazaar/`** (seat keys, signing keys, journals — a sibling of the clone, resolved from `villager.py`/`town-herald.py`'s own location) and **doctrines in `../villagers/<seat>.md`**. The old `../bazaar/` sibling is no longer read. `town-reset.py` and `setup/reset_match.sh` resolve journals as `$VAULT` → `../.bazaar` → `~/.bazaar`; `make_signing_keys.py` examples use `--vault ../.bazaar`. All docs (`docs/`, `AGENTS.md`) swept to the new paths.
+
 ## [2.3.3] - 2026-10-24
 ### Fixed
 - **`tools/bazaar-launch.py` default seat-clone path** was `~/Desktop/GAME` (wrong case on case-sensitive filesystems) — now `~/Desktop/Game`, matching `seats-pull.py`; docstring refreshed for the kebab-case name and the retired `.bat` wrapper.

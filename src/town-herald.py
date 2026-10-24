@@ -25,7 +25,7 @@ Output: gameplay/herald/herald-c<CCC>-morning.md and gameplay/herald/herald-c<CC
 
 Run from any clone of the arena repo with push access, in its own window:
 
-    uv run src/town-herald.py            # journal defaults to ../bazaar/herald-journal.json
+    uv run src/town-herald.py            # journal defaults to ../.bazaar/herald-journal.json
     uv run src/town-herald.py --journal ~/.bazaar/herald-journal.json
 
 It is deliberately self-contained (same poll loop, ask(), commit_and_push
@@ -59,12 +59,12 @@ BALLOT_TABLES_MAX = 2
 
 parser = argparse.ArgumentParser(description="Bazaar of Lies — The Herald")
 parser.add_argument("--journal", default=None,
-                    help="Journal path (default ../bazaar/herald-journal.json)")
+                    help="Journal path (default ../.bazaar/herald-journal.json)")
 args = parser.parse_args()
 
 # src/town-herald.py -> REPO_ROOT is the parent of src/ (the clone root).
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BAZAAR_DIR = os.path.join(os.path.dirname(REPO_ROOT), "bazaar")
+BAZAAR_DIR = os.path.join(os.path.dirname(REPO_ROOT), ".bazaar")
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, "herald-journal.json")
 
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])

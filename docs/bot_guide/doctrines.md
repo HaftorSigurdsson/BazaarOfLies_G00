@@ -144,7 +144,7 @@ Every doctrine must include these **4 rules** (copy verbatim):
 ---
 
 ## **8. Security**
-- **Never commit doctrines** to the repo. Store them outside the arena (e.g., `../bazaar/<seat>.txt`).
+- **Never commit doctrines** to the repo. Store them outside the arena (e.g., `../villagers/<seat>.md`).
 - **Rotate strategies** between matches to avoid predictability.
 
 **May your doctrines outwit your opponents!**

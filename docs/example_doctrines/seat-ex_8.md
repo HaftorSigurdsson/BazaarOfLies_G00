@@ -1,6 +1,6 @@
 # The Lantern’s Beacon — Example Doctrine
 
-*(Example doctrine — the bot reads this file **verbatim** from the vault (`~/.bazaar/<seat>.md`), so it is shown here **unrendered**, exactly as written on disk.)*
+*(Example doctrine — the bot reads this file **verbatim** from `../villagers/<seat>.md`, so it is shown here **unrendered**, exactly as written on disk.)*
 
 ```text
 # The Lantern’s Beacon

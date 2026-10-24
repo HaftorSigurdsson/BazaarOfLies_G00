@@ -13,7 +13,7 @@ nobody can forge another merchant's ballot. This script:
 Refuses to overwrite existing keys. Safe to re-run.
 
 Usage (from the arena repo root):
-    python3 setup/make_signing_keys.py --vault ~/.bazaar
+    python3 setup/make_signing_keys.py --vault ../.bazaar
 """
 import argparse
 import json
@@ -29,7 +29,7 @@ def main():
     ap.add_argument("--seats", default="setup/seats.json",
                     help="Path to seats.json (default setup/seats.json)")
     ap.add_argument("--vault", required=True,
-                    help="Secrets folder for private keys (e.g. ~/.bazaar)")
+                    help="Secrets folder for private keys (e.g. ../.bazaar)")
     args = ap.parse_args()
 
     with open(args.seats) as f:

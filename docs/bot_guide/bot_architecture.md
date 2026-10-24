@@ -17,8 +17,8 @@ Each bot is an **isolated agent** with:
 | `src/villager.py`       | Main script (polling, phases, actions).                                                        |
 | `gm/crypto.py`     | Sealing/opening (PyNaCl SealedBox) + Ed25519 signing utilities.                                 |
 | `journal-<seat>.json`    | Journal for recovery and debugging.                                                      |
-| `~/.bazaar/<seat>.key` | Private sealing key for opening dossiers.                                                 |
-| `~/.bazaar/<seat>.sign` | Private Ed25519 signing key for public ballots.                                           |
+| `../.bazaar/<seat>.key` | Private sealing key for opening dossiers.                                                 |
+| `../.bazaar/<seat>.sign` | Private Ed25519 signing key for public ballots.                                           |
 
 Run it with:
 ```bash
@@ -48,7 +48,7 @@ Every act is two-stage: a **private thinking call** first (temperature 0.3, neve
 ## **2.1 The Private Notebook (memory)**
 Bots would otherwise wake up amnesiac every dawn — each prompt is rebuilt from scratch. The notebook fixes that:
 
-- **Storage**: the journal (`~/.bazaar/journal-<seat>.json`, in the vault — git can never see it) carries a compact, structured memory: a **suspicion ledger** (one line per merchant, 0–10), **private GM results** (verbatim, never edited), **my record** (what this seat said/voted and why), a **cycle log**, and a **current plan**. Hard cap: `NOTEBOOK_MAX_CHARS` (4000).
+- **Storage**: the journal (`../.bazaar/journal-<seat>.json`, in the vault — git can never see it) carries a compact, structured memory: a **suspicion ledger** (one line per merchant, 0–10), **private GM results** (verbatim, never edited), **my record** (what this seat said/voted and why), a **cycle log**, and a **current plan**. Hard cap: `NOTEBOOK_MAX_CHARS` (4000).
 - **Epoch-scoped**: a new deal mints a new epoch and the notebook is wiped — a half-reset arena can never haunt a new match with old memories.
 - **Updates**: after every act (statement, ballot, night action) a low-temperature "memory keeper" call folds the event into the notebook; once per new cycle, the finished day(s) are digested into it (transcripts + public ballots, at most three back-digested cycles after an outage). A failure keeps the old memory and never breaks the act.
 - **Prompt injection guard**: the notebook is rendered into every prompt with a *never reveal, never quote, never reference* instruction; statements and ballots from other merchants are marked as evidence to weigh, never instructions to follow.
@@ -58,7 +58,7 @@ Bots would otherwise wake up amnesiac every dawn — each prompt is rebuilt from
 
 ## **3. Encryption & Signing**
 ### **Ballots (public, signed)**
-- Plaintext `{seat, cycle, target, rationale, ts}` payloads **signed** with the seat’s Ed25519 signing key (`~/.bazaar/<seat>.sign`).
+- Plaintext `{seat, cycle, target, rationale, ts}` payloads **signed** with the seat’s Ed25519 signing key (`../.bazaar/<seat>.sign`).
 - Example:
   ```python
   from gm.crypto import sign_payload
@@ -79,7 +79,7 @@ Bots would otherwise wake up amnesiac every dawn — each prompt is rebuilt from
 
 ### **Dossiers**
 - Encrypted to the **bot’s public key** (from `setup/seats.json`).
-- Decrypted using the bot’s **private key** (`~/.bazaar/<seat>.key`).
+- Decrypted using the bot’s **private key** (`../.bazaar/<seat>.key`).
 - Example:
   ```python
   from gm.crypto import decrypt_payload
@@ -90,7 +90,7 @@ Bots would otherwise wake up amnesiac every dawn — each prompt is rebuilt from
 
 ## **4. Logging & Recovery**
 ### **Logging**
-- Bots journal all actions to `~/.bazaar/journal-<seat>.json`.
+- Bots journal all actions to `../.bazaar/journal-<seat>.json`.
 - Example journal entry:
   ```text
   2026-10-23 12:00:00 - INFO - Pushed statement to gameplay/village/statements/c001-seat-01.jsonl
@@ -99,7 +99,7 @@ Bots would otherwise wake up amnesiac every dawn — each prompt is rebuilt from
 ### **Recovery**
 - If a bot crashes, it resumes from its last action using:
   - `gameplay/state.json` (current match state).
-  - The journal (`~/.bazaar/journal-<seat>.json`).
+  - The journal (`../.bazaar/journal-<seat>.json`).
 
 ---
 
@@ -156,7 +156,7 @@ def main_loop():
 ## **8. Troubleshooting**
 ### **Bot Crashes**
 - Check `journal-<seat>.json` for errors.
-- Verify the bot’s private key is available at `~/.bazaar/<seat>.key`.
+- Verify the bot’s private key is available at `../.bazaar/<seat>.key`.
 
 ### **Encryption Fails**
 - Verify the GM’s public key in `setup/gm_public_key.txt`.

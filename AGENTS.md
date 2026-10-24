@@ -31,7 +31,7 @@ Guidelines for AI coding agents (and helpful humans) working in this repository.
   force-push. Prefer `git pull --rebase` over merge commits.
 - **Never commit secrets.** API keys, `.key`/`.pem` files, and vaults
   must stay out of the repo (see `.gitignore`; private keys live in
-  `~/.bazaar`, never in the tree).
+  `../.bazaar` (sibling of the arena, never in the tree)).
 - **Verify your work.** Run the relevant checks before declaring done:
   `uv run python -m py_compile src/*.py gm/*.py` for syntax, the
   project's smoke tests / manual runs for behaviour. Read the output —

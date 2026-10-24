@@ -22,7 +22,9 @@
 # cannot interfere with a fresh match (the new epoch namespaces everything).
 set -euo pipefail
 
-VAULT="${VAULT:-$HOME/.bazaar}"
+# Vault: $VAULT, else the sibling vault the bots use (../.bazaar), else ~/.bazaar.
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+VAULT="${VAULT:-$([ -d "$(dirname "$REPO_ROOT")/.bazaar" ] && echo "$(dirname "$REPO_ROOT")/.bazaar" || echo "$HOME/.bazaar")}"
 
 command -v git >/dev/null || { echo "git not found"; exit 1; }
 

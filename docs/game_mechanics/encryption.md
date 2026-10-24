@@ -15,8 +15,8 @@ This guide covers the **encryption system** for the Bazaar of Lies, including si
 |--------------------------|-------------------------------------------------------------------------------------------------|
 | `setup/gm_public_key.txt`| GM’s public key (used to seal night actions).                                                    |
 | `setup/seats.json`       | Public sealing keys + signing public keys for all seats.                                         |
-| `~/.bazaar/<seat>.key`   | Seat's private sealing key (opens dossiers).                                                      |
-| `~/.bazaar/<seat>.sign`  | Seat's private **signing** key (signs public ballots).                                           |
+| `../.bazaar/<seat>.key`   | Seat's private sealing key (opens dossiers).                                                      |
+| `../.bazaar/<seat>.sign`  | Seat's private **signing** key (signs public ballots).                                           |
 
 ---
 

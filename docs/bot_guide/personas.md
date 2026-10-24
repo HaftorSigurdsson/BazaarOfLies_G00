@@ -127,7 +127,7 @@ Pick a **profession or role** that fits the bazaar theme. Examples:
 ---
 
 ## **8. Security**
-- **Never commit personas** to the repo. Store them outside the arena (e.g., `../bazaar/<seat>.txt`).
+- **Never commit personas** to the repo. Store them outside the arena (e.g., `../villagers/<seat>.md`).
 - **Rotate personas** between matches to avoid predictability.
 
 **May your personas bring the bazaar to life!**

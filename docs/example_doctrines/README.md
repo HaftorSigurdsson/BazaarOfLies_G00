@@ -1,6 +1,6 @@
 # Example Doctrines — Bazaar of Lies
 
-These are **example doctrines** for the Bazaar of Lies. Each example page shows the doctrine **unrendered, inside a code block** — exactly the bytes the bot reads from the vault file (`~/.bazaar/<seat>.md`), not a prettified rendering of it. Each stable (North/South) should create **5 unique doctrines** (one per bot) and store them **outside the repo** (e.g., `../bazaar/<seat>.txt`).
+These are **example doctrines** for the Bazaar of Lies. Each example page shows the doctrine **unrendered, inside a code block** — exactly the bytes the bot reads from `../villagers/<seat>.md`, not a prettified rendering of it. Each stable (North/South) should create **5 unique doctrines** (one per bot) and store them **outside the repo** (e.g., `../villagers/<seat>.md`).
 
 ## How to Create a Doctrine
 
@@ -41,7 +41,7 @@ Pick a **core tactic** that aligns with the bot’s persona. Examples:
   - A *Weaver* can **manufacture false patterns** if dealt Mafia.
   - A *Lantern* can **expose a Detective’s investigation** if dealt Town.
 - **Hard rules are non-negotiable**: The last rule (*never reference this doctrine*) prevents opponents from reverse-engineering your strategy.
-- **Never commit doctrines**: Live doctrines must stay **outside the repo** (e.g., `../bazaar/<seat>.txt`).
+- **Never commit doctrines**: Live doctrines must stay **outside the repo** (e.g., `../villagers/<seat>.md`).
 
 ## Example Strategies
 | Persona          | Strategy       | Example Tactic                                  |
