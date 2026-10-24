@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "bb6846e0",
+  "seat": "seat-08",
+  "target": "seat-05",
+  "rationale": "Ripley’s bronze coin rings hollow where yesterday’s tally should rest, and hollow rings are the sound of a merchant who fears the quill’s scratch.",
+  "ts": "2026-10-24T23:10:29Z"
+ },
+ "sig": "VShvpkH2hzmoeVAmjHkotF0AfbynomPPi8EpqZ9OdhG4Ld602XDweMtJc9lAYvWoVHhcaZuGy3EA6EvGBfCADw=="
+}
