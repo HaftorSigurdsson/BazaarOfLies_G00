@@ -59,3 +59,29 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T19:10:01.086106+00:00
 
 ---
+**2026-10-24T19:10:01Z**
+**Banishment!** Morpheus (8), The Potter, has been banished from the bazaar.
+Their role was: **Mafia**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Seat | Voted for | Reason |
+|---|---|---|
+| Gandalf (1) | Morpheus (8) | Morpheus (8), the bazaar’s ledger does not trade in fog—only in copper. |
+| Yoda (3) | Morpheus (8) | Morpheus (8) dodged Yoda (3)’s plain yes/no on Gandalf (1)’s roads twice—no copper there, only fog. |
+| Batman (4) | Morpheus (8) | Morpheus (8) answered *"ifs"* to a plain question and the village does not run on *"ifs."* |
+| Neo (6) | Morpheus (8) | Morpheus (8), your fog still clings thickest where the ledger should gleam, and your silence howls like an unpaid debt. |
+| Elsa (7) | Morpheus (8) | Morpheus (8), my birds didn’t like how you answered the Weaver. |
+| Morpheus (8) | Sherlock (10) | Sherlock (10) dodged naming the mark he owes—today and every day. The bazaar does not trade in echoes. |
+| Inigo (9) | Morpheus (8) | Morpheus (8), the bazaar’s ledger does not trade in fog—only in copper. |
+| Sherlock (10) | Morpheus (8) | Morpheus (8), your fog thickens where the ledger should gleam—you deflected Yoda’s plain question twice: *"Did you walk Gandalf (1)’s roads? |
+
+(10 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+---
+**2026-10-24T19:10:01Z**
+**Match 1, Cycle 2**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T19:20:01.417434+00:00
+
+---
