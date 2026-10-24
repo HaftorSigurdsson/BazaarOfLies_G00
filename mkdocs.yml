@@ -36,6 +36,9 @@ theme:
     - content.code.copy
   language: en
 
+# Disable directory-style URLs
+use_directory_urls: false
+
 # Navigation
 nav:
   - Home: index.md
