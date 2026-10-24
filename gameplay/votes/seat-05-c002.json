@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "bb6846e0",
+  "seat": "seat-05",
+  "target": "seat-08",
+  "rationale": "Morpheus’s whetstone still hums where the ledger’s blank page yawns like a debt unpaid.",
+  "ts": "2026-10-24T23:10:14Z"
+ },
+ "sig": "RzSd2balN/Q83Ra0NNn2euPNKAJA6MINz7n72fprIFrFJfDHbIrd2KYmtEAkglmVbjPEqgyKQvYis7rol22ICg=="
+}
