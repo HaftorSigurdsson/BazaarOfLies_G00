@@ -153,7 +153,12 @@ def parse_edition(md_text, md_path):
     """Split an edition into masthead metadata and printable blocks."""
     name = os.path.basename(md_path)
     m = re.match(r"herald-c(\d+)-(morning|evening)\.md", name)
-    cycle, part = (m.group(1), m.group(2)) if m else ("000", "morning")
+    if m:
+        cycle, part = m.group(1), m.group(2)
+    else:               # e.g. the docs sample: herald-sample-evening.md
+        part = "evening" if "evening" in name else "morning"
+        dm = re.search(r"Cycle\s+(\d+)", md_text)
+        cycle = dm.group(1) if dm else "000"
 
     match_no = 1
     mm = re.search(r"\*Match\s+(\d+)", md_text)
