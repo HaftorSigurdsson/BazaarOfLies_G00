@@ -9,7 +9,10 @@ daily. The Herald is a FACTS-ONLY publication:
   - it never speculates about the roles of living merchants;
   - it never invents statements, deaths, or events;
   - roles may only be restated from official obituaries (the GM reveals
-    roles at death).
+    roles at death);
+  - every edition carries a 'By the Numbers' section (machine-counted
+    public figures) and, when the GM has published ballot tables, a
+    'The Voting Record' section.
 
 Editions (one writer per file, journal-guarded against double printing):
   - morning edition — printed once when phase becomes 'discussion'
@@ -41,8 +44,9 @@ MODEL = "mistral-small-2409"
 POLL_SECONDS = 30
 JITTER_SECONDS = 5
 PUSH_ATTEMPTS = 5
-EDITION_MAX_CHARS = 2800
+EDITION_MAX_CHARS = 3600
 ANNOUNCEMENT_HIGHLIGHTS = 6
+BALLOT_TABLES_MAX = 2
 
 parser = argparse.ArgumentParser(description="Bazaar of Lies — The Herald")
 parser.add_argument("--journal", default=None,
@@ -63,7 +67,11 @@ HERALD_SYSTEM = (
     "merchant. Never invent statements, deaths, or events. Roles may only be "
     "restated from official obituaries. Attribute every statement to its "
     "seat. Keep it short and lively: a headline, then brief sections "
-    "(headlines, the dead, the word on the street). No advice on how to vote."
+    "(headlines, the dead, the word on the street, by the numbers, the "
+    "voting record). Include a short 'By the Numbers' section using the "
+    "counted figures exactly as given, and report any ballot tallies as a "
+    "'The Voting Record' section without editorialising about them. "
+    "No advice on how to vote."
 )
 
 
@@ -170,8 +178,8 @@ def announcements_since(journal):
     return blocks[-ANNOUNCEMENT_HIGHLIGHTS:]
 
 
-def statements_digest(state):
-    """The current cycle's public statements (facts, attributed to seats)."""
+def read_statements(state):
+    """The current cycle's public statement records, oldest first."""
     cycle, epoch = state["cycle"], state.get("epoch")
     dawn = state.get("clock", {}).get("dawn")
     recs = {}
@@ -203,8 +211,88 @@ def statements_digest(state):
                 key = (rec.get("seat"), rec.get("seq"))
                 if key not in recs or ts >= recs[key].get("ts", ""):
                     recs[key] = rec
-    ordered = sorted(recs.values(), key=lambda r: r.get("ts", ""))
-    return [f"{r['seat']}: {r['text']}" for r in ordered]
+    return sorted(recs.values(), key=lambda r: r.get("ts", ""))
+
+
+def statements_digest(state):
+    """The current cycle's public statements (facts, attributed to seats)."""
+    return [f"{r['seat']}: {r['text']}" for r in read_statements(state)]
+
+
+def vote_history():
+    """Recent public ballot tallies, parsed from the GM's published tables
+    ('| Seat | Voted for | Reason |' in announcements.md). Newest first."""
+    try:
+        text = open("gameplay/village/announcements.md").read()
+    except OSError:
+        return []
+    tallies = []
+    parts = _ANNOUNCEMENT_SPLIT.split(text)
+    for i in range(2, len(parts), 2):              # block bodies
+        body = parts[i]
+        if "| Voted for |" not in body:
+            continue
+        counts, voters = {}, {}
+        for line in body.splitlines():
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if len(cells) != 3 or not re.fullmatch(r"seat-\d{2}", cells[0]):
+                continue
+            voters[cells[0]] = cells[1]
+            counts[cells[1]] = counts.get(cells[1], 0) + 1
+        if not counts:
+            continue
+        banished = re.search(r"\*\*Banishment!\*\* (seat-\d{2})", body)
+        result = (f"{banished.group(1)} banished" if banished
+                  else "no banishment (tie or no majority)")
+        tally = ", ".join(f"{t}: {n} vote{'s' if n != 1 else ''}"
+                          for t, n in sorted(counts.items(),
+                                             key=lambda kv: -kv[1]))
+        rejected = re.search(r"(\d+) ballot\(s\) rejected", body)
+        line = f"{result} — ballots: {tally}"
+        if rejected:
+            line += f"; {rejected.group(1)} ballot(s) rejected"
+        tallies.append(line)
+    return tallies[-BALLOT_TABLES_MAX:][::-1]
+
+
+def quiet_night_streak():
+    """Consecutive most-recent nights the GM announced as quiet."""
+    try:
+        text = open("gameplay/village/announcements.md").read()
+    except OSError:
+        return 0
+    bodies = _ANNOUNCEMENT_SPLIT.split(text)[2::2]
+    streak = 0
+    for body in reversed(bodies):
+        if "night passed quietly" in body.lower():
+            streak += 1
+        elif "night kill" in body.lower():
+            break
+    return streak
+
+
+def by_the_numbers(state):
+    """Public, machine-counted figures for the 'By the Numbers' section."""
+    lines = []
+    alive = sorted(state.get("alive", []))
+    roll = {e.split(" ")[0] for e in graveyard_roll()}     # unique dead seats
+    lines.append(f"{len(alive)} seats alive, {len(roll)} in the graveyard.")
+    stmts = read_statements(state)
+    if stmts:
+        per_seat = {}
+        for r in stmts:
+            per_seat[r.get("seat")] = per_seat.get(r.get("seat"), 0) + 1
+        counts = ", ".join(f"{s}: {n}" for s, n in sorted(per_seat.items()))
+        silent = [s for s in alive if s not in per_seat]
+        lines.append(f"Statements this cycle: {len(stmts)} ({counts}).")
+        if silent:
+            lines.append(f"Silent so far this cycle: {', '.join(silent)}.")
+    else:
+        lines.append("No public statements this cycle yet.")
+    streak = quiet_night_streak()
+    if streak:
+        lines.append(f"Quiet nights in a row: {streak}.")
+    return lines
 
 
 def facts_digest(state, part):
@@ -219,6 +307,12 @@ def facts_digest(state, part):
     for label in ("discussion_deadline", "voting_deadline", "night_deadline"):
         if clock.get(label):
             digest.append(f"{label.replace('_', ' ')}: {clock[label]}")
+    digest.append("By the numbers (public facts, counted by the Herald):\n"
+                  + "\n".join(by_the_numbers(state)))
+    tallies = vote_history()
+    if tallies:
+        digest.append("Recent ballot tallies (from the GM's public tables, "
+                      "newest first):\n" + "\n".join(tallies))
     return "\n".join(digest)
 
 

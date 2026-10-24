@@ -26,6 +26,7 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 - It **never speculates** about the roles of living merchants.
 - It **never invents** statements, deaths, or events.
 - Roles may only be restated from **official obituaries** (the GM reveals roles at death).
+- Every edition carries a **"By the Numbers"** section (machine-counted public figures: seats alive/dead, per-seat statement counts, who is silent this cycle, the quiet-night streak) and, when the GM has published ballot tables, a **"The Voting Record"** section (the last two tallies, exactly as published — no editorialising).
 
 ### **Editions**
 | Edition | Trigger | Villagers read it | Output |
@@ -42,7 +43,7 @@ After each edition is printed, `src/town-press.py` compiles it into a **one-page
 - **fpdf2 fallback**: if no LaTeX engine is on `PATH`, a plainer pure-Python edition is pressed instead (the paper never fails to appear).
 - Install the engine once, e.g. the self-contained [tectonic](https://tectonic-typesetting.github.io/) binary in `~/.local/bin`, or TeX Live's `pdflatex`.
 
-Planned (not built yet): a woodcut-style engraving under the headline and a "Bazaar Whisper" humour column — the template already reserves the hooks. See a [sample pressed front page](./assets/herald-sample-morning.pdf) ([markdown source](./assets/herald-sample-morning.md)).
+Planned (not built yet): a woodcut-style engraving under the headline — the template already reserves the hook. Built since v1.3: **"The Bazaar Whisper"**, a PDF-only humour column (16 non-game items in a deterministic per-edition pick) ruled off at the foot of the page; it never enters the markdown the merchants read. See a [sample pressed front page](./assets/herald-sample-morning.pdf) ([markdown source](./assets/herald-sample-morning.md)).
 
 ### **Run It**
 Run from any clone of the arena repo with push access, in its own window:

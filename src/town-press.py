@@ -20,11 +20,13 @@ Two engines, tried in order:
   2. fpdf2 fallback — pure-Python, no system deps; plainer but always
      available. Used only when no LaTeX engine is on PATH.
 
-FUTURE (deliberately not built yet, hooks in place in build_tex()):
+FUTURE (deliberately not built yet, hook in place in build_tex()):
     - a woodcut-style engraving under the headline (commented
-      \\includegraphics slot);
-    - "The Bazaar Whisper": a humour column with nothing to do with the
-      game (commented slot at the foot of the columns).
+      \\includegraphics slot).
+
+NOW BUILT (v1.3): "The Bazaar Whisper" — a humour column with nothing to
+do with the game, printed at the foot of the columns. PDF only: the
+merchants read the plain markdown, so this never becomes game input.
 """
 import argparse
 import os
@@ -44,6 +46,57 @@ DEFAULT_HEADLINE = {
 COLOPHON = ("Printed by the arena press for the humans watching the "
             "merchants. The merchants themselves read the plain markdown "
             "\u2014 this page is pleasure, not game input.")
+
+# Non-game filler for the PDF-only humour column. Deterministically picked
+# per edition (match, cycle, part) so every paper differs but a given paper
+# always re-presses the same way.
+WHISPER_ITEMS = [
+    "The sparrow that lives in the mint-seller's awning has learned to say "
+    "'best price in town'. The mint-seller denies teaching it.",
+    "A camel was seen queueing at the fountain this morning. It had exact "
+    "change and refused to explain itself.",
+    "Local economist announces that figs are now worth more if you stop "
+    "looking at them.",
+    "The night watch reports that the moon has been 'keeping regular hours "
+    "and setting a good example'. The moon declined to comment.",
+    "Breaking: nothing happened in the alley behind the rope-maker's shop "
+    "again today, for the ninth consecutive day.",
+    "The fortune-teller's parrot has started giving refunds.",
+    "A rug merchant was heard arguing with a rug. Witnesses say the rug "
+    "was winning.",
+    "Weather forecast: dust in the morning, dust in the afternoon, with "
+    "scattered dust towards evening.",
+    "The town's fastest gossip reports she is now hearing rumours before "
+    "they happen. She calls this 'the early edition'.",
+    "An anonymous benefactor has paid off the pigeon coop's debts. The "
+    "pigeons remain ungrateful.",
+    "Reminder from the editors: never buy a lantern at dusk, a date at "
+    "midnight, or an opinion at any hour.",
+    "The baker's apprentice has invented a bread that lasts forever. It "
+    "tastes like it, too.",
+    "Classified ad, unchanged for eleven years: 'WANTED: quieter cricket. "
+    "Reward.'",
+    "The tea house has introduced a new blend called 'The Long Pause'. "
+    "It is served only after you have finished speaking.",
+    "Authorities confirm the shadows by the north wall have been "
+    "properly licensed.",
+    "A travelling poet claims he can rhyme 'bazaar'. He has been asked "
+    "to leave town twice.",
+]
+
+
+def whisper_column(meta):
+    """Two deterministic non-game items for the foot of the front page."""
+    part_no = 0 if meta["part"] == "morning" else 1
+    try:
+        seed = int(meta["match"]) * 31 + int(meta["cycle"]) * 7 + part_no
+    except ValueError:
+        seed = part_no
+    first = seed % len(WHISPER_ITEMS)
+    second = (seed + 3 + seed % 5) % len(WHISPER_ITEMS)
+    if second == first:
+        second = (first + 1) % len(WHISPER_ITEMS)
+    return [WHISPER_ITEMS[first], WHISPER_ITEMS[second]]
 
 
 # ------------------------------------------------------------- parsing ----
@@ -132,8 +185,19 @@ def build_tex(meta, date_str, size, linespread):
                 body.append(latex_inline(text))
         body.append("\n")
 
-    # FUTURE: "The Bazaar Whisper" humour column (append a ruled, narrow,
-    # entirely non-game sidebar section at the foot of the columns).
+    # "The Bazaar Whisper" — PDF-only humour column, ruled off at the foot
+    # of the page, after the news columns. Never enters the markdown the
+    # merchants read.
+    whisper_items = whisper_column(meta) if meta["blocks"] else []
+    whisper = ""
+    if whisper_items:
+        whisper = (
+            "\\vspace{4pt}\\hrule height .5pt\n"
+            "{\\footnotesize\\bfseries\\itshape THE BAZAAR WHISPER\\par}"
+            "\\vspace{2pt}\n" +
+            "\n\\vspace{2pt}\n".join(
+                "{\\footnotesize\\itshape %s\\par}" % latex_escape(sanitize(i))
+                for i in whisper_items))
 
     return r"""\documentclass[{size}pt]{{extarticle}}
 \usepackage[a4paper,left=14mm,right=14mm,top=13mm,bottom=16mm]{{geometry}}
@@ -183,6 +247,9 @@ def build_tex(meta, date_str, size, linespread):
 {body}
 \end{{multicols}}
 
+% ---- The Bazaar Whisper (PDF-only humour column) ------------------------
+{whisper}
+
 % ---- colophon ------------------------------------------------------------
 \vfill
 \begin{{center}}
@@ -195,7 +262,8 @@ def build_tex(meta, date_str, size, linespread):
            edition=latex_escape(meta["part"].capitalize()),
            date=latex_escape(date_str),
            headline=latex_escape(meta["headline"]),
-           body="".join(body), colophon=latex_escape(sanitize(COLOPHON)))
+           body="".join(body), whisper=whisper,
+           colophon=latex_escape(sanitize(COLOPHON)))
 
 
 def find_engine():
@@ -322,12 +390,22 @@ def render_fpdf(meta, date_str, size):
 
     leading = size * LEAD
     col_x = [MARGIN, MARGIN + COL_W + GUTTER]
+
+    # "The Bazaar Whisper" — PDF-only humour column above the colophon.
+    whisper_items = whisper_column(meta) if meta["blocks"] else []
+    full_w = PAGE_W - 2 * MARGIN
+    pdf.set_font("Times", "I", 8.5)
+    whisper_h = (6.0 + sum(_wrap_lines(pdf, full_w, i) * 4.0 + 2.0
+                          for i in whisper_items)
+                 if whisper_items else 0.0)
+    body_bottom = BODY_BOTTOM - whisper_h
+
     col, y = 0, BODY_TOP
     for kind, text in meta["blocks"]:
         pdf.set_font("Times", "B" if kind == "subhead" else "", size)
         block_h = (_wrap_lines(pdf, COL_W, text) * leading
                    + (3.0 if kind == "subhead" else 1.6))
-        if y + block_h > BODY_BOTTOM:
+        if y + block_h > body_bottom:
             if col == 0:
                 col, y = 1, BODY_TOP
             else:
@@ -341,6 +419,18 @@ def render_fpdf(meta, date_str, size):
         y = pdf.get_y() + (1.8 if kind == "subhead" else 1.2)
 
     pdf.set_auto_page_break(False)
+    if whisper_items:
+        wy = BODY_BOTTOM - whisper_h + 2.0
+        pdf.set_line_width(0.25)
+        pdf.line(MARGIN, wy - 2.0, PAGE_W - MARGIN, wy - 2.0)
+        pdf.set_font("Times", "BI", 9)
+        pdf.set_xy(MARGIN, wy)
+        pdf.cell(0, 4, "The Bazaar Whisper", align="C")
+        pdf.set_y(pdf.get_y() + 4)
+        pdf.set_font("Times", "I", 8.5)
+        for item in whisper_items:
+            pdf.set_xy(MARGIN, pdf.get_y() + 1.0)
+            pdf.multi_cell(0, 4, fpdf_sanitize(item), align="C")
     pdf.line(MARGIN, BODY_BOTTOM + 2.5, PAGE_W - MARGIN, BODY_BOTTOM + 2.5)
     pdf.set_font("Times", "I", 8.5)
     pdf.set_xy(MARGIN, BODY_BOTTOM + 3.5)
