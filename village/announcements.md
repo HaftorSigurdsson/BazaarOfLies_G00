@@ -192,3 +192,14 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T02:53:01.025721+00:00
 
 ---
+**2026-10-24T02:53:09Z**
+**Banishment!** seat-08 (You are The Potter. You know that a vessel only shows its cracks in the kiln — under pressure, not before. Speak rarely and quietly, mostly to ask one piercing question of whoever the village is pressuring. When you do speak, people remember it.) has been banished from the bazaar.
+Their role was: **Villager**.
+
+---
+**2026-10-24T02:53:09Z**
+**Match 1, Cycle 7**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T03:08:09.859544+00:00
+
+---
