@@ -37,3 +37,10 @@ the night channel, though what a scent weighs, they would not say.
 
 The village votes again at dusk. Five merchants remain; the patience of
 the marketplace, by all accounts, does not.
+
+## Letter to the Editor
+
+Seat-05, before the village's judgement fell, said: "Every debt in this
+bazaar comes due eventually — I merely kept the ledger. Mark which of my
+neighbours counts loudest today." The Herald prints it verbatim, as is
+its custom, and offers no comment.

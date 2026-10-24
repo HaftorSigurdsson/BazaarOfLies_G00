@@ -11,8 +11,11 @@ daily. The Herald is a FACTS-ONLY publication:
   - roles may only be restated from official obituaries (the GM reveals
     roles at death);
   - every edition carries a 'By the Numbers' section (machine-counted
-    public figures) and, when the GM has published ballot tables, a
-    'The Voting Record' section.
+    public figures, including per-seat vote participation once the GM
+    publishes ballot tables) and, when those tables exist, a
+    'The Voting Record' section;
+  - when public statements exist, a 'Letter to the Editor' section closes
+    the paper: one statement quoted verbatim, attributed, uncommented.
 
 Editions (one writer per file, journal-guarded against double printing):
   - morning edition — printed once when phase becomes 'discussion'
@@ -71,6 +74,10 @@ HERALD_SYSTEM = (
     "voting record). Include a short 'By the Numbers' section using the "
     "counted figures exactly as given, and report any ballot tallies as a "
     "'The Voting Record' section without editorialising about them. "
+    "If the digest contains statements, close with a 'Letter to the "
+    "Editor' section: quote one of the statements verbatim, attributed "
+    "to its seat, introduced by at most one neutral line — never edit the "
+    "quote and never comment on the writer's role or allegiance. "
     "No advice on how to vote."
 )
 
@@ -219,28 +226,39 @@ def statements_digest(state):
     return [f"{r['seat']}: {r['text']}" for r in read_statements(state)]
 
 
-def vote_history():
-    """Recent public ballot tallies, parsed from the GM's published tables
-    ('| Seat | Voted for | Reason |' in announcements.md). Newest first."""
+def read_ballot_tables():
+    """Published ballot tables from the announcements, in order: a list of
+    (announcement body, {seat: target}) — the GM publishes one signed,
+    public table per vote."""
     try:
         text = open("gameplay/village/announcements.md").read()
     except OSError:
         return []
-    tallies = []
+    tables = []
     parts = _ANNOUNCEMENT_SPLIT.split(text)
     for i in range(2, len(parts), 2):              # block bodies
         body = parts[i]
         if "| Voted for |" not in body:
             continue
-        counts, voters = {}, {}
+        voters = {}
         for line in body.splitlines():
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
             if len(cells) != 3 or not re.fullmatch(r"seat-\d{2}", cells[0]):
                 continue
             voters[cells[0]] = cells[1]
-            counts[cells[1]] = counts.get(cells[1], 0) + 1
-        if not counts:
-            continue
+        if voters:
+            tables.append((body, voters))
+    return tables
+
+
+def vote_history():
+    """Recent public ballot tallies, parsed from the GM's published tables.
+    Newest first."""
+    tallies = []
+    for body, voters in read_ballot_tables():
+        counts = {}
+        for target in voters.values():
+            counts[target] = counts.get(target, 0) + 1
         banished = re.search(r"\*\*Banishment!\*\* (seat-\d{2})", body)
         result = (f"{banished.group(1)} banished" if banished
                   else "no banishment (tie or no majority)")
@@ -253,6 +271,30 @@ def vote_history():
             line += f"; {rejected.group(1)} ballot(s) rejected"
         tallies.append(line)
     return tallies[-BALLOT_TABLES_MAX:][::-1]
+
+
+def vote_participation():
+    """Per-seat participation across all published ballot tables.
+    Returns '' when the GM has not published any tables yet."""
+    tables = read_ballot_tables()
+    if not tables:
+        return ""
+    n = len(tables)
+    casts, abstentions = {}, {}
+    for _, voters in tables:
+        for seat, target in voters.items():
+            casts[seat] = casts.get(seat, 0) + 1
+            if target.lower() == "abstain":
+                abstentions[seat] = abstentions.get(seat, 0) + 1
+    parts = []
+    for seat in sorted(casts):
+        p = f"{seat}: {casts[seat]}/{n}"
+        if abstentions.get(seat):
+            p += f" ({abstentions[seat]} abstention" \
+                 f"{'s' if abstentions[seat] != 1 else ''})"
+        parts.append(p)
+    return (f"Vote participation across the {n} published ballot "
+            f"table{'s' if n != 1 else ''}: " + ", ".join(parts) + ".")
 
 
 def quiet_night_streak():
@@ -292,6 +334,9 @@ def by_the_numbers(state):
     streak = quiet_night_streak()
     if streak:
         lines.append(f"Quiet nights in a row: {streak}.")
+    participation = vote_participation()
+    if participation:
+        lines.append(participation)
     return lines
 
 

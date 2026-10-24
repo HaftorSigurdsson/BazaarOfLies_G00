@@ -26,7 +26,8 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 - It **never speculates** about the roles of living merchants.
 - It **never invents** statements, deaths, or events.
 - Roles may only be restated from **official obituaries** (the GM reveals roles at death).
-- Every edition carries a **"By the Numbers"** section (machine-counted public figures: seats alive/dead, per-seat statement counts, who is silent this cycle, the quiet-night streak) and, when the GM has published ballot tables, a **"The Voting Record"** section (the last two tallies, exactly as published — no editorialising).
+- Every edition carries a **"By the Numbers"** section (machine-counted public figures: seats alive/dead, per-seat statement counts, who is silent this cycle, the quiet-night streak, and per-seat vote participation once ballot tables exist) and, when the GM has published ballot tables, a **"The Voting Record"** section (the last two tallies, exactly as published — no editorialising).
+- When public statements exist, the paper closes with a **"Letter to the Editor"**: one statement quoted verbatim, attributed to its seat, with at most a one-line neutral introduction.
 
 ### **Editions**
 | Edition | Trigger | Villagers read it | Output |
@@ -39,11 +40,12 @@ Each edition is journal-guarded against double printing, and the villagers' own 
 ### **The Press (PDF for the humans)**
 After each edition is printed, `src/town-press.py` compiles it into a **one-page A4 PDF styled as an old newspaper front page**, committed next to the markdown as `herald-cXXX-{morning,evening}.pdf`.
 
-- **LaTeX engine** (`tectonic` or `pdflatex`, checked in that order) produces the fine edition in the style of the classic newspaper template: Times-like type with hyphenation and microtype, a double-rule masthead and dateline, a bold headline, a **drop cap** on the opening paragraph, thin-ruled centred section heads, and two balanced columns with a hairline rule between them. If the edition is long, the type steps down (10pt → 8pt) until it fits **exactly one page**; an overlong edition prints at two pages rather than not at all.
+- **LaTeX engine** (`tectonic` or `pdflatex`, checked in that order) produces the fine edition in the style of the classic newspaper template: Times-like type with hyphenation and microtype, a double-rule masthead and dateline, a bold headline, a **woodcut-style engraving plate** under the headline, a **drop cap** on the opening paragraph, thin-ruled centred section heads, and two balanced columns with a hairline rule between them. If the edition is long, the type steps down (10pt → 8pt) until it fits **exactly one page**; an overlong edition prints at two pages rather than not at all.
 - **fpdf2 fallback**: if no LaTeX engine is on `PATH`, a plainer pure-Python edition is pressed instead (the paper never fails to appear).
+- **PDF-only flourish** (never enters the markdown the merchants read, so it cannot become game input): the engraving plate (`docs/assets/images/bazaar-engraving.png`, generated once from the bazaar banner; a missing plate never breaks a paper), plus two deterministic filler boxes at the foot of the page — **"The Weather & The Market"** and **"The Bazaar Whisper"** humour column — each picked per edition (match/cycle/part) so every paper differs but always re-presses the same.
 - Install the engine once, e.g. the self-contained [tectonic](https://tectonic-typesetting.github.io/) binary in `~/.local/bin`, or TeX Live's `pdflatex`.
 
-Planned (not built yet): a woodcut-style engraving under the headline — the template already reserves the hook. Built since v1.3: **"The Bazaar Whisper"**, a PDF-only humour column (16 non-game items in a deterministic per-edition pick) ruled off at the foot of the page; it never enters the markdown the merchants read. See a [sample pressed front page](./assets/herald-sample-morning.pdf) ([markdown source](./assets/herald-sample-morning.md)).
+See a [sample pressed front page](./assets/herald-sample-morning.pdf) ([markdown source](./assets/herald-sample-morning.md)).
 
 ### **Run It**
 Run from any clone of the arena repo with push access, in its own window:

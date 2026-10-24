@@ -20,13 +20,12 @@ Two engines, tried in order:
   2. fpdf2 fallback — pure-Python, no system deps; plainer but always
      available. Used only when no LaTeX engine is on PATH.
 
-FUTURE (deliberately not built yet, hook in place in build_tex()):
-    - a woodcut-style engraving under the headline (commented
-      \\includegraphics slot).
-
-NOW BUILT (v1.3): "The Bazaar Whisper" — a humour column with nothing to
-do with the game, printed at the foot of the columns. PDF only: the
-merchants read the plain markdown, so this never becomes game input.
+The front page also carries PDF-only flourish that never enters the
+markdown the merchants read: a woodcut-style engraving plate under the
+headline (docs/assets/images/bazaar-engraving.png — generated once from
+the bazaar banner; a missing plate never breaks a paper), plus two
+deterministic filler boxes at the foot of the page: the weather & the
+market, and "The Bazaar Whisper" humour column.
 """
 import argparse
 import os
@@ -97,6 +96,50 @@ def whisper_column(meta):
     if second == first:
         second = (first + 1) % len(WHISPER_ITEMS)
     return [WHISPER_ITEMS[first], WHISPER_ITEMS[second]]
+
+
+# Woodcut-style engraving plate under the headline (generated once from
+# docs/assets/images/bazaar_banner.png; a missing plate never breaks a paper).
+ENGRAVING_PATH = os.path.join(REPO_ROOT, "docs", "assets", "images",
+                              "bazaar-engraving.png")
+
+WEATHER_ITEMS = [
+    "Hot at noon, hotter at dusk, with a light breeze of gossip from the "
+    "north gate.",
+    "Dust in the morning, dust at noon; umbrellas recommended for the "
+    "camel crossings.",
+    "Clear skies over the minarets; the pigeons report excellent flying.",
+    "A chance of shade in the cloth district; elsewhere, relentless sun.",
+    "Warm with scattered haggling; the evening promises a full moon and "
+    "full purses.",
+    "Breezy. The awnings are flapping and so are the merchants.",
+    "Oppressive heat by the fountain, conspiratorial coolness in the "
+    "alleys.",
+    "Sunrise was at the usual time. The Herald checked twice.",
+]
+
+MARKET_ITEMS = [
+    "Pepper: firm. Saffron: smug. Camel feed: suspiciously cheap.",
+    "Rugs are up, figs are down, opinions remain at an all-time high.",
+    "Lantern oil steady; candle wax nervous ahead of the night shift.",
+    "Copper is trading at exactly what the Coppersmith says it is worth.",
+    "Tea is up on rumors. The rumors are also up, mostly on tea.",
+    "Perfume closed higher; nobody can say why, and everybody can smell it.",
+    "Rope: knotty. Dates: pitted. Spices: spicy. Market report concludes.",
+    "The moneylender's interest rates are unchanged, which is itself "
+    "priceless.",
+]
+
+
+def weather_market(meta):
+    """One deterministic weather line + one market line (PDF-only filler)."""
+    part_no = 0 if meta["part"] == "morning" else 1
+    try:
+        seed = int(meta["match"]) * 37 + int(meta["cycle"]) * 11 + part_no
+    except ValueError:
+        seed = part_no
+    return (WEATHER_ITEMS[seed % len(WEATHER_ITEMS)],
+            MARKET_ITEMS[(seed + 1) % len(MARKET_ITEMS)])
 
 
 # ------------------------------------------------------------- parsing ----
@@ -185,19 +228,32 @@ def build_tex(meta, date_str, size, linespread):
                 body.append(latex_inline(text))
         body.append("\n")
 
-    # "The Bazaar Whisper" — PDF-only humour column, ruled off at the foot
-    # of the page, after the news columns. Never enters the markdown the
-    # merchants read.
+    # "The Weather & The Market" and "The Bazaar Whisper" — PDF-only filler
+    # boxes, ruled off at the foot of the page after the news columns.
+    # Never enters the markdown the merchants read.
+    weather, market = weather_market(meta)
     whisper_items = whisper_column(meta) if meta["blocks"] else []
-    whisper = ""
+    foot = ""
     if whisper_items:
-        whisper = (
+        foot = (
             "\\vspace{4pt}\\hrule height .5pt\n"
-            "{\\footnotesize\\bfseries\\itshape THE BAZAAR WHISPER\\par}"
-            "\\vspace{2pt}\n" +
+            "{\\footnotesize\\bfseries\\itshape THE WEATHER "
+            "\\& THE MARKET\\par}\n"
+            "\\vspace{2pt}{\\footnotesize\\itshape %s\\par}\n"
+            "\\vspace{2pt}{\\footnotesize\\itshape %s\\par}\n"
+            "\\vspace{4pt}\\hrule height .5pt\n"
+            "{\\footnotesize\\bfseries\\itshape THE BAZAAR WHISPER\\par}\n"
+            "\\vspace{2pt}\n" % (latex_escape(sanitize(weather)),
+                                 latex_escape(sanitize(market))) +
             "\n\\vspace{2pt}\n".join(
                 "{\\footnotesize\\itshape %s\\par}" % latex_escape(sanitize(i))
                 for i in whisper_items))
+
+    # Woodcut engraving plate under the headline (best-effort).
+    engraving = ""
+    if meta["blocks"] and os.path.exists(ENGRAVING_PATH):
+        engraving = ("\\includegraphics[width=0.55\\linewidth]{%s}\n"
+                     % latex_escape(ENGRAVING_PATH.replace(os.sep, "/")))
 
     return r"""\documentclass[{size}pt]{{extarticle}}
 \usepackage[a4paper,left=14mm,right=14mm,top=13mm,bottom=16mm]{{geometry}}
@@ -206,6 +262,7 @@ def build_tex(meta, date_str, size, linespread):
 \usepackage{{multicol}}
 \usepackage{{titlesec}}
 \usepackage{{lettrine}}
+\usepackage{{graphicx}}
 \linespread{{{linespread}}}
 
 \setlength{{\parindent}}{{0pt}}
@@ -239,16 +296,14 @@ def build_tex(meta, date_str, size, linespread):
 \begin{{center}}
 {{\fontsize{{19}}{{23}}\selectfont\bfseries {headline}\par}}
 \end{{center}}
-% FUTURE: woodcut engraving here, e.g.
-% \includegraphics[width=0.92\linewidth]{{engraving.jpg}}
-
+{engraving}
 \vspace{{2pt}}
 \begin{{multicols}}{{2}}
 {body}
 \end{{multicols}}
 
-% ---- The Bazaar Whisper (PDF-only humour column) ------------------------
-{whisper}
+% ---- PDF-only filler: weather, market, The Bazaar Whisper ----------------
+{foot}
 
 % ---- colophon ------------------------------------------------------------
 \vfill
@@ -262,7 +317,7 @@ def build_tex(meta, date_str, size, linespread):
            edition=latex_escape(meta["part"].capitalize()),
            date=latex_escape(date_str),
            headline=latex_escape(meta["headline"]),
-           body="".join(body), whisper=whisper,
+           body="".join(body), foot=foot, engraving=engraving,
            colophon=latex_escape(sanitize(COLOPHON)))
 
 
@@ -388,26 +443,53 @@ def render_fpdf(meta, date_str, size):
     pdf.multi_cell(0, 10, fpdf_sanitize(meta["headline"]), align="C")
     pdf.set_y(pdf.get_y() + 1.5)
 
+    # woodcut engraving plate under the headline (best-effort)
+    engr_h = 0.0
+    if meta["blocks"] and os.path.exists(ENGRAVING_PATH):
+        from PIL import Image
+        with Image.open(ENGRAVING_PATH) as im:
+            ew, eh = im.size
+        engr_w = 100.0
+        engr_h = engr_w * eh / ew
+        try:
+            pdf.image(ENGRAVING_PATH, x=(PAGE_W - engr_w) / 2.0,
+                      y=pdf.get_y() + 2.0, w=engr_w)
+        except Exception:
+            engr_h = 0.0          # a bad plate must never stop the paper
+
     leading = size * LEAD
     col_x = [MARGIN, MARGIN + COL_W + GUTTER]
 
-    # "The Bazaar Whisper" — PDF-only humour column above the colophon.
-    whisper_items = whisper_column(meta) if meta["blocks"] else []
+    # PDF-only filler boxes above the colophon: weather & market, Whisper.
     full_w = PAGE_W - 2 * MARGIN
     pdf.set_font("Times", "I", 8.5)
-    whisper_h = (6.0 + sum(_wrap_lines(pdf, full_w, i) * 4.0 + 2.0
-                          for i in whisper_items)
-                 if whisper_items else 0.0)
-    body_bottom = BODY_BOTTOM - whisper_h
+    foot_h = 0.0
+    foot_rows = []
+    if meta["blocks"]:
+        weather, market = weather_market(meta)
+        foot_rows = [("B", "The Weather & The Market"),
+                     ("I", weather), ("I", market), ("S", "")]
+        foot_rows += [("B", "The Bazaar Whisper")]
+        foot_rows += [("I", i) for i in whisper_column(meta)]
+        for kind, text in foot_rows:
+            if kind == "S":
+                foot_h += 2.0
+            elif kind == "B":
+                foot_h += 6.0
+            else:
+                foot_h += _wrap_lines(pdf, full_w, text) * 4.0 + 2.0
 
-    col, y = 0, BODY_TOP
+    body_top = BODY_TOP + engr_h
+    body_bottom = BODY_BOTTOM - foot_h
+
+    col, y = 0, body_top
     for kind, text in meta["blocks"]:
         pdf.set_font("Times", "B" if kind == "subhead" else "", size)
         block_h = (_wrap_lines(pdf, COL_W, text) * leading
                    + (3.0 if kind == "subhead" else 1.6))
         if y + block_h > body_bottom:
             if col == 0:
-                col, y = 1, BODY_TOP
+                col, y = 1, body_top
             else:
                 return pdf, False
         pdf.set_xy(col_x[col], y)
@@ -419,18 +501,21 @@ def render_fpdf(meta, date_str, size):
         y = pdf.get_y() + (1.8 if kind == "subhead" else 1.2)
 
     pdf.set_auto_page_break(False)
-    if whisper_items:
-        wy = BODY_BOTTOM - whisper_h + 2.0
+    if foot_rows:
+        fy = BODY_BOTTOM - foot_h + 2.0
         pdf.set_line_width(0.25)
-        pdf.line(MARGIN, wy - 2.0, PAGE_W - MARGIN, wy - 2.0)
-        pdf.set_font("Times", "BI", 9)
-        pdf.set_xy(MARGIN, wy)
-        pdf.cell(0, 4, "The Bazaar Whisper", align="C")
-        pdf.set_y(pdf.get_y() + 4)
-        pdf.set_font("Times", "I", 8.5)
-        for item in whisper_items:
-            pdf.set_xy(MARGIN, pdf.get_y() + 1.0)
-            pdf.multi_cell(0, 4, fpdf_sanitize(item), align="C")
+        pdf.line(MARGIN, fy - 2.0, PAGE_W - MARGIN, fy - 2.0)
+        for kind, text in foot_rows:
+            if kind == "S":
+                pdf.set_y(pdf.get_y() + 2.0)
+                continue
+            pdf.set_xy(MARGIN, pdf.get_y() + (1.0 if kind == "I" else 0.5))
+            pdf.set_font("Times", "BI" if kind == "B" else "I", 9 if kind == "B" else 8.5)
+            if kind == "B":
+                pdf.cell(0, 4, text, align="C")
+                pdf.set_y(pdf.get_y() + 4)
+            else:
+                pdf.multi_cell(0, 4, fpdf_sanitize(text), align="C")
     pdf.line(MARGIN, BODY_BOTTOM + 2.5, PAGE_W - MARGIN, BODY_BOTTOM + 2.5)
     pdf.set_font("Times", "I", 8.5)
     pdf.set_xy(MARGIN, BODY_BOTTOM + 3.5)
