@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "9c5ef90a",
+  "seat": "seat-08",
+  "target": "seat-10",
+  "rationale": "Sherlock (10) dodged naming the mark he owes—today and every day. The bazaar does not trade in echoes.",
+  "ts": "2026-10-24T19:00:07Z"
+ },
+ "sig": "Iwh+hkjPaizF5L6csWMmdmaK+gxkASSGGpWg5O9kNnthR0cmSZFHtPGxlGPh6VcxDK5M72oBugqmzwtJe9XJCg=="
+}
