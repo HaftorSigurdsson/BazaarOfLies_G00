@@ -89,14 +89,16 @@ bazaar-of-lies/
 │   ├── reset_match.sh              # Official full arena reset (bash original)
 │   └── gm_public_key.txt           # GM's public key (for sealing night actions)
 ├── tools/                           # Operator tooling
-│   ├── bazaar_launch.py             # Cross-platform bot launcher core (OS auto-detect)
-│   ├── bazaar-launch.sh / .bat      # Thin launcher wrappers (macOS/Linux/Windows)
+│   ├── bazaar-launch.py             # Cross-platform bot launcher core (OS auto-detect)
+│   ├── bazaar-launch.sh             # Thin launcher wrapper (macOS/Linux; Windows runs the .py directly)
 │   ├── run.sh                       # Neutral side: Herald + GM heartbeat in tmux
 │   ├── seats-pull.py                # Pull every seat clone and report state
-│   └── resolve-jsonl.py             # Repair merge-conflicted arena JSONL files
+│   ├── statements-assemble.py       # Local per-cycle statement mirror (gitignored, --watch)
+│   └── STORE/                       # Retired wrappers (bazaar-launch.bat, bazaar-pull.sh)
 ├── src/                            # All operator & agent scripts
 │   ├── villager.py                 # The autonomous merchant bot (one process per seat)
 │   ├── town-herald.py              # The Herald — facts-only newspaper bot (gameplay/herald/)
+│   ├── town-press.py               # PDF-only press flourish (tectonic, falls back to fpdf2)
 │   ├── town-clock.py               # Local GM heartbeat (dispatches gm.yml)
 │   ├── town-reset.py               # Official full arena reset (Python)
 │   └── town-setup.py               # Keypair generation + seats.json population

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.2] - 2026-10-24
+### Changed
+- **Docs: game-start procedure brought up to date with the current `tools/` and `src/`** — kebab-cased tool names (`tools/bazaar-launch.py`, `tools/statements-assemble.py`), the removed JSONL repair tool dropped from the docs, the retired Windows/`bazaar-pull.sh` wrappers noted as living in `tools/STORE/` (Windows now invokes the launcher core directly), `src/town-press.py` added to the file tree, the Game Day section in `docs/setup.md` now spells out the launcher commands (subsets, `--no-herald`), the neutral side (`tools/run.sh`) with its one-GM-driver warning, and the `--wipe-recaps` reset flag.
+
 ## [2.3.1] - 2026-10-24
 ### Added
 - **`--wipe-recaps` for `src/town-reset.py`**: the full reset also removes match recaps (`gameplay/village/match-XX-recap.md`) when the flag is passed. Without it, recaps are kept exactly as before (history, namespaced by epoch, harmless to a fresh match). The confirmation banner states which way it's going; `--dry-run` previews the recap removal too.

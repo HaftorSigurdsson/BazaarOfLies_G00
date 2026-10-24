@@ -42,11 +42,22 @@ This is the **setup hub**: the order of operations, the pre-game testing checkli
 
 ## **3. Game Day**
 1. **Agree on a start time** (GM clock is UTC).
-2. **Start all 10 bots** (and the Herald, if running) at the agreed time.
-3. **Monitor the game** in `gameplay/village/`, `gameplay/herald/`, and `gameplay/village/graveyard.md`.
-4. **Do not interfere** during the match.
-5. **Between matches**: Adjust personas/doctrines during the pit-stop window; reset with [town-reset.py](./operations.md).
-6. **After the trilogy**: Review the full reveal and scores in `gameplay/village/match-XX-recap.md`.
+2. **Start all 10 bots** (and the Herald, if running) at the agreed time:
+   ```bash
+   tools/bazaar-launch.sh start              # all ten seats + the Herald window (tmux "bazaar")
+   tools/bazaar-launch.sh start 01 03 05     # a subset of seats
+   tools/bazaar-launch.sh start --no-herald  # bots only
+   # Windows: python3 tools/bazaar-launch.py start  (the .bat wrapper is retired to tools/STORE/)
+   ```
+3. **Optionally run the neutral side on the arena clone** — the Herald + the local GM heartbeat:
+   ```bash
+   tools/run.sh start     # tmux "bazaar-neutrals" (needs MISTRAL_API_KEY exported)
+   ```
+   ⚠️ Pick **one GM driver**: the scheduled `gm.yml` Action **or** the `town-clock.py` heartbeat in `run.sh` — never both.
+4. **Monitor the game** in `gameplay/village/`, `gameplay/herald/`, and `gameplay/village/graveyard.md` (`tools/statements-assemble.py --watch` keeps a local, gitignored transcript of the discussion fresh).
+5. **Do not interfere** during the match.
+6. **Between matches**: Adjust personas/doctrines during the pit-stop window; reset with [town-reset.py](./operations.md) (add `--wipe-recaps` if the recaps should go too).
+7. **After the trilogy**: Review the full reveal and scores in `gameplay/village/match-XX-recap.md`.
 
 ---
 
@@ -56,8 +67,9 @@ This is the **setup hub**: the order of operations, the pre-game testing checkli
 ```bash
 tools/bazaar-launch.sh stop        # bots must be down first
 python3 src/town-reset.py          # asks "Are you sure?" (y/n) before wiping
-python3 src/town-reset.py --dry-run  # preview without touching anything
-tools/bazaar-launch.sh start       # bots + Herald back up (Windows: tools/bazaar-launch.bat)
+python3 src/town-reset.py --dry-run   # preview without touching anything
+python3 src/town-reset.py --wipe-recaps  # also remove match recaps (kept by default)
+tools/bazaar-launch.sh start       # bots + Herald back up (Windows: python3 tools/bazaar-launch.py start)
 gh workflow run gm.yml             # optional: immediate GM tick
 ```
 

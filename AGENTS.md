@@ -48,7 +48,7 @@ Guidelines for AI coding agents (and helpful humans) working in this repository.
 
 - Bot changes require restarting **all ten seats together plus the
   Herald window** (`tools/bazaar-launch.sh stop && tools/bazaar-launch.sh start`;
-  on Windows use `tools/bazaar-launch.bat`).
+  on Windows run the launcher core: `python3 tools/bazaar-launch.py start`).
 - **Family-friendly vocabulary**: nobody is ever killed, murdered, or dead in
   prose — the village **banishes** (day vote) and the Family **shutters a
   stall** so the merchant has **left the bazaar** by morning. The Herald
