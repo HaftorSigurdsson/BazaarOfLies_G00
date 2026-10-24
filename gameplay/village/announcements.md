@@ -128,3 +128,14 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-24T20:15:01.502699+00:00
 
 ---
+**2026-10-24T20:20:01Z**
+**Stall shuttered!** Hermione (2), The Carpet Weaver, shuttered their stall and left the bazaar overnight. Their role was: **Villager**.
+
+---
+**2026-10-24T20:20:01Z**
+**Match 1, Cycle 4**
+The bazaar awakens!
+**Seats alive:** Gandalf (1), Yoda (3), Batman (4), Neo (6), Elsa (7), Inigo (9)
+**Discussion ends at:** 2026-10-24T20:50:01.038778+00:00
+
+---
