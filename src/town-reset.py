@@ -283,7 +283,7 @@ def main():
     commit_reset(args.dry_run, args.push)
 
     log("Done. Start the bots and (optionally) tick the GM:")
-    log("      ./bazaar-launch.sh start && gh workflow run gm.yml")
+    log("      tools/bazaar-launch.sh start && gh workflow run gm.yml")
     return 0
 
 

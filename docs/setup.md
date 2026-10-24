@@ -54,10 +54,10 @@ This is the **setup hub**: the order of operations, the pre-game testing checkli
 ⚠️ **Always use the official script — `src/town-reset.py` — to reset between matches.** A partial manual reset once caused the **ghost-replay bug**: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order.
 
 ```bash
-./bazaar-launch.sh stop            # bots must be down first
+tools/bazaar-launch.sh stop        # bots must be down first
 python3 src/town-reset.py          # asks "Are you sure?" (y/n) before wiping
 python3 src/town-reset.py --dry-run  # preview without touching anything
-./bazaar-launch.sh start           # bots + Herald back up
+tools/bazaar-launch.sh start       # bots + Herald back up (Windows: tools/bazaar-launch.bat)
 gh workflow run gm.yml             # optional: immediate GM tick
 ```
 

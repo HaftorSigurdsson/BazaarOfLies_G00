@@ -13,9 +13,9 @@
 # unable to echo a finished match.
 #
 # Usage:
-#   ./bazaar-launch.sh stop                  # bots must be down first
+#   tools/bazaar-launch.sh stop              # bots must be down first
 #   python3 setup/reset_match.sh             # run from the arena repo root
-#   ./bazaar-launch.sh start                 # bots + Herald back up
+#   tools/bazaar-launch.sh start             # bots + Herald back up
 #   gh workflow run gm.yml                   # optional: immediate GM tick
 #
 # Match recaps (gameplay/village/match-XX-recap.md) are KEPT — they are history and
@@ -92,4 +92,4 @@ else
 fi
 
 echo "==> Done. Start the bots and (optionally) tick the GM:"
-echo "      ./bazaar-launch.sh start && gh workflow run gm.yml"
+echo "      tools/bazaar-launch.sh start && gh workflow run gm.yml"

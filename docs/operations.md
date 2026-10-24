@@ -14,6 +14,11 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 | **Arena reset** | `src/town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
 | **Seat keypairs** | `src/town-setup.py` | Generates per-seat encryption keypairs and populates `setup/seats.json`. |
 | **Signing keys** | `setup/make_signing_keys.py` | One-time generation of per-seat Ed25519 signing keys. |
+| **Plate ingestion** | `setup/make_plates.py` | Converts raw Herald plate art into uniform grayscale 3:1 plates. |
+| **Bot launcher** | `tools/bazaar_launch.py` (+ `.sh`/`.bat` wrappers) | Cross-platform start/stop/status of all bots + the Herald (tmux on macOS/Linux, console windows on Windows). |
+| **Neutral side** | `tools/run.sh` | Runs the Herald + local GM heartbeat on this clone in tmux. |
+| **Seat clone report** | `tools/seats-pull.py` (+ `bazaar-pull.sh` wrapper) | Pulls every seat clone and reports HEAD + dirty state. |
+| **JSONL repair** | `tools/resolve-jsonl.py` | Strips merge-conflict markers from arena JSONL files and dedupes crash-resume duplicates. |
 | **Match reset (bash)** | `setup/reset_match.sh` | The original one-command full arena reset. |
 | **Game Master** | `.github/workflows/gm.yml` + `gm/run.py` | Neutral referee (state machine, tallies, night resolution). |
 
@@ -108,11 +113,11 @@ The **official way** to reset the arena between matches. A partial manual reset 
 
 ### **Usage**
 ```bash
-./bazaar-launch.sh stop            # bots must be down first
+tools/bazaar-launch.sh stop        # bots must be down first
 python3 src/town-reset.py              # asks "Are you sure?" (y/n) before wiping
 python3 src/town-reset.py --dry-run    # preview: show what would be wiped, touch nothing, no prompts
 python3 src/town-reset.py --push       # after committing, asks before pushing
-./bazaar-launch.sh start           # bots + Herald back up
+tools/bazaar-launch.sh start       # bots + Herald back up (Windows: tools/bazaar-launch.bat)
 gh workflow run gm.yml             # optional: immediate GM tick
 ```
 
@@ -133,7 +138,7 @@ Every deal mints an **epoch**. Ballots, night actions, statements and journal ke
 ---
 
 ## **7. Rules of the Road**
-- **Bots must be restarted together** (plus the Herald window) after any bot change: `./bazaar-launch.sh stop && ./bazaar-launch.sh start`.
+- **Bots must be restarted together** (plus the Herald window) after any bot change: `tools/bazaar-launch.sh stop && tools/bazaar-launch.sh start` (the launcher is cross-platform Python — `tools/bazaar_launch.py` — with `.sh` and `.bat` wrappers; it starts the Herald window too).
 - A missed ballot = **abstain**. A missed night action = **silence**. A missed statement = **quiet**. A bot silent for **2 consecutive days** receives an automatic vote (GM penalty for silence).
 - **Token budget**: 10,000 tokens per bot per cycle is enforced.
 - **Never commit private keys** (`*.key`, `*.sign`) — `.gitignore` covers `*.key`; keep the vault outside the repo.

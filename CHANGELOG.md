@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] - 2026-10-24
+### Added
+- **`tools/` — operator tooling, reviewed and refactored**:
+  - `bazaar_launch.py`: cross-platform bot launcher core — auto-detects the OS (tmux on macOS/Linux with explicit `MISTRAL_API_KEY` injection and macOS `caffeinate`; one console window per bot on Windows with a PID registry for stop/status). **Now also launches the Herald window** and accepts seat subsets (`start 01 03 05`). Thin wrappers: `bazaar-launch.sh` (POSIX) and `bazaar-launch.bat` (Windows) — the requested .bat version.
+  - `run.sh` (was an empty placeholder): runs the neutral side on this clone — the Herald + local GM heartbeat (`town-clock.py`) in a `bazaar-neutrals` tmux session, with start/stop/status.
+  - `bazaar-pull.sh` (was an empty placeholder): thin wrapper around `seats-pull.py`.
+### Fixed
+- **Launcher ran the renamed script**: `bazaar-launch.sh` executed `uv run bot.py` (renamed to `src/villager.py` long ago) and never launched the Herald. Both fixed via the Python core.
+- `tools/resolve-jsonl.py`: globbed the wrong path (`village/*.jsonl`); now repairs all `gameplay/village/**/*.jsonl`, and additionally dedupes crash-resume duplicates (same seat+seq keeps the later ts).
+- `tools/seats-pull.py`: game dir overridable via `BAZAAR_GAME_DIR` (aligned with the launcher).
+
+### Changed
+- All launcher references across docs, AGENTS.md, and the reset tools updated to `tools/bazaar-launch.sh` / `.bat`; the tooling overview table now lists the whole `tools/` and `setup/` suite.
+
 ## [1.6.2] - 2026-10-24
 ### Fixed
 - **Full documentation/code alignment pass**. Removed or corrected every stale claim found in a repo-wide scan:

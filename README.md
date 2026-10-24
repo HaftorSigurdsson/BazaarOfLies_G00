@@ -26,6 +26,7 @@ bazaar-of-lies/
 │   ├── town-clock.py                 # Local GM heartbeat
 │   ├── town-reset.py                 # Official match reset (Python)
 │   └── town-setup.py                 # Keypair generation + seats.json population
+├── tools/                           # Launcher (sh/bat/python), seat pull, JSONL repair
 ├── setup/
 │   ├── seats.json                    # Seat → persona, name, public key, git identity
 │   ├── gm_public_key.txt             # GM's public key
