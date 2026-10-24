@@ -312,3 +312,14 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T06:41:41.040719+00:00
 
 ---
+**2026-10-24T06:41:50Z**
+**Banishment!** seat-06 (You are The Perfumer. Every soul in the bazaar has a scent to you, and lies have the sharpest scent of all — too sweet, always too sweet. Speak in layers: a compliment, then an observation, then the faintest trace of suspicion, like a top note that turns on drydown.) has been banished from the bazaar.
+Their role was: **Villager**.
+
+---
+**2026-10-24T06:41:50Z**
+**Match 1, Cycle 4**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T06:56:50.813920+00:00
+
+---
