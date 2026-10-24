@@ -21,11 +21,13 @@ Two engines, tried in order:
      available. Used only when no LaTeX engine is on PATH.
 
 The front page also carries PDF-only flourish that never enters the
-markdown the merchants read: a woodcut-style engraving plate under the
-headline (docs/assets/images/bazaar-engraving.png — generated once from
-the bazaar banner; a missing plate never breaks a paper), plus two
-deterministic filler boxes at the foot of the page: the weather & the
-market, and "The Bazaar Whisper" humour column.
+markdown the merchants read: a woodcut plate at the head of the first
+column, content-keyed to the edition (a night-kill paper gets a
+different plate than a quiet market morning) from the motif pool in
+docs/assets/plates/ — ingested from raw art by setup/make_plates.py,
+with docs/assets/images/bazaar-engraving.png as the static fallback —
+plus two deterministic filler boxes at the foot of the page: the
+weather & the market, and "The Bazaar Whisper" humour column.
 """
 import argparse
 import os
@@ -98,11 +100,57 @@ def whisper_column(meta):
     return [WHISPER_ITEMS[first], WHISPER_ITEMS[second]]
 
 
-# Woodcut-style engraving plate at the head of the first (left) column
-# (generated once from
-# docs/assets/images/bazaar_banner.png; a missing plate never breaks a paper).
-ENGRAVING_PATH = os.path.join(REPO_ROOT, "docs", "assets", "images",
-                              "bazaar-engraving.png")
+# Woodcut plate at the head of the first column. The static plate below
+# is the fallback; per-edition content-keyed motifs live in
+# docs/assets/plates/ (ingested from raw art by setup/make_plates.py).
+STATIC_PLATE = os.path.join(REPO_ROOT, "docs", "assets", "images",
+                            "bazaar-engraving.png")
+PLATES_DIR = os.path.join(REPO_ROOT, "docs", "assets", "plates")
+
+# Content keys → plate filename, in priority order: game events first,
+# then personas, then scenery. Missing motifs simply fall through to the
+# next match; the chat.mistral prompt uses these exact filenames.
+PLATE_RULES = [
+    (re.compile(r"night kill|found dead", re.I), "dagger-on-cobblestones.png"),
+    (re.compile(r"quiet night|without a funeral", re.I), "moon-and-stars.png"),
+    (re.compile(r"banish", re.I), "scales-of-judgement.png"),
+    (re.compile(r"banish", re.I), "ballot-urn.png"),
+    (re.compile(r"banish", re.I), "tombstones-cypress.png"),
+    (re.compile(r"graveyard|funeral|obituar", re.I), "tombstones-cypress.png"),
+    (re.compile(r"carpet weaver|loom", re.I), "weavers-loom.png"),
+    (re.compile(r"moneylender|ledger", re.I), "ledger-and-quill.png"),
+    (re.compile(r"perfumer|scent", re.I), "perfume-bottles.png"),
+    (re.compile(r"coppersmith|copper", re.I), "copper-pots.png"),
+    (re.compile(r"potter|kiln", re.I), "potters-kiln.png"),
+    (re.compile(r"tea seller|tea house|over tea", re.I), "tea-house-stove.png"),
+    (re.compile(r"bird merchant|nightingale|birds say", re.I),
+     "nightingales-birdcage.png"),
+    (re.compile(r"rope", re.I), "rope-coils.png"),
+    (re.compile(r"mint", re.I), "mint-bowl.png"),
+    (re.compile(r"spice", re.I), "spice-sacks.png"),
+    (re.compile(r"caravan|camel", re.I), "camel-caravan.png"),
+    (re.compile(r"fountain", re.I), "fountain-with-camel.png"),
+    (re.compile(r"lantern", re.I), "lantern-in-the-dark.png"),
+]
+PLATE_DEFAULTS = {
+    "morning": "sunrise-over-domes.png",
+    "evening": "sunset-over-stalls.png",
+}
+
+
+def plate_for_edition(md_text, part):
+    """The plate this edition earns, chosen from its own text (PDF-only
+    flourish — the markdown is unaffected). Deterministic: same edition,
+    same plate. Falls back to the static engraving when nothing matches
+    or the plates folder is empty."""
+    candidates = [name for rx, name in PLATE_RULES if rx.search(md_text)]
+    candidates.append(PLATE_DEFAULTS[part])
+    for name in candidates:
+        path = os.path.join(PLATES_DIR, name)
+        if os.path.exists(path):
+            return path
+    return STATIC_PLATE
+
 
 WEATHER_ITEMS = [
     "Hot at noon, hotter at dusk, with a light breeze of gossip from the "
@@ -191,6 +239,7 @@ def parse_edition(md_text, md_path):
         "part": part,
         "headline": headline or DEFAULT_HEADLINE[part],
         "blocks": blocks,
+        "plate": plate_for_edition(md_text, part),
     }
 
 
@@ -255,14 +304,14 @@ def build_tex(meta, date_str, size, linespread):
                 "{\\footnotesize\\itshape %s\\par}" % latex_escape(sanitize(i))
                 for i in whisper_items))
 
-    # Woodcut engraving plate: a column-width illustration at the TOP of
-    # the FIRST (left) column, above the drop cap (best-effort).
-    engraving = ""
-    if meta["blocks"] and os.path.exists(ENGRAVING_PATH):
-        engraving = ("\\includegraphics[width=\\linewidth]{%s}\n"
-                     "\\vspace{3pt}\n"
-                     % latex_escape(ENGRAVING_PATH.replace(os.sep, "/")))
-        body.insert(0, engraving)
+    # Woodcut plate: a column-width illustration at the TOP of the FIRST
+    # (left) column, above the drop cap — content-keyed per edition
+    # (best-effort; a missing plate never breaks a paper).
+    plate = meta.get("plate")
+    if meta["blocks"] and plate and os.path.exists(plate):
+        body.insert(0, "\\includegraphics[width=\\linewidth]{%s}\n"
+                      "\\vspace{3pt}\n"
+                      % latex_escape(plate.replace(os.sep, "/")))
 
     return r"""\documentclass[{size}pt]{{extarticle}}
 \usepackage[a4paper,left=14mm,right=14mm,top=13mm,bottom=16mm]{{geometry}}
@@ -451,14 +500,15 @@ def render_fpdf(meta, date_str, size):
     pdf.multi_cell(0, 10, fpdf_sanitize(meta["headline"]), align="C")
     pdf.set_y(pdf.get_y() + 1.5)
 
-    # woodcut engraving plate at the top of the FIRST (left) column
+    # woodcut plate at the top of the FIRST (left) column — content-keyed
     engr_h = 0.0
-    if meta["blocks"] and os.path.exists(ENGRAVING_PATH):
+    plate = meta.get("plate")
+    if meta["blocks"] and plate and os.path.exists(plate):
         from PIL import Image
-        with Image.open(ENGRAVING_PATH) as im:
+        with Image.open(plate) as im:
             ew, eh = im.size
         try:
-            pdf.image(ENGRAVING_PATH, x=MARGIN, y=BODY_TOP, w=COL_W)
+            pdf.image(plate, x=MARGIN, y=BODY_TOP, w=COL_W)
             engr_h = COL_W * eh / ew + 3.0
         except Exception:
             engr_h = 0.0          # a bad plate must never stop the paper
