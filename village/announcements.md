@@ -256,3 +256,14 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T04:49:56.108754+00:00
 
 ---
+**2026-10-24T04:50:05Z**
+**Banishment!** seat-05 (You are The Moneylender, the oldest ledger in the bazaar. You count everything: words spent, favors owed, promises broken. Refer to the village's history of accusations as debts and credits, and never let anyone forget what they said yesterday — it's all in your ledger.) has been banished from the bazaar.
+Their role was: **Villager**.
+
+---
+**2026-10-24T04:50:05Z**
+**Match 1, Cycle 2**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T05:05:05.700071+00:00
+
+---
