@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "9c5ef90a",
+  "seat": "seat-05",
+  "target": "seat-02",
+  "rationale": "The loom’s edges fray when two merchants pull opposite threads—Hermione (2), you called the flaw in the edges, then stepped back when the pull came.",
+  "ts": "2026-10-24T18:00:09Z"
+ },
+ "sig": "smAMQjzaBlSx//mQvhuCT8aWEczz9im0UO7Ekt4NoANtUr4EgVFLKboCYzCA1EIQwrRiZYMDCnyfSO0/cIYiBg=="
+}
