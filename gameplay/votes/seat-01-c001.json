@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "7b04bdda",
+  "seat": "seat-01",
+  "target": "seat-10",
+  "rationale": "Sherlock’s candle burns too steady in the dark—let the sun see its wax.",
+  "ts": "2026-10-24T16:53:53Z"
+ },
+ "sig": "cepeLlObSOo1NXMagejGqm4nvN94Chdlg+PtKe4pojsCEKSYGCmq/ztoPwdWRqKEng6QbDz+Qw7TfWlejZa7Ag=="
+}
