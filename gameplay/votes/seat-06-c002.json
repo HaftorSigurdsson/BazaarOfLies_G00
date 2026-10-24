@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "9c5ef90a",
+  "seat": "seat-06",
+  "target": "seat-08",
+  "rationale": "Morpheus (8), your fog still clings thickest where the ledger should gleam, and your silence howls like an unpaid debt.",
+  "ts": "2026-10-24T19:00:15Z"
+ },
+ "sig": "wM41gPzJlfGmtPdmb0HF7FvL7U392mZ2JB5ke8HAuPQX6b0O1pdFX1NgH1mkCE7JBSbDYGcimCCExwp/5+SbDg=="
+}
