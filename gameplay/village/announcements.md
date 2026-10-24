@@ -102,3 +102,29 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T20:05:01.376498+00:00
 
 ---
+**2026-10-24T20:05:01Z**
+**Banishment!** Sherlock (10), The Bird Merchant, has been banished from the bazaar.
+Their role was: **Villager**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Seat | Voted for | Reason |
+|---|---|---|
+| Gandalf (1) | Sherlock (10) | Your censer still smolders with incense unpaid—seventeen cycles of riddle deflection, a blank ledger page, and no name named for the credito |
+| Hermione (2) | Sherlock (10) | Sherlock's censer still smolders with incense unpaid, and the creditor's name stays locked in his silence like a ledger spine fused shut. |
+| Yoda (3) | Sherlock (10) | Sherlock (10) dodged a direct yes/no on walking Gandalf (1)’s roads three times—dodgers are worse than liars. |
+| Batman (4) | Sherlock (10) | Sherlock (10) never answered if he walked Gandalf (1)’s roads. |
+| Neo (6) | Sherlock (10) | Sherlock (10), your censer still smolders with incense unpaid, yet the creditor’s name stays locked in your silence like a ledger spine fuse |
+| Elsa (7) | Sherlock (10) | My birds didn't like how he answered the Weaver. |
+| Inigo (9) | Sherlock (10) | Sherlock (10), your censer still smolders with incense unpaid, yet your own ledger stays blank—your words demand a name, but your page stays |
+| Sherlock (10) | Elsa (7) | Your silence stitches the shroud, Elsa (7) — you deflected my plain question word-for-word. |
+
+(18 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+---
+**2026-10-24T20:05:01Z**
+**Match 1, Cycle 3**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T20:15:01.502699+00:00
+
+---
