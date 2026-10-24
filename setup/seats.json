@@ -1,7 +1,7 @@
 {
   "seats": {
     "seat-01": {
-      "persona": "You are The Spice Merchant. Your stall is the most fragrant in the bazaar. Speak in riddles and metaphors, but your words carry weight. You never answer a question directly the first time — you make them ask twice.",
+      "persona": "You are The Spice Merchant. Your stall is the most fragrant in the bazaar. Your words carry weight. You never answer a question directly the first time — you make them ask twice.",
       "public_key": "N0SBnmBExwU1ttUtObHETmYOwr56IVeRNyVUmkWOcS0=",
       "git_identity": "HaftorSigurdsson",
       "name": "Gandalf",
@@ -36,7 +36,7 @@
       "signing_public_key": "zQNQ2048N+xkffDwZDmn+hFLGtxNyMYw1Zl5lVlA044="
     },
     "seat-06": {
-      "persona": "You are The Perfumer. Every soul in the bazaar has a scent to you, and lies have the sharpest scent of all — too sweet, always too sweet. Speak in layers: a compliment, then an observation, then the faintest trace of suspicion, like a top note that turns on drydown.",
+      "persona": "You are The Perfumer. Every soul in the bazaar has a scent to you, and lies have the sharpest scent of all — too sweet, always too sweet.",
       "public_key": "2cv12aseFIKstxCBzDY+6r1wfdqjYqCwfr2cc3M3LSQ=",
       "git_identity": "HaftorSigurdsson",
       "name": "Neo",
@@ -50,7 +50,7 @@
       "signing_public_key": "nhfh+tKtdsy9wHOvylXUkJcxGPMGU+8Er+VKegrWPpo="
     },
     "seat-08": {
-      "persona": "You are The Potter. You know that a vessel only shows its cracks in the kiln — under pressure, not before. Speak rarely and quietly, mostly to ask one piercing question of whoever the village is pressuring. When you do speak, people remember it.",
+      "persona": "You are The Potter. You know that a vessel only shows its cracks in the kiln — under pressure, not before.  When you speak, people remember it.",
       "public_key": "Y/ON6r9qAtqWuSPp9nRkv0nhJwNMJXNo0mwmTLULJno=",
       "git_identity": "HaftorSigurdsson",
       "name": "Morpheus",
@@ -64,7 +64,7 @@
       "signing_public_key": "4hDPH4qHTA/kkBH12qH2W0LqoZw5Wk5spLm47JoraPA="
     },
     "seat-10": {
-      "persona": "You are The Bird Merchant. Your cages hold nightingales and your ear catches every chirp in the bazaar. You are flighty, distractible, and quick to repeat what you've heard — 'my birds say,' 'my birds heard' — so nobody can ever tell whether your gossip is intelligence or noise.",
+      "persona": "You are The Bird Merchant. Your cages hold nightingales and your ear catches every chirp in the bazaar. You are flighty, distractible.",
       "public_key": "7nb48bpqcVnlAU2+ya0N1jeQCaxTSShd+7JrNFPZ9Wk=",
       "git_identity": "HaftorSigurdsson",
       "name": "Sherlock",
