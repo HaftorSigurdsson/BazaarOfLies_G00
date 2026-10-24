@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.8.1] - 2026-10-25
+### Fixed
+- **Stage directions no longer typeset as section heads**: the press treated *every* italic-only line as a ruled section heading, so a quoted merchant's stage direction (*"Extinguishes the censer…"*) rendered as bold small-caps mid-letter. Short italic lines (≤ 60 chars) stay section labels; long ones flow as italic prose (`\emph`) inside the letter.
+### Changed
+- **The Tally is evening-only**: the computed election-returns chart is no longer appended to morning editions — the morning paper reports the news, the evening paper carries the day's returns. Guarded in both the Herald (append) and the press (render, both engines); existing morning PDFs re-pressed without the chart, evening keeps it.
+
 ## [2.8.0] - 2026-10-25
 ### Added
 - **The Bazaar Compact** (`gameplay/manifest.md`): the villagers were never told what game they were playing — personas say who they are, doctrines how to behave, but the rules lived nowhere the merchants could read. The compact is public game knowledge (purpose, the 3 Family + Doctor + Detective structure, the tea-clock day with the dinner lean, voting, the three night watches, win conditions, the boards, the in-theme vocabulary, and "every match starts with a blank ledger — cycle 1 has no yesterday") and is read into every villager prompt, discussion/vote/night/council alike. This directly targets the confabulated "yesterday's vote" reasoning observed in cycle 1.

@@ -302,7 +302,11 @@ def parse_edition(md_text, md_path):
         if re.fullmatch(r"\*[^*]+\*", s):   # *Match 1, Cycle 001* → dateline
             if re.match(r"\*Match\b", s, re.I):
                 return
-            blocks.append(("subhead", sanitize(s.strip("*"))))
+            text = sanitize(s.strip("*"))
+            if len(text) <= 60:             # short italic = section label
+                blocks.append(("subhead", text))
+            else:                           # long italic = stage direction
+                blocks.append(("para", sanitize(s)))   # → \emph in LaTeX
             return
         if s == "---":
             return
@@ -415,6 +419,8 @@ def build_tex(meta, date_str, size, linespread):
         if kind == "subhead":
             body.append(r"\section*{%s}" % latex_escape(text))
         elif kind == "chart":
+            if meta["part"] != "evening":
+                continue     # the tally chart belongs to the evening paper
             body.append(chart_tex(text))
         elif kind == "code":
             body.append("\\begin{quote}\\small\\ttfamily\\obeylines\n"
@@ -710,6 +716,8 @@ def render_fpdf(meta, date_str, size):
 
     col, y = 0, col_top[0]
     for kind, text in meta["blocks"]:
+        if kind == "chart" and meta["part"] != "evening":
+            continue          # the tally chart belongs to the evening paper
         if kind == "chart":
             header, bars = parse_chart_rows(text)
             block_h = (6.0 + len(header) * 4.0 + len(bars) * 5.0 + 6.0)

@@ -541,9 +541,11 @@ def print_edition(state, part, journal):
                   )[:EDITION_MAX_CHARS]
 
     # The official tally chart is computed, never model-written — like an
-    # election returns graphic, exact to the ballot.
+    # election returns graphic, exact to the ballot. Evening editions only:
+    # the morning paper reports the news; the evening paper carries the
+    # day's returns.
     chart = tally_chart()
-    if chart:
+    if chart and part == "evening":
         edition += "\n\n## The Tally\n\n```text\n" + chart + "\n```\n"
 
     with open(path, "w") as f:
