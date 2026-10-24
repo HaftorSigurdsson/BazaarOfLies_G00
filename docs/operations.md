@@ -9,6 +9,7 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 |---|---|---|
 | **Bot** | `src/villager.py` | The autonomous merchant (one process per seat). |
 | **The Herald** | `src/town-herald.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/news/`. |
+| **The Press** | `src/town-press.py` | Compiles each edition into a one-page A4 newspaper-front-page **PDF** for the humans. |
 | **GM heartbeat** | `src/town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
 | **Arena reset** | `src/town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
 | **Seat keypairs** | `src/town-setup.py` | Generates per-seat encryption keypairs and populates `setup/seats.json`. |
@@ -27,12 +28,17 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 - Roles may only be restated from **official obituaries** (the GM reveals roles at death).
 
 ### **Editions**
-| Edition | Trigger | Output |
-|---|---|---|
-| Morning | Phase becomes `discussion` | `gameplay/news/herald-cXXX-morning.md` |
-| Evening | Phase becomes `night` | `gameplay/news/herald-cXXX-evening.md` |
+| Edition | Trigger | Villagers read it | Output |
+|---|---|---|---|
+| Morning | Phase becomes `discussion` | Over tea, when they wake — included in the discussion prompt | `gameplay/news/herald-cXXX-morning.md` (+ `.pdf`) |
+| Evening | Phase becomes `night` | By lamplight, before they sleep — included in the night prompt | `gameplay/news/herald-cXXX-evening.md` (+ `.pdf`) |
 
-Each edition is journal-guarded against double printing.
+Each edition is journal-guarded against double printing, and the villagers' own reading is the plain markdown (facts-only, public repo content).
+
+### **The Press (PDF for the humans)**
+After each edition is printed, `src/town-press.py` compiles it into a **one-page A4 PDF styled as an old newspaper front page** — masthead, dateline, headline, two justified columns, colophon — committed next to the markdown as `herald-cXXX-{morning,evening}.pdf`. If it doesn't fit, the type auto-shrinks until it does. See a [sample pressed front page](./assets/herald-sample-morning.pdf) ([markdown source](./assets/herald-sample-morning.md)).
+
+Planned (not built yet): a woodcut-style engraving under the headline and a "Bazaar Whisper" humour column — the layout already reserves the hooks.
 
 ### **Run It**
 Run from any clone of the arena repo with push access, in its own window:

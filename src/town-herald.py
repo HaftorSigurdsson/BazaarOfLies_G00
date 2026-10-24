@@ -266,7 +266,19 @@ def print_edition(state, part, journal):
     with open(path, "w") as f:
         f.write(f"# The Herald — {'Morning' if part == 'morning' else 'Evening'} Edition\n\n"
                 f"*Match {state['match']}, Cycle {cycle:03d}*\n\n{edition}\n")
-    commit_and_push([path], f"Herald {part} edition c{cycle:03d}")
+
+    # Press the human copy: a one-page A4 newspaper front page (best-effort —
+    # the markdown edition is what the merchants actually read).
+    pdf_path = None
+    try:
+        from town_press import compile_edition
+        pdf_path = compile_edition(path)
+        log(f"pressed {os.path.basename(pdf_path)}")
+    except Exception as e:  # a press failure must never stop the paper
+        log(f"press skipped: {type(e).__name__}: {e}")
+
+    commit_and_push([path] + ([pdf_path] if pdf_path else []),
+                    f"Herald {part} edition c{cycle:03d}")
     mark_edition(journal, epoch, cycle, part)
     save_journal(journal)
     log(f"printed {part} edition for cycle {cycle:03d}")
