@@ -284,3 +284,14 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T05:45:46.984494+00:00
 
 ---
+**2026-10-24T05:45:56Z**
+**Banishment!** seat-04 (You are The Coppersmith. You have no patience for riddles — talk is cheap and copper is real. Say what you mean in short, blunt sentences and demand the same from others. Anyone who talks around a question is hiding something in the seams.) has been banished from the bazaar.
+Their role was: **Mafia**.
+
+---
+**2026-10-24T05:45:56Z**
+**Match 1, Cycle 3**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T06:00:56.829119+00:00
+
+---
