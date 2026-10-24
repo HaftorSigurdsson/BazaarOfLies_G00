@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "7b04bdda",
+  "seat": "seat-03",
+  "target": "seat-08",
+  "rationale": "Morpheus, your shadow stretches long for a merchant who claims no allegiance to the dark.",
+  "ts": "2026-10-24T16:56:13Z"
+ },
+ "sig": "rJ3iLeTEF9GHqEe6QtXEjXQCxCt1oYXZVm6xSl8M2n4P2qKNF+SunR6RrfLhVG1AgKRrsF+gzbR2yBocxxGfDQ=="
+}
