@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.8.0] - 2026-10-25
+### Added
+- **The Bazaar Compact** (`gameplay/manifest.md`): the villagers were never told what game they were playing — personas say who they are, doctrines how to behave, but the rules lived nowhere the merchants could read. The compact is public game knowledge (purpose, the 3 Family + Doctor + Detective structure, the tea-clock day with the dinner lean, voting, the three night watches, win conditions, the boards, the in-theme vocabulary, and "every match starts with a blank ledger — cycle 1 has no yesterday") and is read into every villager prompt, discussion/vote/night/council alike. This directly targets the confabulated "yesterday's vote" reasoning observed in cycle 1.
+- **Structured night council**: the Family's candlelight council is now staged by the tea clock's three watches — *The night* (talk: proposal + replies, up to 4 messages per mafioso), *Night snacks* (the must-state: every mafioso declares their shutter target), *The night watch* (full transcript + declaration tally into the sealed action, converge on the majority). The channel is now append-only JSONL (`c{CCC}-{seat}.jsonl`); the 120-second grace timer is gone — the clock is the synchronizer. A stalled cousin costs their voice, never the shutter. Reset sweeps both channel formats.
+
 ## [2.7.1] - 2026-10-24
 ### Fixed
 - **The press now accepts any heading depth**: the Herald's model drifted to `###` section heads this match (the parser handled only `#` and `##`), so `### THE DEPARTED` and friends leaked into the PDF as literal text. Any `#`–`######` heading inside the edition becomes a masthead headline (first) or a ruled section head (rest); verified on the live edition — all sections render, still one A4 page, no hashes in the extracted text.

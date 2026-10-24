@@ -84,7 +84,7 @@ family = os.path.join(vault, "family")
 council = 0
 if os.path.isdir(family):
     import glob as globmod
-    for path in sorted(globmod.glob(os.path.join(family, "c*-seat-*.json"))):
+    for path in sorted(globmod.glob(os.path.join(family, "c*-seat-*.json*"))):
         os.remove(path)
         council += 1
 print(f"gameplay/state.json reset to phase=setup; {removed} journal(s) cleared from vault; {council} family council proposal(s) cleared")

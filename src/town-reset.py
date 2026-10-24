@@ -195,7 +195,7 @@ def clear_family_channel(vault, dry):
     if not os.path.isdir(fam):
         return 0
     removed = 0
-    for path in sorted(globmod.glob(os.path.join(fam, "c*-seat-*.json"))):
+    for path in sorted(globmod.glob(os.path.join(fam, "c*-seat-*.json*"))):
         if remove(path, dry):
             removed += 1
     return removed

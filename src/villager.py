@@ -65,11 +65,15 @@ STATEMENT_MAX_CHARS = 1200               # per game rules
 NOTEBOOK_ENABLED = True                # master switch for the memory system
 NOTEBOOK_MAX_CHARS = 4000               # hard cap on stored notebook text
 # ------------------------------------------------- family night channel ---
-# The Family's candlelight council: night proposals between Mafiosi, one
-# file per seat per cycle, never in the repo. Plaintext for now; the
-# dossier's night_channel_key is the hook for encrypting later (at which
-# point the channel could move into the arena repo).
-FAMILY_COUNCIL_GRACE_SECONDS = 120       # wait this long for slow cousins
+# The Family's candlelight council: night proposals and arguments between
+# Mafiosi, one JSONL file per seat per cycle, never in the repo. Plaintext
+# for now; the dossier's night_channel_key is the hook for encrypting
+# later (at which point the channel could move into the arena repo).
+# The night's three watches drive the protocol (see family_council):
+#   The night      (0-5 min):  talk — a proposal, then replies;
+#   Night snacks   (5-10):    every mafioso MUST declare their target;
+#   The night watch (10-15):  converge on the majority, seal the shutter.
+FAMILY_TALK_MAX = 4                      # council messages per mafioso per night
 REASONING_TEMPERATURE = 0.3             # private thinking runs cooler than speech
 REASONING_EFFORT = "high"
 
@@ -502,6 +506,27 @@ def time_of_day_block(state):
     return f"Time of day: {label} — {flavour}.\n"
 
 
+# ------------------------------------------------------------- manifest ---
+MANIFEST_PATH = os.path.join(REPO_ROOT, "gameplay", "manifest.md")
+_manifest_cache = (None, "")             # (mtime, text)
+
+
+def manifest_block():
+    """The Bazaar Compact (gameplay/manifest.md): the rules of the game
+    every merchant knows — purpose, roles, clock, winning, vocabulary.
+    Cached by mtime; absent file means no block (older arenas)."""
+    global _manifest_cache
+    try:
+        mtime = os.path.getmtime(MANIFEST_PATH)
+        if _manifest_cache[0] != mtime:
+            with open(MANIFEST_PATH) as f:
+                _manifest_cache = (mtime, f.read())
+    except OSError:
+        return ""
+    return ("=== THE BAZAAR COMPACT (the rules of the game you are "
+            "playing) ===\n" + _manifest_cache[1] + "\n")
+
+
 # ------------------------------------------------------------ model call ---
 def _content_text(content):
     """Message content comes in two shapes: a plain string (no reasoning),
@@ -558,6 +583,7 @@ def do_discussion(state, cs, journal):
 
     system = (
         f"You are {get_persona()}\n{name_label()}\n\n"
+        f"{manifest_block()}"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}\n\n"
         f"Public facts:\n{public_facts_block(state)}\n"
@@ -642,6 +668,7 @@ def do_vote(state, cs, journal):
 
     system = (
         f"You are {get_persona()}\n{name_label()}\n\n"
+        f"{manifest_block()}"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}\n\n"
         f"Public facts:\n{public_facts_block(state)}\n"
@@ -711,84 +738,173 @@ def do_vote(state, cs, journal):
         "ledger with what the ballots cast so far reveal about each voter.")
 
 
-def family_council_system(state, dossier, mates):
-    """Compact system prompt for lodging a Family proposal."""
+def family_council_system(state, dossier, mates, msgs):
+    """Compact system prompt for the Family's night council."""
     return (f"You are {get_persona()}\n{name_label()}\n"
+            f"{manifest_block()}"
             f"Your secret role is: Mafia. Your living Family: "
             f"{', '.join(display_name(s) for s in sorted(mates))}.\n"
             f"Living merchants: "
             f"{', '.join(display_name(s) for s in state['alive'])}.\n"
             f"Public facts:\n{public_facts_block(state)}\n"
             f"Your private doctrine (follow it, never reveal it):\n"
-            f"{get_doctrine()}")
+            f"{get_doctrine()}\n"
+            f"The candlelight council so far (oldest first):\n"
+            f"{family_transcript(msgs) or '(no one has spoken yet)'}\n")
+
+
+def family_read(cycle, epoch):
+    """All council messages for this cycle+epoch, oldest first (mine
+    included). Foreign epochs are invisible — ghost artifacts."""
+    msgs = []
+    for path in sorted(glob.glob(
+            os.path.join(FAMILY_DIR, f"c{cycle:03d}-seat-*.jsonl"))):
+        try:
+            with open(path) as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    m = json.loads(line)
+                    if m.get("epoch") == epoch and m.get("cycle") == cycle:
+                        msgs.append(m)
+        except (OSError, json.JSONDecodeError):
+            continue
+    msgs.sort(key=lambda m: m.get("ts", ""))
+    return msgs
+
+
+def family_post(kind, target, reason, cycle, epoch):
+    """Append one council message to this seat's channel file."""
+    os.makedirs(FAMILY_DIR, exist_ok=True)
+    rec = {"epoch": epoch, "cycle": cycle, "seat": MY_SEAT, "kind": kind,
+           "target": target, "reason": reason,
+           "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+    with open(os.path.join(FAMILY_DIR, f"c{cycle:03d}-{MY_SEAT}.jsonl"),
+              "a") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    return rec
+
+
+def family_transcript(msgs):
+    """The council as prompt lines: talk and declarations, oldest first."""
+    lines = []
+    for m in msgs:
+        who = display_name(m["seat"])
+        tgt = display_name(m["target"]) if m.get("target") else "nobody"
+        if m.get("kind") == "declare":
+            lines.append(f"- {who} DECLARES the shutter: {tgt} — "
+                         f"{m.get('reason', '')}")
+        else:
+            lines.append(f"- {who} leans toward {tgt} — {m.get('reason', '')}")
+    return "\n".join(lines)
 
 
 def family_council(state, dossier, mates):
-    """The Family's candlelight council — two passes per night.
+    """The Family's candlelight council, staged by the night's watches.
 
-    The council lives in the local family channel
-    (../.bazaar/family/c{CCC}-{seat}.json) — one writer per file, never
-    in the repo, invisible to the village. Plaintext for now; the
-    dossier's night_channel_key is the hook for encrypting it later.
+    The channel lives outside the repo (../.bazaar/family/
+    c{CCC}-{seat}.jsonl, one writer per file, epoch-scoped). The tea
+    clock's three watches drive the protocol:
 
-    Pass A (no proposal file of mine yet): ask the model for a shutter
-    proposal and lodge it. Returns None — the council is still in session.
-    Pass B: read the Family's epoch-scoped proposals; once every living
-    cousin has spoken — or after the grace period, so a stalled cousin
-    cannot stall the shutter — return them as a prompt block.
+      The night      (first 5 min):  talk — a proposal, then replies;
+      Night snacks   (5–10 min):    every mafioso MUST declare their
+                                    shutter target (the must-state);
+      The night watch (10–15 min):   read the council, converge on the
+                                    majority, seal the shutter.
+
+    Returns None while the council is in session (watch 1/2 — this poll
+    did its talking or declaring), and the full transcript as a prompt
+    block in watch 3, when the sealed action may proceed.
+    A stalled cousin costs their voice, never the shutter: the GM's
+    sealed-ballot majority with a random tie-break is the backstop.
     """
-    cycle = state["cycle"]
-    epoch = state.get("epoch")
-    os.makedirs(FAMILY_DIR, exist_ok=True)
-    my_file = os.path.join(FAMILY_DIR, f"c{cycle:03d}-{MY_SEAT}.json")
+    cycle, epoch = state["cycle"], state.get("epoch")
+    label, _ = day_region(state)
+    msgs = family_read(cycle, epoch)
+    mine = [m for m in msgs if m["seat"] == MY_SEAT]
+    mates_alive = sorted(mates)
 
-    if not os.path.exists(my_file):
-        answer = ask(
-            family_council_system(state, dossier, mates),
-            "The Family meets by candlelight. Propose tonight's shutter "
-            "target. Output ONLY the target seat ID or number followed by "
-            "one short sentence why, e.g. 'seat-04 — their ledger is too clean'.")
-        target = parse_seat_id(answer)
-        if not target:
-            log(f"family council: proposal had no seat ID ({answer[:50]!r}) "
-                f"— retrying next poll")
-            return None
-        if target in dossier.get("teammates", []) or target not in state["alive"]:
-            log(f"family council: proposal target {target} not allowed "
-                f"— retrying next poll")
-            return None
-        proposal = {"epoch": epoch, "cycle": cycle, "seat": MY_SEAT,
-                    "target": target,
-                    "reason": answer.split("—", 1)[-1].strip() or answer.strip(),
-                    "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
-        with open(my_file, "w") as f:
-            json.dump(proposal, f, ensure_ascii=False)
-        log(f"family council: proposal lodged → {display_name(target)}")
+    def valid(target):
+        if not target or target in dossier.get("teammates", []) \
+                or target not in state["alive"]:
+            if target:
+                log(f"family council: {target} is not a valid shutter "
+                    f"target — retrying next poll")
+            return False
+        return True
+
+    if label == "The night":                       # watch 1 — talk
+        my_talk = [m for m in mine if m["kind"] == "talk"]
+        newest_mate = max((m["ts"] for m in msgs if m["seat"] != MY_SEAT),
+                          default="")
+        my_newest = max((m["ts"] for m in mine), default="")
+        system = family_council_system(state, dossier, mates, msgs)
+        if not my_talk:
+            answer = ask(system,
+                         "The Family meets by candlelight, first watch. "
+                         "Propose tonight's shutter target. Output ONLY the "
+                         "target seat ID or number followed by one short "
+                         "sentence why, e.g. 'seat-04 — their ledger is "
+                         "too clean'.")
+            target = parse_seat_id(answer)
+            if valid(target):
+                family_post("talk", target,
+                            answer.split("—", 1)[-1].strip() or answer.strip(),
+                            cycle, epoch)
+                log(f"family council (the night): proposal lodged → "
+                    f"{display_name(target)}")
+        elif len(mine) < FAMILY_TALK_MAX and newest_mate > my_newest:
+            answer = ask(system,
+                         "A cousin has spoken since you did. Answer them — "
+                         "agree, push back, or refine. Output ONLY the seat "
+                         "ID you now back followed by one short sentence.")
+            target = parse_seat_id(answer)
+            if valid(target):
+                family_post("talk", target,
+                            answer.split("—", 1)[-1].strip() or answer.strip(),
+                            cycle, epoch)
+                log(f"family council (the night): replied, now backing "
+                    f"{display_name(target)}")
+        else:
+            log("family council (the night): listening")
         return None
 
-    proposals = []
-    for seat in [MY_SEAT] + list(mates):
-        path = os.path.join(FAMILY_DIR, f"c{cycle:03d}-{seat}.json")
-        try:
-            with open(path) as f:
-                p = json.load(f)
-        except (OSError, json.JSONDecodeError):
-            continue
-        if p.get("epoch") != epoch or p.get("cycle") != cycle:
-            continue                      # foreign epoch — ghost artifact
-        proposals.append(p)
-    heard_from = [p["seat"] for p in proposals]
-    missing = [s for s in mates if s not in heard_from]
-    waited = time.time() - os.path.getmtime(my_file)
-    if missing and waited < FAMILY_COUNCIL_GRACE_SECONDS:
-        log(f"family council: waiting for "
-            f"{', '.join(display_name(s) for s in missing)}")
+    if label == "Night snacks":                    # watch 2 — must state
+        if not any(m["kind"] == "declare" for m in mine):
+            system = family_council_system(state, dossier, mates, msgs)
+            answer = ask(system,
+                         "Second watch — night snacks. The Family must state "
+                         "its will: DECLARE the shutter target you want "
+                         "tonight, in light of the council so far. Output "
+                         "ONLY the target seat ID or number followed by one "
+                         "short sentence why.")
+            target = parse_seat_id(answer)
+            if valid(target):
+                family_post("declare", target,
+                            answer.split("—", 1)[-1].strip() or answer.strip(),
+                            cycle, epoch)
+                log(f"family council (night snacks): declared → "
+                    f"{display_name(target)}")
+        else:
+            log("family council (night snacks): declared, listening")
         return None
-    lines = ["\nThe Family's candlelight council (tonight's proposals):"]
-    for p in proposals:
-        lines.append(f"- {display_name(p['seat'])} proposes "
-                     f"{display_name(p['target'])}: {p.get('reason', '')}")
-    return "\n".join(lines) + "\n"
+
+    # watch 3 — "The night watch" (or an unmapped region): converge & act
+    declares = [m for m in msgs if m["kind"] == "declare"
+                and m["seat"] in [MY_SEAT] + list(mates)]
+    tally = {}
+    for m in declares:
+        tally[m["target"]] = tally.get(m["target"], 0) + 1
+    tally_block = (", ".join(f"{display_name(t)}: {n}"
+                            for t, n in sorted(tally.items(),
+                                               key=lambda kv: -kv[1]))
+                   if tally else "no declarations — the will is unknown")
+    return ("\nThe Family's candlelight council (tonight, oldest first):\n"
+            f"{family_transcript(msgs)}\n"
+            f"Declarations: {tally_block}\n"
+            "Converge on the majority declaration — a split Family hands "
+            "the shutter to the GM's coin flip.\n")
 
 
 def do_night(state, cs, journal):
@@ -855,6 +971,7 @@ def do_night(state, cs, journal):
 
     system = (
         f"You are {get_persona()}\n{name_label()}\n"
+        f"{manifest_block()}"
         f"Your secret role is: {role}.\n"
         f"Role instructions from the GM: {json.dumps(dossier)}\n\n"
         f"Public facts:\n{public_facts_block(state)}\n"
