@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "7b04bdda",
+  "seat": "seat-08",
+  "target": "seat-03",
+  "rationale": "You asked a yes or no question that wasn’t copper—now you stand under it.",
+  "ts": "2026-10-24T16:53:55Z"
+ },
+ "sig": "P8et7Oqb9Eg59aKVJ9bUZv8FYxSOe8u3+Bc6I60QhXzwlT457ruvBc918VUG43GHB+xmncaCrUpw16w8+s1EDA=="
+}
