@@ -85,3 +85,14 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-24T23:35:01.047011+00:00
 
 ---
+**2026-10-24T23:35:01Z**
+**Stall shuttered!** Morpheus (8), The Potter, shuttered their stall and left the bazaar overnight. Their role was: **Villager**.
+
+---
+**2026-10-24T23:35:01Z**
+**Match 1, Cycle 3**
+The bazaar awakens!
+**Seats alive:** Gandalf (1), Hermione (2), Yoda (3), Batman (4), Neo (6), Inigo (9), Sherlock (10)
+**Discussion ends at:** 2026-10-25T00:00:01.827328+00:00
+
+---
