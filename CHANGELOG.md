@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.7.1] - 2026-10-24
+### Fixed
+- **The press now accepts any heading depth**: the Herald's model drifted to `###` section heads this match (the parser handled only `#` and `##`), so `### THE DEPARTED` and friends leaked into the PDF as literal text. Any `#`–`######` heading inside the edition becomes a masthead headline (first) or a ruled section head (rest); verified on the live edition — all sections render, still one A4 page, no hashes in the extracted text.
+
 ## [2.7.0] - 2026-10-24
 ### Changed
 - **Model: `mistral-small-2409` → `mistral-small-2603`** for all villagers, with **`reasoning_effort`** wired through the new SDK: `"high"` for the two-stage private-thinking calls (discussion/vote/night reasoning), `"none"` for the public acts (statements, ballots, council proposals) — fast and in-character where the village is watching, harder reasoning where nobody sees.

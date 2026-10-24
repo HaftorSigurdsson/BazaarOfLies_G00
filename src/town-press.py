@@ -288,21 +288,16 @@ def parse_edition(md_text, md_path):
     def body_line(s):
         """One line of edition prose → headline / subhead / paragraph."""
         nonlocal headline
-        if s.startswith("# "):            # edition title → masthead covers it
-            t = sanitize(s[2:].strip())
-            if re.match(r"the herald\b", t, re.I):
-                return                     # the duplicate inner masthead
-            if headline is None:          # first section heading = headline
-                headline = t
-            else:
-                blocks.append(("subhead", t))
-            return
-        if s.startswith("## "):
-            text = sanitize(s[3:].strip().strip("*"))
-            if headline is None:          # first section heading = headline
-                headline = text
-            else:
-                blocks.append(("subhead", text))
+        if s.startswith("#"):             # any heading depth (# … ######)
+            m = re.match(r"#{1,6}\s*(.+)", s)
+            if m:
+                t = sanitize(m.group(1).strip().strip("*"))
+                if re.match(r"the herald\b", t, re.I):
+                    return                 # the duplicate inner masthead
+                if headline is None:      # first section heading = headline
+                    headline = t
+                else:
+                    blocks.append(("subhead", t))
             return
         if re.fullmatch(r"\*[^*]+\*", s):   # *Match 1, Cycle 001* → dateline
             if re.match(r"\*Match\b", s, re.I):
