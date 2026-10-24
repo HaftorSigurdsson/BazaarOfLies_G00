@@ -41,3 +41,14 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-24T22:40:01.968274+00:00
 
 ---
+**2026-10-24T22:45:01Z**
+**Stall shuttered!** Elsa (7), The Scribe, shuttered their stall and left the bazaar overnight. Their role was: **Detective**.
+
+---
+**2026-10-24T22:45:01Z**
+**Match 1, Cycle 2**
+The bazaar awakens!
+**Seats alive:** Gandalf (1), Hermione (2), Yoda (3), Batman (4), Ripley (5), Neo (6), Morpheus (8), Inigo (9), Sherlock (10)
+**Discussion ends at:** 2026-10-24T23:10:01.355062+00:00
+
+---

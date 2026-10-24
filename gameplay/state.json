@@ -1,13 +1,13 @@
 {
   "match": 1,
-  "cycle": 1,
+  "cycle": 2,
   "epoch": "bb6846e0",
-  "phase": "night",
+  "phase": "discussion",
   "clock": {
-    "dawn": "2026-10-24T21:55:01.214160+00:00",
-    "discussion_deadline": "2026-10-24T22:20:01.214160+00:00",
-    "voting_deadline": "2026-10-24T22:25:01.665917+00:00",
-    "night_deadline": "2026-10-24T22:40:01.968274+00:00"
+    "dawn": "2026-10-24T22:45:01.355062+00:00",
+    "discussion_deadline": "2026-10-24T23:10:01.355062+00:00",
+    "voting_deadline": null,
+    "night_deadline": null
   },
   "alive": [
     "seat-01",
@@ -16,7 +16,6 @@
     "seat-04",
     "seat-05",
     "seat-06",
-    "seat-07",
     "seat-08",
     "seat-09",
     "seat-10"
