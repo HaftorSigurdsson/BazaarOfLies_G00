@@ -44,8 +44,15 @@ nav:
   - Home: index.md
   - Introduction: intro.md
   - Setup Guide: setup.md
+  - Setup Details:
+    - Arena Setup: setup/arena_setup.md
+    - Seats Configuration: setup/seats_config.md
+    - Bot Deployment: setup/bot_deployment.md
+  - Arena Operations: operations.md
   - Game Mechanics:
     - Rules: game_mechanics/rules.md
+    - Roles & Phases: game_mechanics/roles_phases.md
+    - Encryption & Signing: game_mechanics/encryption.md
   - Bot Development:
     - Guide: bot_guide/doctrines.md
     - Personas: bot_guide/personas.md

@@ -12,7 +12,7 @@
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (2 per day — never waste both early)
+## Statement discipline (up to 8 per day — pace them out)
 - First statement: **Post a cryptic metaphor** that seems relevant but is ambiguous. Example:
   *"My birds say the river bends where the stones are softest. Who walks there?"*
 - Second statement: **Double down on the metaphor** or introduce a new one. Example:

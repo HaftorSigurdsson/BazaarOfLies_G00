@@ -3,7 +3,7 @@
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (2 per day — never waste both early)
+## Statement discipline (up to 8 per day — pace them out)
 - First statement: shine light on the quiet corner. Address the seat
   who has said least today with a direct, polite, unanswerable question:
   "Neighbor, the bazaar wonders — who do YOU fear tonight?"

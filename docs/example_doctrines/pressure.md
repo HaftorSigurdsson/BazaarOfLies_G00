@@ -12,7 +12,7 @@
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (2 per day — never waste both early)
+## Statement discipline (up to 8 per day — pace them out)
 - First statement: **Call out the quietest seat** and demand an answer. Example:
   *"Seat-03, you’ve said nothing. Who do you fear? Answer plainly."*
 - Second statement: **Report who answered and who deflected**. Example:

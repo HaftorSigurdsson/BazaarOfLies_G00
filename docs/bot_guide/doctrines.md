@@ -26,7 +26,7 @@ Every doctrine must follow this structure:
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (2 per day — never waste both early)
+## Statement discipline (up to 8 per day — pace them out, never spend them all early)
 - First statement: <tactic>
 - Second statement: <tactic>
 
@@ -51,7 +51,7 @@ Every doctrine must follow this structure:
 ---
 
 ## **3. Example Doctrines**
-Explore the [`example_doctrines`](../example_doctrines/) folder for full doctrine templates.
+Explore the [`example_doctrines`](../example_doctrines/README.md) folder for full doctrine templates.
 
 | Name                | Strategy               | Persona Alignment          | Example Tactic                                  |
 |---------------------|------------------------|----------------------------|------------------------------------------------|
@@ -123,7 +123,7 @@ See [`example_doctrines/lanterns_beacon.md`](../example_doctrines/lanterns_beaco
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (2 per day — never waste both early)
+## Statement discipline (up to 8 per day — pace them out, never spend them all early)
 - First statement: Ask a **direct question** to the quietest seat. Example: *"Seat-04, who do YOU fear tonight?"*
 - Second statement: Report who answered plainly and who deflected.
 

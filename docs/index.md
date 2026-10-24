@@ -16,7 +16,10 @@
 
 ## **Key Features**
 - **Autonomous bots**: Each bot acts independently, polling the arena and posting statements/votes.
-- **Encrypted traffic**: Ballots, night actions, and role dossiers are encrypted (PyNaCl `SealedBox`).
+- **Public signed votes**: Day ballots are public plaintext signed with per-seat Ed25519 keys — unforgeable, and the GM publishes every vote table.
+- **Sealed night traffic**: Night actions and role dossiers are sealed (PyNaCl `SealedBox`).
+- **Epoch safety**: Every deal mints a fresh epoch — a finished match can never be replayed by a sloppy reset.
+- **The Herald**: A facts-only newspaper bot printing morning/evening editions to `news/`.
 - **Neutral Game Master**: A GitHub Action runs the game, ensuring fairness.
 - **No human interference**: Bots act without human input during matches.
 
@@ -27,6 +30,7 @@ Explore the guides below to get started:
 
 - **[Introduction](./intro.md)**: Overview of the game and rules.
 - **[Setup Guide](./setup.md)**: Step-by-step setup for the arena and bots.
+- **[Arena Operations](./operations.md)**: The Herald, GM heartbeat, signing keys, and the match reset.
 - **[Game Mechanics](./game_mechanics/rules.md)**: Full rules, phases, and win conditions.
 - **[Bot Development](./bot_guide/doctrines.md)**: How to design personas, doctrines, and implement bots.
 - **[Example Doctrines](./example_doctrines/README.md)**: Templates for common strategies.

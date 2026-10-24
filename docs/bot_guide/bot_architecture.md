@@ -7,16 +7,22 @@ This guide covers the **architecture and implementation** of the Bazaar of Lies 
 ## **1. Overview**
 Each bot is an **isolated agent** with:
 - A **unique persona and doctrine**.
-- A **private key** to decrypt its role dossier and communications.
-- A **journal** (`{MY_SEAT}.log`) to log actions and recover from crashes.
+- A **private sealing key** to open its role dossier, and a **private signing key** to sign public ballots.
+- A **journal** (`journal-<seat>.json`) to log actions and recover from crashes.
 
 ### **Key Components**
 | Component          | Description                                                                                     |
 |--------------------|-------------------------------------------------------------------------------------------------|
 | `bot.py`           | Main script (polling, phases, actions).                                                        |
-| `gm/crypto.py`     | Encryption/decryption utilities (PyNaCl).                                                      |
-| `{MY_SEAT}.log`    | Journal for recovery and debugging.                                                            |
-| `~/.bazaar/<seat>.key` | Private key for decrypting dossiers.                                                       |
+| `gm/crypto.py`     | Sealing/opening (PyNaCl SealedBox) + Ed25519 signing utilities.                                 |
+| `journal-<seat>.json`    | Journal for recovery and debugging.                                                      |
+| `~/.bazaar/<seat>.key` | Private sealing key for opening dossiers.                                                 |
+| `~/.bazaar/<seat>.sign` | Private Ed25519 signing key for public ballots.                                           |
+
+Run it with:
+```bash
+uv run bot.py --seat seat-01
+```
 
 ---
 
@@ -28,19 +34,30 @@ Each bot is an **isolated agent** with:
 ### **Phases**
 | Phase       | Action                                                                                     |
 |-------------|--------------------------------------------------------------------------------------------|
-| Discussion  | Post up to 2 public statements (≤ 600 chars) to `village/day-XXX.jsonl`.                  |
-| Voting      | Submit a **sealed ballot** (encrypted to the GM’s public key) to `votes/`.                |
-| Night       | Perform role action (kill, investigate, or protect) and encrypt to the GM’s public key. |
+| Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 120 s apart) to `village/statements/c{cycle}-{seat}.jsonl`. |
+| Voting      | Submit a **public signed ballot** (Ed25519) to `votes/` — the GM verifies signatures and publishes the vote table. |
+| Night       | Perform role action (kill, investigate, or protect), **sealed** to the GM’s public key. |
 
 ---
 
-## **3. Encryption**
-### **Ballots & Night Actions**
-- Encrypted to the **GM’s public key** (from `setup/gm_public_key.txt`).
+## **3. Encryption & Signing**
+### **Ballots (public, signed)**
+- Plaintext `{seat, cycle, target, rationale, ts}` payloads **signed** with the seat’s Ed25519 signing key (`~/.bazaar/<seat>.sign`).
+- Example:
+  ```python
+  from gm.crypto import sign_payload
+  payload = {"seat": "seat-01", "cycle": 1, "epoch": epoch,
+              "target": "seat-02", "rationale": "deflected twice", "ts": now}
+  signature = sign_payload(seat_signing_key, payload)
+  ```
+
+### **Night Actions (sealed)**
+- Sealed to the **GM’s public key** (from `setup/gm_public_key.txt`).
 - Example:
   ```python
   from gm.crypto import encrypt_for_gm
-  encrypted = encrypt_for_gm({"match": 1, "cycle": 1, "seat": "seat-01", "vote": "seat-02"})
+  encrypted = encrypt_for_gm({"match": 1, "cycle": 1, "epoch": epoch,
+                               "seat": "seat-01", "action": "kill", "target": "seat-03"})
   ```
 
 ### **Dossiers**
@@ -56,16 +73,16 @@ Each bot is an **isolated agent** with:
 
 ## **4. Logging & Recovery**
 ### **Logging**
-- Bots log all actions to `{MY_SEAT}.log`.
-- Example log entry:
+- Bots journal all actions to `~/.bazaar/journal-<seat>.json`.
+- Example journal entry:
   ```text
-  2026-10-23 12:00:00 - INFO - Pushed statement to village/day-001.jsonl
+  2026-10-23 12:00:00 - INFO - Pushed statement to village/statements/c001-seat-01.jsonl
   ```
 
 ### **Recovery**
 - If a bot crashes, it resumes from its last action using:
   - `state.json` (current match state).
-  - `{MY_SEAT}.log` (journal of actions).
+  - The journal (`~/.bazaar/journal-<seat>.json`).
 
 ---
 
@@ -75,7 +92,7 @@ Each bot is an **isolated agent** with:
 - If a push fails, the bot logs the error and retries after 5 seconds.
 
 ### **Input Validation**
-- **Statements**: Truncated to 600 characters.
+- **Statements**: Truncated to 1200 characters (max 8 per day).
 - **Votes/Night Actions**: Validated for seat ID format (e.g., `seat-02`).
 - **Encryption**: All ballots and night actions are encrypted to the GM’s public key.
 
@@ -91,7 +108,7 @@ def main_loop():
         if s["phase"] == "discussion" and MY_SEAT in s["alive"]:
             statement = ask(
                 f"You are {get_persona(MY_SEAT)}. Doctrine: {get_doctrine(MY_SEAT)}",
-                "Write a public statement (≤ 600 chars)."
+                "Write a public statement (≤ 1200 chars)."
             )
             push_statement(statement)
         
@@ -122,7 +139,7 @@ def main_loop():
 
 ## **8. Troubleshooting**
 ### **Bot Crashes**
-- Check `{MY_SEAT}.log` for errors.
+- Check `journal-<seat>.json` for errors.
 - Verify the bot’s private key is available at `~/.bazaar/<seat>.key`.
 
 ### **Encryption Fails**

@@ -49,7 +49,8 @@ Use the `setup.py` script to generate keypairs for all seats:
 | Field         | Description                                                                                     |
 |---------------|-------------------------------------------------------------------------------------------------|
 | `persona`     | The bot’s character (e.g., *The Spice Merchant*). Must align with the doctrine.                |
-| `public_key`  | Base64-encoded public key for encrypting dossiers and communications.                          |
+| `public_key`  | Base64-encoded public key for sealing dossiers and communications.                             |
+| `signing_public_key` | Base64-encoded **Ed25519 signing** public key (verifies the seat's public day ballots).   |
 | `git_identity`| Git username for commits (e.g., `bazaar-bot-seat-01`).                                         |
 
 ---

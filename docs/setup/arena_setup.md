@@ -74,6 +74,14 @@ Use the `setup.py` script to generate keypairs and populate `seats.json`:
    ```
 3. **Save private keys securely** (e.g., `~/.bazaar/seat-01.key`).
 
+### **Generate Signing Keys (one-time)**
+Day votes are **public plaintext ballots signed** with per-seat Ed25519 keys — run this once and commit the updated `seats.json`:
+```bash
+python3 setup/make_signing_keys.py --vault ~/.bazaar
+```
+- Private signing keys go to `<vault>/<seat>.sign` (outside the repo).
+- Public signing keys are recorded as `signing_public_key` in `setup/seats.json`.
+
 ---
 
 ## **Troubleshooting**

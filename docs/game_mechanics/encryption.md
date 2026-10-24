@@ -5,40 +5,60 @@ This guide covers the **encryption system** for the Bazaar of Lies, including se
 ---
 
 ## **1. Overview**
-- **PyNaCl (libsodium)**: Used for all encryption/decryption.
-- **Public/Private Keypairs**: Each bot and the GM have a keypair.
-- **SealedBox**: Encrypts messages so only the recipient can decrypt them.
+- **PyNaCl (libsodium)**: Used for all sealing/sealing-open (`SealedBox`) and **Ed25519 signing**.
+- **Public/Private Keypairs**: Each bot and the GM have a sealing keypair; each seat also has an **Ed25519 signing keypair** for public ballots.
+- **SealedBox**: Seals messages so only the recipient can open them (night actions, dossiers).
+- **Ed25519 Signatures**: Prove authorship of **public day ballots** without hiding them.
 
 ### **Key Files**
 | File                     | Description                                                                                     |
 |--------------------------|-------------------------------------------------------------------------------------------------|
-| `setup/gm_public_key.txt`| GM’s public key (used to encrypt ballots/night actions).                                        |
-| `setup/seats.json`       | Public keys for all seats (used to encrypt dossiers).                                           |
-| `~/.bazaar/<seat>.key`   | Private keys for bots (used to decrypt dossiers).                                               |
+| `setup/gm_public_key.txt`| GM’s public key (used to seal night actions).                                                    |
+| `setup/seats.json`       | Public sealing keys + signing public keys for all seats.                                         |
+| `~/.bazaar/<seat>.key`   | Seat's private sealing key (opens dossiers).                                                      |
+| `~/.bazaar/<seat>.sign`  | Seat's private **signing** key (signs public ballots).                                           |
 
 ---
 
-## **2. Encryption Workflow**
-### **Ballots & Night Actions**
-1. **Bot encrypts** a payload (e.g., vote or night action) to the GM’s public key:
+## **2. Encryption & Signing Workflow**
+### **Ballots (public, signed)**
+Day votes are **public plaintext ballots signed** with a per-seat Ed25519 signing key — nobody can forge another merchant's ballot:
+
+1. **Bot signs** the ballot payload:
+   ```python
+   from gm.crypto import sign_payload
+   payload = {"seat": "seat-01", "cycle": 1, "epoch": "a1b2c3d4",
+              "target": "seat-02", "rationale": "deflected twice", "ts": "..."}
+   signature = sign_payload(seat_signing_key, payload)
+   ```
+2. **Bot writes** the signed payload to `votes/`.
+3. **GM verifies** the signature and the epoch before counting:
+   ```python
+   from gm.crypto import verify_payload
+   ok = verify_payload(seat_signing_public_key, payload, signature)
+   ```
+
+### **Night Actions (sealed)**
+1. **Bot seals** a night payload (kill / investigate / protect) to the GM’s public key:
    ```python
    from gm.crypto import encrypt_for_gm
-   encrypted = encrypt_for_gm({"match": 1, "cycle": 1, "seat": "seat-01", "vote": "seat-02"})
+   encrypted = encrypt_for_gm({"match": 1, "cycle": 1, "epoch": "...",
+                                "seat": "seat-01", "action": "kill", "target": "seat-03"})
    ```
-2. **Bot writes** the encrypted payload to `votes/` or `night/`.
-3. **GM decrypts** the payload using its private key:
+2. **Bot writes** the sealed payload to `night/`.
+3. **GM opens** the payload using its private key:
    ```python
    from gm.crypto import decrypt_payload
    decrypted = decrypt_payload(gm_private_key, encrypted)
    ```
 
-### **Dossiers**
-1. **GM encrypts** a role dossier to a bot’s public key:
+### **Dossiers (sealed to each seat)**
+1. **GM seals** a role dossier to a bot’s public key:
    ```python
    from gm.crypto import encrypt_for_seat
    encrypted_dossier = encrypt_for_seat(seat_public_key, {"role": "Mafia"})
    ```
-2. **Bot decrypts** the dossier using its private key:
+2. **Bot opens** the dossier using its private key:
    ```python
    from gm.crypto import decrypt_payload
    decrypted_dossier = decrypt_payload(seat_private_key, encrypted_dossier)
@@ -47,27 +67,31 @@ This guide covers the **encryption system** for the Bazaar of Lies, including se
 ---
 
 ## **3. Example Payloads**
-### **Ballot**
+### **Ballot (public + signed)**
 ```json
 {
-  "match": 1,
-  "cycle": 1,
   "seat": "seat-01",
-  "vote": "seat-02"
+  "cycle": 1,
+  "epoch": "a1b2c3d4",
+  "target": "seat-02",
+  "rationale": "The river bends around every question.",
+  "ts": "2026-10-24T20:55:00Z"
 }
 ```
 
-### **Night Action**
+### **Night Action (sealed)**
 ```json
 {
   "match": 1,
   "cycle": 1,
+  "epoch": "a1b2c3d4",
   "seat": "seat-01",
+  "action": "kill",
   "target": "seat-03"
 }
 ```
 
-### **Dossier**
+### **Dossier (sealed to the seat)**
 ```json
 {
   "role": "Mafia",

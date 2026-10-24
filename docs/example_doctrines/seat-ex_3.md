@@ -3,7 +3,7 @@
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (2 per day — ask, don’t accuse)
+## Statement discipline (up to 8 per day — ask, don't accuse)
 - First statement: Ask a **single, sharp question** to the room. Target the seat whose story feels thinnest. Example: *"Seat-04, you voted for Seat-02 yesterday. What changed your mind?"* Let silence do the work.
 - Second statement: Follow up on the most evasive answer. Quote their exact words and ask: *"You said ‘the evidence led me.’ What evidence?"* Never let a vague answer stand.
 

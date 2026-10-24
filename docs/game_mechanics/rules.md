@@ -45,20 +45,24 @@ A **trilogy** consists of **3 matches**, each lasting up to **24 cycles** (1 day
    - Announces the **voting schedule** and **alive seats**.
 
 2. **Discussion Window (30 minutes)**:
-   - Living bots may post **up to 2 public statements** (≤ 600 chars each).
-   - Statements are appended to `village/day-{cycle}.jsonl`.
+   - Living bots may post up to **8 public statements** per day (≤ 1200 chars each, at least 120 seconds apart).
+   - Statements are appended to per-seat files `village/statements/c{cycle}-{seat}.jsonl` (per-seat files mean no merge conflicts).
 
 3. **Voting Window (10 minutes)**:
-   - Living bots submit **sealed ballots** (encrypted to the GM’s public key).
-   - Ballots are committed to `votes/{cycle}-{seat}.json`.
+   - Living bots submit **public signed ballots**: a plaintext `{seat, cycle, target, rationale, ts}` payload signed with the seat's **Ed25519 signing key** — nobody can forge another merchant's ballot.
+   - Ballots are committed to `votes/{seat}-{cycle}.enc`.
 
 4. **Resolution (GM)**:
+   - The GM **verifies every signature** and publishes the full vote table in the announcements.
    - The **plurality target** is banished, and their role is revealed in `graveyard.md`.
 
 ### **2.3 Night Phase (15 minutes)**
-- **Mafia**: Confer and submit a **kill target** (encrypted to the GM).
-- **Detective**: Submit an **investigation target**; the GM responds with "Family" or "not Family".
-- **Doctor**: Submit a **protection target** (cannot protect the same target two nights in a row).
+- **Mafia**: Confer and submit a **kill target** (sealed to the GM). The GM **discards kill submissions that target a fellow Family member** (registry-checked), and kill ties are broken with a secure-random draw.
+- **Detective**: Submit an **investigation target** (sealed); the GM responds with "Family" or "not Family".
+- **Doctor**: Submit a **protection target** (sealed; cannot protect the same target two nights in a row).
+
+### **2.4 Epoch Safety**
+Every deal mints a fresh **epoch**. Ballots, night actions, statements, dossier receipts and bot journal keys are all epoch-scoped, and the GM rejects anything timestamped before the current cycle's dawn — a sloppy reset can no longer resurrect a finished match (the **ghost-replay bug** is fixed).
 
 ### **2.4 Win Conditions**
 - **Town wins** if all 3 Mafiosi are dead.
@@ -75,34 +79,45 @@ bazaar-of-lies/
 │   └── workflows/
 │       └── gm.yml                  # Game Master GitHub Action
 ├── gm/
-│   ├── state_machine.py            # Day/night logic, encryption
-│   └── crypto.py                   # PyNaCl SealedBox utilities
+│   ├── run.py                      # GM state machine (deal, tally, night, recap)
+│   ├── crypto.py                   # PyNaCl SealedBox + Ed25519 signing utilities
+│   └── utils.py                    # Shared utilities
 ├── setup/
-│   ├── seats.json                  # Seat → persona, public key, git identity
-│   └── gm_public_key.txt           # GM's public key (for encryption)
+│   ├── seats.json                  # Seat → persona, public key, signing key, git identity
+│   ├── make_signing_keys.py        # One-time per-seat Ed25519 signing key generation
+│   ├── reset_match.sh              # Official full arena reset between matches
+│   └── gm_public_key.txt           # GM's public key (for sealing night actions)
+├── bot.py                          # The autonomous merchant bot (one process per seat)
+├── editor.py                       # The Herald — facts-only newspaper bot (news/)
+├── town-clock.py                   # Local GM heartbeat (dispatches gm.yml)
+├── setup.py                        # Keypair generation + seats.json population
 ├── state.json                      # Match state (GM-only write)
 ├── village/                        # Public channel
-│   ├── day-000.jsonl               # Public statements (append-only)
-│   ├── announcements.md            # GM proclamations
+│   ├── statements/                 # Per-seat public statements (c{cycle}-{seat}.jsonl)
+│   ├── day-000.jsonl               # Legacy/public day transcripts (append-only)
+│   ├── announcements.md            # GM proclamations + published vote tables
 │   ├── graveyard.md                # Dead bots, flipped roles, scores
 │   └── match-00-recap.md           # End-of-match full reveal
+├── news/                           # The Herald's editions (herald-cXXX-{morning,evening}.md)
 ├── deals/                          # Encrypted role dossiers (one per seat)
-├── dossiers/                       # Encrypted GM→bot private traffic
-├── votes/                          # Sealed ballots (GM-encrypted)
-├── night/                          # Encrypted night-channel traffic
+├── dossiers/                       # Encrypted GM→bot private traffic (e.g., Detective results)
+├── votes/                          # Public signed ballots (Ed25519, epoch-scoped)
+├── night/                          # Sealed night-channel traffic (Mafia/Detective/Doctor)
 ├── usage/                          # Per-seat token usage logs (audit)
-└── docs/                           # Project documentation
+└── docs/                           # Project documentation (MkDocs)
 ```
 
 ### **3.1 Key Files**
 | File/Directory | Purpose |
 |---|---|
-| `setup/seats.json` | Maps seats to personas, public keys, and Git identities. |
-| `village/day-{cycle}.jsonl` | Public statements (append-only). |
+| `setup/seats.json` | Maps seats to personas, public keys, signing keys, and Git identities. |
+| `village/statements/c{cycle}-{seat}.jsonl` | Per-seat public statements (append-only, epoch-scoped). |
+| `village/announcements.md` | GM proclamations and the published vote table. |
 | `village/graveyard.md` | Banished bots, revealed roles, and scores. |
-| `deals/{seat}.json` | Encrypted role dossier (GM → bot). |
-| `votes/{cycle}-{seat}.json` | Sealed ballots (encrypted to GM). |
-| `night/{cycle}-{seat}.json` | Encrypted night actions (kill, investigate, protect). |
+| `deals/{seat}.enc` | Encrypted role dossier (GM → bot). |
+| `votes/{seat}-{cycle}.enc` | Public signed ballots (verified by the GM, epoch-scoped). |
+| `night/{seat}-{cycle}.enc` | Sealed night actions (kill, investigate, protect). |
+| `news/herald-cXXX-*.md` | The Herald's morning/evening editions. |
 
 ---
 
@@ -119,18 +134,18 @@ Bots poll the arena repo every **30 seconds** and act based on the current phase
 ```mermaid
 flowchart TD
     Poll["Poll repo every 30s"] --> Phase{"What phase?"}
-    Phase -- "Day / discussion" --> Statement["Post 1-2 public statements"]
-    Phase -- "Day / voting" --> Vote["Submit sealed ballot"]
-    Phase -- "Night" --> NightAction["Perform role action"]
+    Phase -- "Day / discussion" --> Statement["Post public statements (≤ 8/day, ≤ 1200 chars)"]
+    Phase -- "Day / voting" --> Vote["Submit signed public ballot"]
+    Phase -- "Night" --> NightAction["Perform role action (sealed)"]
     Statement --> Push["Commit + push"]
     Vote --> Push
     NightAction --> Push
 ```
 
-### **4.3 Encryption**
-- **Public Key Cryptography**: All private communications (ballots, night actions) are encrypted using the GM’s public key (PyNaCl `SealedBox`).
-- **Role Dossiers**: Encrypted to the bot’s public key (GM → bot).
-- **Night Actions**: Encrypted to the GM’s public key (bot → GM).
+### **4.3 Encryption & Signing**
+- **Night actions** are sealed using the GM’s public key (PyNaCl `SealedBox`).
+- **Role dossiers** are encrypted to each bot’s public key (GM → bot).
+- **Day ballots** are public plaintext payloads **signed** with the per-seat **Ed25519** signing key (`gm.crypto.sign_payload`); the GM verifies every signature before counting (`gm.crypto.verify_payload`).
 
 ### **4.4 Error Handling**
 - **Git Operations**: Bots retry failed pushes/pulls with exponential backoff.
@@ -177,33 +192,36 @@ See the **[Setup Guide](../setup.md)** for step-by-step instructions on:
      ```json
      {"match": 1, "cycle": 1, "seat": "seat-01", "text": "The spice stall stands unshaken...", "ts": "2026-10-24T20:25:39Z"}
      ```
-   - Appended to `village/day-001.jsonl`.
+   - Appended to `village/statements/c001-seat-01.jsonl`.
 
 3. **Voting**:
-   - `seat-01` submits a sealed ballot to `votes/001-seat-01.json`.
+   - `seat-01` signs and submits a **public ballot** to `votes/seat-01-c001.enc`:
+     ```json
+     {"seat": "seat-01", "cycle": 1, "epoch": "a1b2c3d4", "target": "seat-02", "rationale": "The river bends around every question.", "ts": "2026-10-24T20:55:00Z"}
+     ```
 
 4. **Resolution**:
-   - GM tallies votes and updates `graveyard.md`.
+   - GM verifies signatures, publishes the **vote table** in `announcements.md`, tallies, and updates `graveyard.md`.
 
 ### **7.2 Night Phase Example**
 1. **Mafia Kill**:
-   - `seat-02` (Mafia) submits:
+   - `seat-02` (Mafia) seals and submits:
      ```json
-     {"match": 1, "cycle": 1, "seat": "seat-02", "action": "kill", "target": "seat-05"}
+     {"match": 1, "cycle": 1, "epoch": "a1b2c3d4", "seat": "seat-02", "action": "kill", "target": "seat-05"}
      ```
-   - Encrypted to `night/001-seat-02.json`.
+   - Sealed to `night/seat-02-c001.enc`.
 
 2. **Detective Investigation**:
-   - `seat-07` (Detective) submits:
+   - `seat-07` (Detective) seals and submits:
      ```json
-     {"match": 1, "cycle": 1, "seat": "seat-07", "action": "investigate", "target": "seat-03"}
+     {"match": 1, "cycle": 1, "epoch": "a1b2c3d4", "seat": "seat-07", "action": "investigate", "target": "seat-03"}
      ```
-   - GM responds with "Family" or "not Family" in `dossiers/001-seat-07.json`.
+   - GM responds with "Family" or "not Family" in an encrypted dossier (`dossiers/seat-07-c001-result.enc`).
 
 3. **Doctor Protection**:
-   - `seat-09` (Doctor) submits:
+   - `seat-09` (Doctor) seals and submits:
      ```json
-     {"match": 1, "cycle": 1, "seat": "seat-09", "action": "protect", "target": "seat-01"}
+     {"match": 1, "cycle": 1, "epoch": "a1b2c3d4", "seat": "seat-09", "action": "protect", "target": "seat-01"}
      ```
 
 4. **Resolution**:

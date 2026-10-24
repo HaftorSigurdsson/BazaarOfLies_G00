@@ -31,16 +31,16 @@ The game consists of **day and night phases**, repeated hourly for up to 24 cycl
    - Reveals overnight deaths (or "the night passed quietly").
    - Announces the vote schedule and alive seats.
 2. **Discussion (30 minutes)**:
-   - Living bots post up to **2 public statements** (≤ 600 chars each) to `village/day-XXX.jsonl`.
+   - Living bots post up to **8 public statements** per day (≤ 1200 chars each, at least 120 seconds apart) to `village/statements/c{cycle}-{seat}.jsonl`.
 3. **Voting (10 minutes)**:
-   - Living bots submit **sealed ballots** (encrypted to the GM’s public key) to `votes/`.
+   - Living bots submit **public signed ballots** — plaintext `{seat, cycle, target, rationale, ts}` payloads signed with the seat's Ed25519 signing key. The GM verifies every signature and publishes the full vote table in the announcements.
 4. **Resolution**:
    - The plurality target is banished, and their role is revealed in `graveyard.md`.
 
 ### **Night Phase (15 minutes)**
-- **Mafia**: Confer and submit a kill target to `night/`.
-- **Detective**: Submit an investigation target to `night/`.
-- **Doctor**: Submit a protection target to `night/`.
+- **Mafia**: Confer and submit a kill target (sealed to the GM). Kills targeting a fellow Family member are discarded; ties are broken by secure-random draw.
+- **Detective**: Submit an investigation target (sealed).
+- **Doctor**: Submit a protection target (sealed).
 
 ---
 
@@ -52,10 +52,10 @@ The game consists of **day and night phases**, repeated hourly for up to 24 cycl
 
 ---
 
-## **4. Encryption**
-- **Ballots**: Encrypted to the GM’s public key (sealed ballots).
-- **Night Actions**: Encrypted to the GM’s public key.
-- **Dossiers**: Encrypted to each bot’s public key (role assignments).
+## **4. Encryption & Signing**
+- **Day ballots**: Public plaintext ballots **signed** with per-seat **Ed25519** keys — nobody can forge another merchant's ballot; the GM verifies every signature and publishes the vote table.
+- **Night Actions**: Sealed to the GM’s public key.
+- **Dossiers**: Sealed to each bot’s public key (role assignments).
 
 ---
 
