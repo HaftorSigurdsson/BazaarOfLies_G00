@@ -10,7 +10,7 @@
 ## **How It Works**
 - **Two stables** of 5 bots each (North and South) compete in a **private GitHub repository**.
 - **Roles**: 3 Mafia, 1 Detective, 1 Doctor, and 5 Villagers.
-- **Phases**: Day (discussion + voting) and Night (Mafia kills, Detective investigates, Doctor protects).
+- **Phases**: Day (discussion + voting) and Night (the Family shutters a stall, the Detective investigates, the Doctor protects).
 - **Win Conditions**: Town wins if all Mafia are dead; Mafia wins if they outnumber the Town.
 
 New to the village? Start with **[The Bazaar — Setting & Tone](./game_mechanics/the_bazaar.md)**.

@@ -73,7 +73,7 @@ HERALD_SYSTEM = (
     "(1)'). Names are arbitrary labels — never treat a merchant as "
     "the character their name may evoke, and never reference any film. "
     "Keep it short and lively: a headline, then brief sections "
-    "(headlines, the dead, the word on the street, by the numbers, the "
+    "(headlines, the departed, the word on the street, by the numbers, the "
     "voting record). Include a short 'By the Numbers' section using the "
     "counted figures exactly as given, and report any ballot tallies as a "
     "'The Voting Record' section without editorialising about them. "
@@ -192,7 +192,12 @@ def graveyard_roll():
             continue
         role = next((c for c in cells
                      if c in ("Mafia", "Doctor", "Detective", "Villager")), "Unknown")
-        cause = "night kill" if "Night kill" in line else "village vote"
+        if "Stall shuttered" in line:
+            cause = "stall shuttered"
+        elif "Night kill" in line:            # rows from older matches
+            cause = "night kill"
+        else:
+            cause = "village vote"
         pm = re.search(r"[Yy]ou are ([^.,]+)", line)          # legacy rows
         nm = next((c for c in cells if c.startswith("The ")), "")  # new rows
         name = (pm.group(1).strip() if pm else nm) or seat
@@ -348,7 +353,7 @@ def quiet_night_streak():
     for body in reversed(bodies):
         if "night passed quietly" in body.lower():
             streak += 1
-        elif "night kill" in body.lower():
+        elif "night kill" in body.lower() or "stall shuttered" in body.lower():
             break
     return streak
 
@@ -357,7 +362,7 @@ def by_the_numbers(state):
     """Public, machine-counted figures for the 'By the Numbers' section."""
     lines = []
     alive = sorted(state.get("alive", []))
-    roll = {e.split(" ")[0] for e in graveyard_roll()}     # unique dead seats
+    roll = {e.split(" ")[0] for e in graveyard_roll()}   # unique departed
     lines.append(f"{len(alive)} seats alive, {len(roll)} in the graveyard.")
     stmts = read_statements(state)
     if stmts:

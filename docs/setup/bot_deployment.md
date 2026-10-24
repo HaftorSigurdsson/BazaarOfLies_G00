@@ -64,7 +64,7 @@ Each act is two-stage: a private thinking call first (never posted), then the pu
 |-------------|--------------------------------------------------------------------------------------------|
 | Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 120 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl`. |
 | Voting      | Submit a **public signed ballot** (Ed25519) to `gameplay/votes/`; the GM verifies signatures and publishes the vote table. |
-| Night       | Perform role action (kill, investigate, or protect), **sealed** to the GM’s public key. |
+| Night       | Perform role action (shutter, investigate, or protect), **sealed** to the GM’s public key. |
 
 ### **Journaling**
 - Bots journal their actions to `~/.bazaar/journal-<seat>.json` for recovery and debugging (plus console output). The same journal carries their **private notebook** memory — never committed to git, wiped at each new match epoch.

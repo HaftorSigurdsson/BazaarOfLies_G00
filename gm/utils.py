@@ -57,7 +57,7 @@ def update_graveyard(seat: str, persona: str, role: str,
     """
     state = read_state()
     line = (f"| {state['match']} | {state['cycle']} | {display_name(seat)} | "
-            f"{persona_name(persona)} | {role} | {banished_by or 'Night kill'} |")
+            f"{persona_name(persona)} | {role} | {banished_by or 'Stall shuttered'} |")
     path = "gameplay/village/graveyard.md"
     if not os.path.exists(path):
         with open(path, "w") as f:

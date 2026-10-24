@@ -40,7 +40,7 @@ GM_ROLES_FILE = "gm/roles.enc"
 SECURE_RANDOM = random.SystemRandom()
 PUBLISH = not os.environ.get("GM_NO_PUSH")   # GM_NO_PUSH=1 → local testing
 
-KIND_BY_ROLE = {"Mafia": "kill", "Doctor": "save", "Detective": "investigate"}
+KIND_BY_ROLE = {"Mafia": "shutter", "Doctor": "save", "Detective": "investigate"}
 
 
 def parse_ts(s):
@@ -314,7 +314,7 @@ def tally_votes():
                         or payload.get("cycle") != state["cycle"]):
                     raise ValueError("ballot for another match/cycle")
                 if seat not in state["alive"]:
-                    raise ValueError("ballot from a dead seat")
+                    raise ValueError("ballot from a seat that has left the bazaar")
                 ts = parse_ts(payload.get("ts"))
                 if ts is None or (dawn and ts < dawn):
                     raise ValueError("stale ballot")
@@ -410,7 +410,7 @@ def resolve_night_actions():
             log(f"night action from {seat} ignored (no night role)")
             continue
         if target not in state["alive"]:
-            log(f"night action from {seat} targets dead {target} — ignored")
+            log(f"night action from {seat} targets {target}, who has left the bazaar — ignored")
             continue
         actions.append((a.get("ts", ""), seat, kind, target))
 
@@ -419,42 +419,43 @@ def resolve_night_actions():
     for ts, seat, kind, target in actions:
         latest[seat] = (kind, target)
 
-    kills, saves, investigates = [], [], []
+    shutters, saves, investigates = [], [], []
     for seat, (kind, target) in latest.items():
-        {"kill": kills, "save": saves, "investigate": investigates}[kind].append((seat, target))
+        {"shutter": shutters, "save": saves, "investigate": investigates}[kind].append((seat, target))
 
-    # Friendly fire is forbidden: the Family never kills its own. Kill
-    # submissions targeting a fellow Mafioso (per the GM registry — the
-    # bot's self-declared role is never trusted) are discarded.
-    valid_kills = []
-    for seat, target in kills:
+    # Friendly fire is forbidden: the Family never shutters one of its
+    # own. Shutter submissions targeting a fellow Mafioso (per the GM
+    # registry — the bot's self-declared role is never trusted) are discarded.
+    valid_shutters = []
+    for seat, target in shutters:
         if registry.get(target) == "Mafia":
-            log(f"kill by {seat} targeting fellow Family member {target} — discarded")
+            log(f"shutter by {seat} targeting fellow Family member {target} — discarded")
             continue
-        valid_kills.append((seat, target))
+        valid_shutters.append((seat, target))
 
-    # Mafia kill: majority target among valid submissions; ties are broken
+    # Mafia shutter: majority target among valid submissions; ties are broken
     # securely at random, never by submission order.
-    kill_target = None
-    if valid_kills:
-        kc = Counter(t for _, t in valid_kills)
-        top_count = max(kc.values())
-        top_targets = [t for t, c in kc.items() if c == top_count]
-        kill_target = SECURE_RANDOM.choice(top_targets)
+    shutter_target = None
+    if valid_shutters:
+        sc = Counter(t for _, t in valid_shutters)
+        top_count = max(sc.values())
+        top_targets = [t for t, c in sc.items() if c == top_count]
+        shutter_target = SECURE_RANDOM.choice(top_targets)
 
-    if kill_target and kill_target not in {t for _, t in saves}:
-        state["alive"].remove(kill_target)
-        role = registry.get(kill_target, "Unknown")
-        update_graveyard(kill_target, seats[kill_target]["persona"], role)
+    if shutter_target and shutter_target not in {t for _, t in saves}:
+        state["alive"].remove(shutter_target)
+        role = registry.get(shutter_target, "Unknown")
+        update_graveyard(shutter_target, seats[shutter_target]["persona"], role)
         update_announcements(
-            f"**Night kill!** {display_name(kill_target)}, "
-            f"{persona_name(seats[kill_target]['persona'])}, "
-            f"was found dead in the bazaar. Their role was: **{role}**."
+            f"**Stall shuttered!** {display_name(shutter_target)}, "
+            f"{persona_name(seats[shutter_target]['persona'])}, "
+            "shuttered their stall and left the bazaar overnight. "
+            f"Their role was: **{role}**."
         )
-        log(f"night kill: {kill_target} (role revealed: {role})")
+        log(f"stall shuttered: {shutter_target} (role revealed: {role})")
     else:
         update_announcements("The night passed quietly.")
-        log("no kill (saved, or no Mafia action)")
+        log("no shutter (saved, or no Mafia action)")
 
     # Detective results go to the DETECTIVE — never to the investigated seat.
     for detective, target in investigates:

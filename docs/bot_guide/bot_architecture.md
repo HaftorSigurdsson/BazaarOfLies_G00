@@ -41,7 +41,7 @@ Every act is two-stage: a **private thinking call** first (temperature 0.3, neve
 |-------------|--------------------------------------------------------------------------------------------|
 | Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 120 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl`. |
 | Voting      | Submit a **public signed ballot** (Ed25519) to `gameplay/votes/` — the GM verifies signatures and publishes the vote table. |
-| Night       | Perform role action (kill, investigate, or protect), **sealed** to the GM’s public key. Private GM results are persisted to the notebook verbatim — a Detective's findings survive past the prompt that delivered them. |
+| Night       | Perform role action (shutter, investigate, or protect), **sealed** to the GM’s public key. Private GM results are persisted to the notebook verbatim — a Detective's findings survive past the prompt that delivered them. |
 
 ---
 

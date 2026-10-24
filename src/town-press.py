@@ -22,7 +22,7 @@ Two engines, tried in order:
 
 The front page also carries PDF-only flourish that never enters the
 markdown the merchants read: a woodcut plate at the head of the first
-column, content-keyed to the edition (a night-kill paper gets a
+column, content-keyed to the edition (a stall-shuttered paper gets a
 different plate than a quiet market morning) from the motif pool in
 docs/assets/plates/ — ingested from raw art by setup/make_plates.py,
 with docs/assets/images/bazaar-engraving.png as the static fallback —
@@ -111,11 +111,12 @@ PLATES_DIR = os.path.join(REPO_ROOT, "docs", "assets", "plates")
 # then personas, then scenery. Missing motifs simply fall through to the
 # next match; the chat.mistral prompt uses these exact filenames.
 PLATE_RULES = [
-    (re.compile(r"night kill|found dead", re.I), "dagger-on-cobblestone.png"),
+    (re.compile(r"shutter|night kill|found dead", re.I),
+     "sunset-over-stalls.png"),
     # NB: the "quiet nights in a row" stat line must NOT match — only the
     # event phrasing earns the moon.
     (re.compile(r"night passed quietly|quiet nights?(?!s?\s+in a row)"
-                r"|without a funeral", re.I), "moon-and-stars.png"),
+                r"|without a (?:funeral|departure)", re.I), "moon-and-stars.png"),
     (re.compile(r"banish", re.I), "scales-of-judgement.png"),
     (re.compile(r"ballot|\bvot(?:e|es|ing|ed)\b", re.I), "ballot-urn.png"),
     (re.compile(r"banish", re.I), "tombstones-cypress.png"),

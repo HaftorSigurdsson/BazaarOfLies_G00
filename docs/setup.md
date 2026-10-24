@@ -35,7 +35,7 @@ This is the **setup hub**: the order of operations, the pre-game testing checkli
 2. **GM push/pull**: Verify the GM can update `gameplay/state.json` and `gameplay/village/graveyard.md`.
 
 ### **2.3 Test Recovery**
-1. **Kill a bot mid-match** and restart it.
+1. **Stop a bot mid-match** and restart it.
 2. Verify it **resumes from its journal** (`../bazaar/journal-<seat>.json`).
 
 ---

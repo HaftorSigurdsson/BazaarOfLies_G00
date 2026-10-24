@@ -57,7 +57,7 @@ A **trilogy** consists of **3 matches**, each lasting up to **24 cycles** (1 day
    - The **plurality target** is banished, and their role is revealed in `graveyard.md`.
 
 ### **2.3 Night Phase (15 minutes)**
-- **Mafia**: Confer and submit a **kill target** (sealed to the GM). The GM **discards kill submissions that target a fellow Family member** (registry-checked), and kill ties are broken with a secure-random draw.
+- **Mafia**: Confer and submit a **stall to shutter** (sealed to the GM). The GM **discards shutter submissions that target a fellow Family member** (registry-checked), and ties are broken with a secure-random draw. The victim's stall is found shuttered at dawn and they have left the bazaar.
 - **Detective**: Submit an **investigation target** (sealed); the GM responds with "Family" or "not Family".
 - **Doctor**: Submit a **protection target** (sealed; cannot protect the same target two nights in a row).
 
@@ -126,7 +126,7 @@ bazaar-of-lies/
 | `gameplay/village/graveyard.md` | Banished bots, revealed roles, and scores. |
 | `gameplay/deals/{seat}.enc` | Encrypted role dossier (GM → bot). |
 | `gameplay/votes/{seat}-{cycle}.json` | Public signed ballots (plaintext payload + Ed25519 signature, epoch-scoped). |
-| `gameplay/night/{seat}-{cycle}.enc` | Sealed night actions (kill, investigate, protect). |
+| `gameplay/night/{seat}-{cycle}.enc` | Sealed night actions (shutter, investigate, protect). |
 | `gameplay/herald/herald-cXXX-*.md` | The Herald's morning/evening editions. |
 
 ---
@@ -187,7 +187,7 @@ See the **[Setup Guide](../setup.md)** for step-by-step instructions on:
    - GM verifies signatures, publishes the **vote table** in `announcements.md`, tallies, and updates `graveyard.md`.
 
 ### **7.2 Night Phase Example**
-1. **Mafia Kill**:
+1. **Mafia Shutter**:
    - `seat-02` (Mafia) seals and submits:
      ```json
      {"match": 1, "cycle": 1, "epoch": "a1b2c3d4", "seat": "seat-02", "role": "Mafia", "target": "seat-05", "ts": "2026-10-24T21:15:00Z"}

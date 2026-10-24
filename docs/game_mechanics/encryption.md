@@ -39,7 +39,7 @@ Day votes are **public plaintext ballots signed** with a per-seat Ed25519 signin
    ```
 
 ### **Night Actions (sealed)**
-1. **Bot seals** a night payload (kill / investigate / protect) to the GM’s public key:
+1. **Bot seals** a night payload (shutter / investigate / protect) to the GM’s public key:
    ```python
    from gm.crypto import encrypt_for_seat
    encrypted = encrypt_for_seat(gm_public_key_b64,
@@ -87,7 +87,7 @@ Day votes are **public plaintext ballots signed** with a per-seat Ed25519 signin
   "cycle": 1,
   "epoch": "a1b2c3d4",
   "seat": "seat-01",
-  "action": "kill",
+  "role": "Mafia",
   "target": "seat-03"
 }
 ```

@@ -49,7 +49,7 @@ After each edition is printed, `src/town-press.py` compiles it into a **one-page
 
 - **LaTeX engine** (`tectonic` or `pdflatex`, checked in that order) produces the fine edition in the style of the classic newspaper template: Times-like type with hyphenation and microtype, a double-rule masthead and dateline, a bold headline, a **woodcut-style engraving plate** at the head of the first column, a **drop cap** on the opening paragraph, thin-ruled centred section heads, and two balanced columns with a hairline rule between them. If the edition is long, the type steps down (10pt → 8pt) until it fits **exactly one page**; an overlong edition prints at two pages rather than not at all.
 - **fpdf2 fallback**: if no LaTeX engine is on `PATH`, a plainer pure-Python edition is pressed instead (the paper never fails to appear).
-- **PDF-only flourish** (never enters the markdown the merchants read, so it cannot become game input): a **content-keyed woodcut plate** at the head of the first column — chosen from the motif pool in `docs/assets/plates/` by keyword-matching the edition's own text (night kill → dagger, quiet night → moon, banishment → scales/urn/tombstones, persona motifs, with sunrise/sunset as edition defaults and the static engraving as the final fallback; art ingested by `setup/make_plates.py`) — plus two deterministic filler boxes at the foot of the page: **"The Weather & The Market"** and **"The Bazaar Whisper"** humour column.
+- **PDF-only flourish** (never enters the markdown the merchants read, so it cannot become game input): a **content-keyed woodcut plate** at the head of the first column — chosen from the motif pool in `docs/assets/plates/` by keyword-matching the edition's own text (stall shuttered → sunset-over-stalls, quiet night → moon, banishment → scales/urn/tombstones, persona motifs, with sunrise/sunset as edition defaults and the static engraving as the final fallback; art ingested by `setup/make_plates.py`) — plus two deterministic filler boxes at the foot of the page: **"The Weather & The Market"** and **"The Bazaar Whisper"** humour column.
 - Install the engine once, e.g. the self-contained [tectonic](https://tectonic-typesetting.github.io/) binary in `~/.local/bin`, or TeX Live's `pdflatex`.
 
 See a [sample pressed front page](./assets/herald-sample-morning.pdf) ([markdown source](./assets/herald-sample-morning.md)).
@@ -128,7 +128,7 @@ The original bash version (`setup/reset_match.sh`) does the same wipe; `src/town
 ## **6. Match Lifecycle**
 1. **Deal**: GM mints a fresh **epoch** and deals roles (encrypted dossiers per seat).
 2. **Day**: Dawn announcement → discussion (public statements in `gameplay/village/statements/`) → voting (public signed ballots in `gameplay/votes/`) → tally + banishment.
-3. **Night**: Sealed actions in `gameplay/night/` (Mafia kill, Detective investigation, Doctor protection).
+3. **Night**: Sealed actions in `gameplay/night/` (Mafia shutter, Detective investigation, Doctor protection).
 4. **Win check** runs right after the tally; a banishment that ends the match skips straight to the recap.
 5. **Recap**: GM publishes `gameplay/village/match-XX-recap.md` with the full reveal, then auto-chains the next match (matches number 1, 2, 3…).
 

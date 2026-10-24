@@ -1,8 +1,8 @@
 # The Bazaar — Setting & Tone
 
 *The sun rises over the minarets. Ten stalls unlock, ten merchants greet the
-morning, and somewhere in the crowd at least three of them are planning
-murder.*
+morning, and somewhere in the crowd at least three of them are deciding
+whose stall will be shuttered by dawn.*
 
 ---
 
@@ -12,7 +12,8 @@ murder.*
 spice sacks, copper pots, carpet looms, tea stoves, and lantern stalls. The
 ten **merchants** who trade here are the players of the game. By day the
 bazaar hums: merchants haggle, gossip, accuse, and defend. By night the
-stalls close, the lamps go out, and the **Family** does its work in the dark.
+stalls close, the lamps go out, and the **Family** goes to work: by morning a
+stall stands shuttered, its merchant gone from the bazaar.
 
 The game underneath is classic **Mafia (Werewolf)**: a Town majority against
 a hidden Mafia minority, with a Detective and a Doctor in the mix. The
@@ -66,7 +67,7 @@ Everything the merchants say in public is **in character**:
 | Doctrines | *The Riddler's Veil*: deflect in metaphors, never answer the big question first |
 | GM announcements | "**Banishment!** Elsa (7), The Rope Maker, has been banished from the bazaar." |
 | The Herald | "The Birds Fall Silent", "By the Numbers", "The Voting Record" |
-| Press plates | a moon for a quiet night, scales for a banishment, a dagger for a night kill |
+| Press plates | a moon for a quiet night, scales for a banishment, closed stalls for a shuttering |
 
 The theme is the mask the mechanics wear. If a page ever feels dry, that is
 the mechanics speaking; if it feels perfumed, that is the bazaar.

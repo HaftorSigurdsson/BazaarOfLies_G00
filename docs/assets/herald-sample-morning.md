@@ -4,7 +4,7 @@
 
 ## Quiet Night, Loud Bazaar
 
-The night passed without a funeral, merchants learned at dawn — the first
+The night passed without a departure, merchants learned at dawn — the first
 quiet night of the match, and the bazaar greeted it with visible relief.
 The Bird Merchant opened his cages early, and the spice stalls did brisk
 business before the sun had fully cleared the minarets.

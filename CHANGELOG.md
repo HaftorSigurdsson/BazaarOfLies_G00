@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.0] - 2026-10-24
+### Changed
+- **Family-friendly vocabulary** (full sweep, code and docs): nobody is ever killed, murdered, or found dead.
+  - **Night result** (public): the GM announcement is now `**Stall shuttered!** {name}, {merchant}, shuttered their stall and left the bazaar overnight. Their role was: …` — the softer variant, no fire. The graveyard cause column reads `Stall shuttered` (was `Night kill`).
+  - **The Family's private talk**: the Mafia verb is now to *shutter a stall* ("Choose a living merchant who is NOT Family and shutter their stall tonight"); internal GM kinds/logs renamed kill → shutter.
+  - **The Herald**: the "the dead" section is now **"the departed"**; the sample morning paper reads "the night passed without a departure".
+  - **Compat**: every parser (Herald, villagers, press plates, quiet-night streak, graveyard causes) accepts BOTH the old `Night kill` strings — historical matches stay readable — and the new phrasing.
+  - **Press**: the dagger plate is retired (art deleted); a shuttered-stall edition now earns the closed-stalls-at-dusk plate (`sunset-over-stalls`), including re-presses of old editions.
+  - Docs updated everywhere (rules, encryption, bot guides, index, operations, setup, setting page); AGENTS.md now carries the vocabulary rule for future edits. The CHANGELOG itself stays as written — it is a historical log.
+
 ## [1.8.7] - 2026-10-24
 ### Changed
 - **README slimmed to its job**: removed the repo-structure tree, Key Features list, and the vague Quick Start — all of it duplicated (better maintained) in the docs. The README is now the pitch + a documentation index (incl. the new Setting page and the `mkdocs serve` hint). The **canonical repo map** is `docs/game_mechanics/rules.md` §3, which now also lists `tools/` and `setup/make_plates.py` and the seats.json `name` field.

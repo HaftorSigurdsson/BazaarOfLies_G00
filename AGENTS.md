@@ -49,6 +49,11 @@ Guidelines for AI coding agents (and helpful humans) working in this repository.
 - Bot changes require restarting **all ten seats together plus the
   Herald window** (`tools/bazaar-launch.sh stop && tools/bazaar-launch.sh start`;
   on Windows use `tools/bazaar-launch.bat`).
+- **Family-friendly vocabulary**: nobody is ever killed, murdered, or dead in
+  prose — the village **banishes** (day vote) and the Family **shutters a
+  stall** so the merchant has **left the bazaar** by morning. The Herald
+  section is "the departed". Machine keys may vary; player-facing text must
+  not. Parsers accept the old "Night kill" strings for historical data.
 - The villagers (`src/villager.py`) carry a **private notebook** memory in the vault
   journal — epoch-scoped, never in git. Master switch: `NOTEBOOK_ENABLED`.
 - The Herald (`src/town-herald.py`) is **facts-only**: anything fed to
