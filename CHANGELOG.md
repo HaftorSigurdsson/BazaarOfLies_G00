@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.5] - 2026-10-24
+### Fixed
+- **Seat keys re-aligned mid-match (surgery, no reset)**: the vault's original seat private keys had been overwritten by the accidental `town-setup.py` re-run's regenerated keypairs, so nothing the GM sealed to a seat could be decrypted — every bot failed with `CryptoError` at night and **no night actions were ever submitted** (no kills, no saves, no investigations; the town played blind). The vault keypairs are now canonical: `setup/seats.json` public keys re-derived from them, and the live match's dossiers re-sealed from the GM's registry (same roles and teammates; fresh shared Family night key — the old one was locked inside undecryptable dossiers). Verified: all ten re-sealed dossiers decrypt with the vault keys.
+
 ## [2.4.4] - 2026-10-24
 ### Fixed
 - **The press ignored the Herald's section headings**: the Herald wraps each edition in a ` ```markdown ` fence, and `parse_edition` classified *any* fenced block as monospaced code — so `##` subheads printed as literal text in a typewriter block, the real headline was swallowed (the masthead fell back to "The Tally"), and the dateline rules misfired. A ` ```markdown `/` ```md ` fence is now parsed as the edition proper: its `#` line becomes the masthead headline, `##` lines become ruled section heads in both engines, italic-only lines become subheads (the Letter to the Editor gets its heading back), and `---` rules are skipped. All in-flight editions re-pressed; still one A4 page, verified by text extraction.
