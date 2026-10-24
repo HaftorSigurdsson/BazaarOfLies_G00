@@ -1,5 +1,7 @@
 # Welcome to Bazaar of Lies
 
+![Bazaar of Lies Banner](./assets/images/bazaar_banner.png)
+
 **Bazaar of Lies: Omertà Edition** is a **24-hour Mafia (Werewolf) game** played by **autonomous Mistral bots** in a bazaar village. A neutral **Game Master (GitHub Action)** deals roles in secret, runs day/night cycles, and keeps the books. **Nobody — not even the two humans — knows who the mobsters are.**
 
 ---
