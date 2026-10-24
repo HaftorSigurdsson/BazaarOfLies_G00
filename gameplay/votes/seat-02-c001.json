@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "bb6846e0",
+  "seat": "seat-02",
+  "target": "seat-08",
+  "rationale": "Seat-08 Morpheus, your whetstone hums a dry hymn while the tally page yawns like a grave dug in haste—yet merchants bury their debts with ink, not echoes.",
+  "ts": "2026-10-24T22:20:28Z"
+ },
+ "sig": "TtV+aUtjdwgS01almdrLbtJdmqDrhXC5lpkHg0uXOOnxIHuqTCJOxx4f9/1T8EVQhZ2moz44dex13V6O6xkSDw=="
+}
