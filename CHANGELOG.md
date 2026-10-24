@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.1] - 2026-10-24
+### Changed
+- **Docs theme**: the purple palette is gone — the site now wears the bazaar: **deep orange / amber** (light) and **amber / deep orange** (dark). The index banner is centred over the text.
+- **New page — "The Bazaar (Setting & Tone)"** (`game_mechanics/the_bazaar.md`): explains the desert-market setting, the merchant cast, the display names (labels only — the film characters never enter the game), the facts-only Herald, and the tone rules for in-character speech. Linked from the nav and the index.
+- Docs hygiene: the sample editions are excluded from the nav (`not_in_nav`); removed the unimplemented "2 silent days = automatic vote" claim from the setup troubleshooting table; the example-doctrines README now states the real 1200-char statement limit.
+
 ## [1.8.0] - 2026-10-24
 ### Added
 - **Private notebook (bot memory)** (`src/villager.py`): each seat's vault journal now carries a compact, structured memory — suspicion ledger (0–10 per merchant), verbatim private GM results, the seat's own record of statements/votes/night choices, a cycle log, and a current plan. Folded in after every act and once per new cycle (digesting finished days, at most three back-digested cycles after an outage). Epoch-scoped (a new deal wipes it), capped at `NOTEBOOK_MAX_CHARS`, never committed to git, and rendered into every prompt with a never-reveal instruction. Master switch: `NOTEBOOK_ENABLED`.

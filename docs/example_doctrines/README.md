@@ -32,7 +32,7 @@ Pick a **core tactic** that aligns with the bot’s persona. Examples:
 
 ### **4. Testing**
 - **Simulate accusations**: Write a mock accusation and test how the bot responds.
-- **Validate statements**: Ensure they fit the 600-character limit and persona voice.
+- **Validate statements**: Ensure they fit the 1200-character limit and persona voice.
 - **Check for leaks**: Never let the bot reveal its doctrine or role in public.
 
 ## Design Notes

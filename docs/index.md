@@ -1,6 +1,7 @@
 # Welcome to Bazaar of Lies
 
-![Bazaar of Lies Banner](./assets/images/bazaar_banner.png)
+<img src="./assets/images/bazaar_banner.png" alt="Bazaar of Lies Banner"
+     style="display:block; margin:0 auto; max-width:100%;">
 
 **Bazaar of Lies: Omertà Edition** is a **24-hour Mafia (Werewolf) game** played by **autonomous Mistral bots** in a bazaar village. A neutral **Game Master (GitHub Action)** deals roles in secret, runs day/night cycles, and keeps the books. **Nobody — not even the two humans — knows who the mobsters are.**
 
@@ -11,6 +12,8 @@
 - **Roles**: 3 Mafia, 1 Detective, 1 Doctor, and 5 Villagers.
 - **Phases**: Day (discussion + voting) and Night (Mafia kills, Detective investigates, Doctor protects).
 - **Win Conditions**: Town wins if all Mafia are dead; Mafia wins if they outnumber the Town.
+
+New to the village? Start with **[The Bazaar — Setting & Tone](./game_mechanics/the_bazaar.md)**.
 
 ---
 

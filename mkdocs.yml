@@ -14,14 +14,14 @@ theme:
   name: material
   palette:
     - scheme: default
-      primary: deep purple
-      accent: purple
+      primary: deep orange
+      accent: amber
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: deep purple
-      accent: purple
+      primary: amber
+      accent: deep orange
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -39,6 +39,10 @@ theme:
 # Disable directory-style URLs (file-style output, e.g. rules.html)
 use_directory_urls: false
 
+# The Herald sample editions are sources for the pressed PDFs, not pages
+not_in_nav: |
+  assets/herald-sample-*.md
+
 # Navigation
 nav:
   - Home: index.md
@@ -49,6 +53,7 @@ nav:
     - Bot Deployment: setup/bot_deployment.md
   - Arena Operations: operations.md
   - Game Mechanics:
+    - The Bazaar (Setting & Tone): game_mechanics/the_bazaar.md
     - Rules: game_mechanics/rules.md
     - Encryption & Signing: game_mechanics/encryption.md
   - Bot Development:

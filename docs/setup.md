@@ -69,7 +69,7 @@ See the [Arena Operations guide](./operations.md) for exactly what the reset doe
 | Symptom | Fix |
 |---|---|
 | GM Action fails | Check the Actions logs; verify `GM_PRIVATE_KEY` is set; check the GM token's write access. |
-| Bot crashes | It resumes on restart from `state.json` + its journal. Missed ballot = abstain; missed night action = silence; 2 silent days = automatic vote. |
+| Bot crashes | It resumes on restart from `state.json` + its journal. Missed ballot = abstain; missed night action = silence. |
 | Encryption fails | Verify public keys in `setup/seats.json` are base64; test locally before deploying. |
 | Vote rejected | Ballots must be signed with the seat's Ed25519 key and carry the current epoch — run `setup/make_signing_keys.py` once if keys are missing. |
 
