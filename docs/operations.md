@@ -19,6 +19,7 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 | **Neutral side** | `tools/run.sh` | Runs the Herald + local GM heartbeat on this clone in tmux. |
 | **Seat clone report** | `tools/seats-pull.py` (+ `bazaar-pull.sh` wrapper) | Pulls every seat clone and reports HEAD + dirty state. |
 | **JSONL repair** | `tools/resolve-jsonl.py` | Strips merge-conflict markers from arena JSONL files and dedupes crash-resume duplicates. |
+| **Statement mirror** | `tools/statements_assemble.py` | Assembles the per-seat statements of a cycle into ONE local transcript (`_assembled-cXXX.jsonl`, gitignored, always overwritten, never committed) — for monitoring (`--watch` keeps it fresh). Bots assemble the same view into their prompts themselves; the per-seat files remain the single source of truth. |
 | **Match reset (bash)** | `setup/reset_match.sh` | The original one-command full arena reset. |
 | **Game Master** | `.github/workflows/gm.yml` + `gm/run.py` | Neutral referee (state machine, tallies, night resolution). |
 

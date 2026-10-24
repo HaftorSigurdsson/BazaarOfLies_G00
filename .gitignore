@@ -6,3 +6,6 @@ __pycache__/
 site/
 .venv/
 *.sign
+
+# local statement transcript mirror (assembled, never committed)
+gameplay/village/statements/_assembled-*.jsonl
