@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 3,
+  "epoch": "9c5ef90a",
+  "seat": "seat-03",
+  "target": "seat-10",
+  "rationale": "Sherlock (10) dodged a direct yes/no on walking Gandalf (1)’s roads three times—dodgers are worse than liars.",
+  "ts": "2026-10-24T19:55:32Z"
+ },
+ "sig": "MWNPa1urc04OADdb3vxurZTO21BtvL14whcWP8UutPo5t3WQiZCdcjLoKAHV4JnNd7By4odxVQc21TExYc2DAQ=="
+}
