@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 3,
+  "epoch": "9c5ef90a",
+  "seat": "seat-09",
+  "target": "seat-10",
+  "rationale": "Sherlock (10), your censer still smolders with incense unpaid yet your own ledger stays blank—your words demand a name, yet you refuse to write one.",
+  "ts": "2026-10-24T19:55:12Z"
+ },
+ "sig": "Un7zWugJHKX7t7c2Vg/hlHrgF7wNd1vIn2G+JJiWmNDYIgc1CvYTkacUVWGoEDnNv2K1hCW3dghBlqhHbqdnCg=="
+}
