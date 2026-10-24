@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "bb6846e0",
+  "seat": "seat-06",
+  "target": "seat-05",
+  "rationale": "Seat-05 Ripley, your flute’s endless song now hums in a minor key laced with the scent of overripe figs—too sweet, always too sweet—and the bazaar trades in yes and no, not echoes.",
+  "ts": "2026-10-24T22:20:18Z"
+ },
+ "sig": "On4Yu+/n0BwQ7hrtREznlr3mUDc5Fixiw8LGUUb/Dy0hVyd2P/3RuM+6jMffXx/AksonJQymhtocyQV2I7wcDA=="
+}
