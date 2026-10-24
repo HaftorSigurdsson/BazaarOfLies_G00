@@ -43,7 +43,7 @@ import time
 from mistralai import Mistral
 
 # ---------------------------------------------------------------- config ---
-MODEL = "mistral-small-2409"
+MODEL = "mistral-large-latest"
 POLL_SECONDS = 30
 JITTER_SECONDS = 5
 PUSH_ATTEMPTS = 5
