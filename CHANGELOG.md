@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.3] - 2026-10-24
+### Added
+- **Ten new motifs** ingested (37 plates total): cutpurse-in-crowd, fortune-teller, merchants-haggling, moneylender-counting, porter-with-basket, puppeteer-show, scribe-at-work, spice-merchant-weighing, tea-vendor-serving, water-carrier — each wired into the scenery keyword tier (thief/stolen, fortune/fate, haggling/bargain, counting, porter/basket, puppet, scribe/manuscript, weigh, tea vendor/poured, water/thirsty). Rules deliberately avoid over-firing words (e.g. "letter", which every edition's Letters section contains).
+
 ## [1.5.2] - 2026-10-24
 ### Added
 - **Event motif set completed** (27 plates total): moon-and-stars, dagger-on-cobblestone, scales-of-judgement, ballot-urn, lantern-in-the-dark, and a bonus solar-eclypse plate — all ingested and wired to the top-priority rules (night kill, quiet night, banishment, vote, lantern, eclipse).
