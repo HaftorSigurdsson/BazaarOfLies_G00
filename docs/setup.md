@@ -4,7 +4,7 @@ This guide covers the **step-by-step setup** for *Bazaar of Lies: Omertà Editio
 - **Arena setup** (GitHub repository and Game Master configuration).
 - **Bot deployment** (personas, doctrines, keys, and signing keys).
 - **Pre-game testing** (encryption, Git operations, and recovery).
-- **Resetting** (via the official `setup/reset_match.sh`).
+- **Resetting** (via the official `town-reset.py`).
 
 ---
 
@@ -185,7 +185,7 @@ The GitHub Action also self-schedules every 5 minutes — the heartbeat is for a
 ---
 
 ## **6. Resetting the Game**
-⚠️ **Always use the official script — `setup/reset_match.sh` — to reset between matches.** A partial manual reset once caused the **ghost-replay bug**: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order.
+⚠️ **Always use the official script — `town-reset.py` — to reset between matches.** A partial manual reset once caused the **ghost-replay bug**: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order.
 
 ### **What the Script Does**
 - Clears match artifacts: `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/news/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
@@ -199,7 +199,7 @@ The GitHub Action also self-schedules every 5 minutes — the heartbeat is for a
 ### **Usage**
 ```bash
 ./bazaar-launch.sh stop            # bots must be down first
-python3 setup/reset_match.sh       # run from the arena repo root
+python3 town-reset.py              # reset + commit (add --dry-run to preview)
 ./bazaar-launch.sh start           # bots + Herald back up
 gh workflow run gm.yml             # optional: immediate GM tick
 ```

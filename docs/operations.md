@@ -10,8 +10,9 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 | **Bot** | `bot.py` | The autonomous merchant (one process per seat). |
 | **The Herald** | `editor.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/news/`. |
 | **GM heartbeat** | `town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
+| **Arena reset** | `town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
 | **Signing keys** | `setup/make_signing_keys.py` | One-time generation of per-seat Ed25519 signing keys. |
-| **Match reset** | `setup/reset_match.sh` | One-command full arena reset between matches. |
+| **Match reset (bash)** | `setup/reset_match.sh` | The original one-command full arena reset. |
 | **Game Master** | `.github/workflows/gm.yml` + `gm/run.py` | Neutral referee (state machine, tallies, night resolution). |
 
 ---
@@ -76,25 +77,30 @@ python3 setup/make_signing_keys.py --vault ~/.bazaar
 
 ---
 
-## **5. Match Reset (`setup/reset_match.sh`)**
+## **5. Match Reset (`town-reset.py`)**
 The **official way** to reset the arena between matches. A partial manual reset once caused the **ghost-replay bug**: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order. Always use the script.
 
 ### **What It Does**
-- Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/news/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
+- Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/news/`, `gameplay/usage/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
 - Rewrites the public boards fresh: `graveyard.md`, `announcements.md`.
 - Resets `gameplay/state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `gameplay/state.json` — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).
-- Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, default `~/.bazaar`).
-- Commits (and pushes) the reset.
+- Clears **local journals** (seat journals + Herald journal) from the vault (`--vault` or `$VAULT`, default `~/.bazaar`) — keys and signing keys are untouched.
+- Repairs the arena's shape: every folder that is supposed to exist is recreated if missing and gets a **`.gitkeep`** if it doesn't have one.
+- Commits the reset (push only with `--push`).
 
 **Match recaps (`gameplay/village/match-XX-recap.md`) are kept** — they are history and cannot interfere with a fresh match (the new epoch namespaces everything).
 
 ### **Usage**
 ```bash
 ./bazaar-launch.sh stop            # bots must be down first
-python3 setup/reset_match.sh       # run from the arena repo root
+python3 town-reset.py              # reset + commit (from the arena repo root)
+python3 town-reset.py --dry-run    # preview: show what would be wiped, touch nothing
+python3 town-reset.py --push       # also push the reset commit
 ./bazaar-launch.sh start           # bots + Herald back up
 gh workflow run gm.yml             # optional: immediate GM tick
 ```
+
+The original bash version (`setup/reset_match.sh`) does the same wipe; `town-reset.py` adds the dry-run, the `.gitkeep` repairs, and a push-only-on-request commit.
 
 ---
 

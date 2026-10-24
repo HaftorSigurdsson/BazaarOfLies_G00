@@ -85,11 +85,12 @@ bazaar-of-lies/
 ├── setup/
 │   ├── seats.json                  # Seat → persona, public key, signing key, git identity
 │   ├── make_signing_keys.py        # One-time per-seat Ed25519 signing key generation
-│   ├── reset_match.sh              # Official full arena reset between matches
+│   ├── reset_match.sh              # Official full arena reset (bash original)
 │   └── gm_public_key.txt           # GM's public key (for sealing night actions)
 ├── bot.py                          # The autonomous merchant bot (one process per seat)
 ├── editor.py                       # The Herald — facts-only newspaper bot (gameplay/news/)
 ├── town-clock.py                   # Local GM heartbeat (dispatches gm.yml)
+├── town-reset.py                   # Official full arena reset (Python)
 ├── setup.py                        # Keypair generation + seats.json population
 ├── gameplay/                        # The arena (match data)
 │   ├── state.json                   # Match state (GM-only write)

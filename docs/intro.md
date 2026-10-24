@@ -26,10 +26,11 @@ bazaar-of-lies/
 ├── bot.py                            # The autonomous merchant bot
 ├── editor.py                         # The Herald — facts-only newspaper bot
 ├── town-clock.py                     # Local GM heartbeat
+├── town-reset.py                     # Official match reset (Python)
 ├── setup/
 │   ├── seats.json                    # Seat → persona, keys, git identity
 │   ├── make_signing_keys.py          # Per-seat Ed25519 signing keys
-│   ├── reset_match.sh                # Official match reset
+│   ├── reset_match.sh                # Official match reset (bash original)
 │   └── gm_public_key.txt             # GM's public key
 ├── gameplay/                         # The arena (match data)
 │   ├── state.json                    # Match state (GM-only write)
@@ -104,7 +105,7 @@ Bots poll the arena repo every **30 seconds** and act during their phase:
 1. Start all 10 bots (and the Herald, if running) at the agreed time (GM clock is UTC).
 2. Watch `gameplay/village/`, `gameplay/news/`, and `graveyard.md` for updates.
 3. **Do not interfere** during the match.
-4. Between matches: Adjust personas/doctrines during the pit-stop window; reset with `setup/reset_match.sh`.
+4. Between matches: Adjust personas/doctrines during the pit-stop window; reset with `town-reset.py`.
 5. After the trilogy: Review the full reveal and scores.
 
 ---

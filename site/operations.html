@@ -829,15 +829,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-match-reset-setupreset_matchsh" class="md-nav__link">
+  <a href="#5-match-reset-town-resetpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Match Reset (setup/reset_match.sh)
+        5. Match Reset (town-reset.py)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Match Reset (setup/reset_match.sh)">
+    <nav class="md-nav" aria-label="5. Match Reset (town-reset.py)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1725,14 +1725,19 @@
 <td>Locally dispatches the GM workflow on an interval and prints live status.</td>
 </tr>
 <tr>
+<td><strong>Arena reset</strong></td>
+<td><code>town-reset.py</code></td>
+<td>One-command full arena reset in Python (artifacts + boards + state template + journals + <code>.gitkeep</code> repairs).</td>
+</tr>
+<tr>
 <td><strong>Signing keys</strong></td>
 <td><code>setup/make_signing_keys.py</code></td>
 <td>One-time generation of per-seat Ed25519 signing keys.</td>
 </tr>
 <tr>
-<td><strong>Match reset</strong></td>
+<td><strong>Match reset (bash)</strong></td>
 <td><code>setup/reset_match.sh</code></td>
-<td>One-command full arena reset between matches.</td>
+<td>The original one-command full arena reset.</td>
 </tr>
 <tr>
 <td><strong>Game Master</strong></td>
@@ -1806,23 +1811,27 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python3<span class="w"> </span>setup/make_signing_keys.py<span class="w"> </span>--vault<span class="w"> </span>~/.bazaar
 </code></pre></div>
 <hr />
-<h2 id="5-match-reset-setupreset_matchsh"><strong>5. Match Reset (<code>setup/reset_match.sh</code>)</strong><a class="headerlink" href="#5-match-reset-setupreset_matchsh" title="Permanent link">&para;</a></h2>
+<h2 id="5-match-reset-town-resetpy"><strong>5. Match Reset (<code>town-reset.py</code>)</strong><a class="headerlink" href="#5-match-reset-town-resetpy" title="Permanent link">&para;</a></h2>
 <p>The <strong>official way</strong> to reset the arena between matches. A partial manual reset once caused the <strong>ghost-replay bug</strong>: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order. Always use the script.</p>
 <h3 id="what-it-does"><strong>What It Does</strong><a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Clears <strong>match artifacts</strong> (keeping the directories): <code>gameplay/votes/</code>, <code>gameplay/night/</code>, <code>gameplay/dossiers/</code>, <code>gameplay/deals/</code>, <code>gameplay/news/</code>, <code>gameplay/village/statements/</code>, <code>gameplay/village/day-*.jsonl</code>.</li>
+<li>Clears <strong>match artifacts</strong> (keeping the directories): <code>gameplay/votes/</code>, <code>gameplay/night/</code>, <code>gameplay/dossiers/</code>, <code>gameplay/deals/</code>, <code>gameplay/news/</code>, <code>gameplay/usage/</code>, <code>gameplay/village/statements/</code>, <code>gameplay/village/day-*.jsonl</code>.</li>
 <li>Rewrites the public boards fresh: <code>graveyard.md</code>, <code>announcements.md</code>.</li>
 <li>Resets <code>gameplay/state.json</code> to a <strong>pristine template</strong> with <code>phase: setup</code> (⚠️ it does <strong>not</strong> delete <code>gameplay/state.json</code> — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).</li>
-<li>Clears <strong>local journals</strong> (seat journals + Herald journal) from the vault (<code>$VAULT</code>, default <code>~/.bazaar</code>).</li>
-<li>Commits (and pushes) the reset.</li>
+<li>Clears <strong>local journals</strong> (seat journals + Herald journal) from the vault (<code>--vault</code> or <code>$VAULT</code>, default <code>~/.bazaar</code>) — keys and signing keys are untouched.</li>
+<li>Repairs the arena's shape: every folder that is supposed to exist is recreated if missing and gets a <strong><code>.gitkeep</code></strong> if it doesn't have one.</li>
+<li>Commits the reset (push only with <code>--push</code>).</li>
 </ul>
 <p><strong>Match recaps (<code>gameplay/village/match-XX-recap.md</code>) are kept</strong> — they are history and cannot interfere with a fresh match (the new epoch namespaces everything).</p>
 <h3 id="usage"><strong>Usage</strong><a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./bazaar-launch.sh<span class="w"> </span>stop<span class="w">            </span><span class="c1"># bots must be down first</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python3<span class="w"> </span>setup/reset_match.sh<span class="w">       </span><span class="c1"># run from the arena repo root</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>./bazaar-launch.sh<span class="w"> </span>start<span class="w">           </span><span class="c1"># bots + Herald back up</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>gh<span class="w"> </span>workflow<span class="w"> </span>run<span class="w"> </span>gm.yml<span class="w">             </span><span class="c1"># optional: immediate GM tick</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python3<span class="w"> </span>town-reset.py<span class="w">              </span><span class="c1"># reset + commit (from the arena repo root)</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>python3<span class="w"> </span>town-reset.py<span class="w"> </span>--dry-run<span class="w">    </span><span class="c1"># preview: show what would be wiped, touch nothing</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>python3<span class="w"> </span>town-reset.py<span class="w"> </span>--push<span class="w">       </span><span class="c1"># also push the reset commit</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>./bazaar-launch.sh<span class="w"> </span>start<span class="w">           </span><span class="c1"># bots + Herald back up</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>gh<span class="w"> </span>workflow<span class="w"> </span>run<span class="w"> </span>gm.yml<span class="w">             </span><span class="c1"># optional: immediate GM tick</span>
 </code></pre></div>
+<p>The original bash version (<code>setup/reset_match.sh</code>) does the same wipe; <code>town-reset.py</code> adds the dry-run, the <code>.gitkeep</code> repairs, and a push-only-on-request commit.</p>
 <hr />
 <h2 id="6-match-lifecycle"><strong>6. Match Lifecycle</strong><a class="headerlink" href="#6-match-lifecycle" title="Permanent link">&para;</a></h2>
 <ol>
