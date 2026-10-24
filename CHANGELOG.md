@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2026-10-24
+### Added
+- **The Herald has a voice**: the system prompt now writes as a 19th-century town paper — ink-stained, thrifty with words, dryly witty, vintage flourishes used sparingly — while keeping the facts-only doctrine byte-for-byte.
+- **The Tally (election-returns chart)**: computed by the Herald from the latest public ballot table (never model-written, exact to the ballot) and appended to every edition as a fenced text chart — small-caps header, ballots and abstentions counted, one solid `▓` bar per candidate. The **press re-renders it as an old-style bar graph** in the PDF: ruled frame, small-caps caption, solid black bars on a common baseline (LaTeX tabular rules in the fine edition, filled rects in the fpdf2 fallback). Verified by raster inspection in both engines, still one A4 page.
+- **Masthead motto**: *"All the facts fit to print — the rumours you may trade elsewhere."* under the dateline in both engines.
+### Changed
+- The model is explicitly told **not** to write a voting-record section (the computed chart is authoritative; it may summarise the result in one sentence). The evening sample carries the new Tally section and has been re-pressed.
+
 ## [1.9.1] - 2026-10-24
 ### Added
 - **`shuttered-stall` plate**: dedicated night-result motif (closed stall, padlock, single lamp — ingested in final grayscale 3:1 format). A stall-shuttered edition now earns it instead of the interim sunset plate.

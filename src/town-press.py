@@ -47,6 +47,7 @@ DEFAULT_HEADLINE = {
 COLOPHON = ("Printed by the arena press for the humans watching the "
             "merchants. The merchants themselves read the plain markdown "
             "\u2014 this page is pleasure, not game input.")
+MOTTO = "All the facts fit to print \u2014 the rumours you may trade elsewhere."
 
 # Non-game filler for the PDF-only humour column. Deterministically picked
 # per edition (match, cycle, part) so every paper differs but a given paper
@@ -245,8 +246,22 @@ def parse_edition(md_text, md_path):
         match_no = mm.group(1)
 
     headline, blocks = None, []
+    in_code, code_lines = False, []
     for line in md_text.splitlines():
         s = line.strip()
+        if s.startswith("```"):
+            if in_code:                   # end of a fenced block
+                text = "\n".join(code_lines)
+                kind = ("chart" if "\u2593" in text or "\u2588" in text
+                        else "code")
+                blocks.append((kind, text))
+                in_code, code_lines = False, []
+            else:
+                in_code, code_lines = True, []
+            continue
+        if in_code:
+            code_lines.append(s)
+            continue
         if not s:
             continue
         if s.startswith("# "):            # edition title — masthead covers it
@@ -274,6 +289,21 @@ def parse_edition(md_text, md_path):
 
 
 # ---------------------------------------------------------------- latex ----
+def parse_chart_rows(text):
+    """A tally chart block → (header lines, [(label, count), …]).
+    ASCII separator rules are dropped — the engines draw their own."""
+    header, bars = [], []
+    for line in text.splitlines():
+        m = re.match(r"^(.*?)\s+[\u2593\u2588]+\s*(\d+)\s*$", line)
+        if m:
+            bars.append((m.group(1).strip(), int(m.group(2))))
+        elif line and set(line) <= {"-"}:
+            continue
+        else:
+            header.append(line)
+    return header, bars
+
+
 def latex_escape(text):
     return (text.replace("\\", r"\textbackslash{}")
                 .replace("&", r"\&").replace("%", r"\%")
@@ -291,12 +321,43 @@ def latex_inline(text):
     return text
 
 
+def chart_tex(text):
+    """The tally chart as an old-style election-returns graphic: ruled
+    frame, small-caps caption, solid black bars on a common baseline."""
+    header, bars = parse_chart_rows(text)
+    top = max((n for _, n in bars), default=1)
+    rows = []
+    for label, n in bars:
+        w = max(0.9, 4.5 * n / top)
+        rows.append("%s & \\rule{%.2fem}{1.2ex} & %s \\\\" %
+                    (latex_escape(sanitize(label)), w, n))
+    head = [latex_escape(sanitize(l)) for l in header]
+    tex = ["\\begin{center}",
+           "\\hrule height .6pt\\vspace{5pt}"]
+    if head:
+        tex.append("{\\footnotesize\\scshape\\textbf{%s}}\\\\" % head[0])
+        for extra in head[1:]:
+            tex.append("\\textit{\\footnotesize %s}\\\\[2pt]" % extra)
+    tex.append("\\vspace{3pt}")
+    tex.append("\\begin{tabular}{@{}l@{\\hspace{8pt}}l@{\\hspace{8pt}}r@{}}")
+    tex += rows
+    tex.append("\\end{tabular}")
+    tex.append("\\vspace{4pt}\\hrule height .6pt")
+    tex.append("\\end{center}\n")
+    return "\n".join(tex)
+
+
 def build_tex(meta, date_str, size, linespread):
     """A one-page newspaper front page, Overleaf-template style."""
     body, first_para_done = [], False
     for kind, text in meta["blocks"]:
         if kind == "subhead":
             body.append(r"\section*{%s}" % latex_escape(text))
+        elif kind == "chart":
+            body.append(chart_tex(text))
+        elif kind == "code":
+            body.append("\\begin{quote}\\small\\ttfamily\\obeylines\n"
+                        + latex_escape(text) + "\n\\end{quote}")
         else:
             if not first_para_done:          # drop cap on the opening paragraph
                 words = text.split()
@@ -377,6 +438,8 @@ def build_tex(meta, date_str, size, linespread):
 \doubleRule
 {{\small\itshape Vol. {match} --- No. {cycle} \quad|\quad {edition} Edition
   \quad|\quad {date} \quad|\quad Price: one spiced date\par}}
+\vspace{{1pt}}
+{{\footnotesize\itshape {motto}\par}}
 \vspace{{2pt}}\hrule height .3pt
 \end{{center}}
 
@@ -405,6 +468,7 @@ def build_tex(meta, date_str, size, linespread):
            date=latex_escape(date_str),
            headline=latex_escape(meta["headline"]),
            body="".join(body), foot=foot,
+           motto=latex_escape(sanitize(MOTTO)),
            colophon=latex_escape(sanitize(COLOPHON)))
 
 
@@ -525,10 +589,14 @@ def render_fpdf(meta, date_str, size):
     pdf.cell(0, 5, fpdf_sanitize(dateline), align="C")
     pdf.line(MARGIN, pdf.get_y() + 1.2, PAGE_W - MARGIN, pdf.get_y() + 1.2)
 
-    pdf.set_y(pdf.get_y() + 5)
+    pdf.set_y(pdf.get_y() + 1.8)
+    pdf.set_font("Times", "I", 8)
+    pdf.cell(0, 3.5, fpdf_sanitize(MOTTO), align="C")
+
+    pdf.set_y(pdf.get_y() + 3.5)
     pdf.set_font("Times", "B", 22)
     pdf.multi_cell(0, 10, fpdf_sanitize(meta["headline"]), align="C")
-    pdf.set_y(pdf.get_y() + 1.5)
+    pdf.set_y(pdf.get_y() + 1.0)
 
     # woodcut plate at the top of the FIRST (left) column — content-keyed
     engr_h = 0.0
@@ -570,21 +638,56 @@ def render_fpdf(meta, date_str, size):
 
     col, y = 0, col_top[0]
     for kind, text in meta["blocks"]:
-        pdf.set_font("Times", "B" if kind == "subhead" else "", size)
-        block_h = (_wrap_lines(pdf, COL_W, text) * leading
-                   + (3.0 if kind == "subhead" else 1.6))
+        if kind == "chart":
+            header, bars = parse_chart_rows(text)
+            block_h = (6.0 + len(header) * 4.0 + len(bars) * 5.0 + 6.0)
+        elif kind == "code":
+            block_h = len(text.splitlines()) * 4.0 + 4.0
+        else:
+            pdf.set_font("Times", "B" if kind == "subhead" else "", size)
+            block_h = (_wrap_lines(pdf, COL_W, text) * leading
+                       + (3.0 if kind == "subhead" else 1.6))
         if y + block_h > body_bottom:
             if col == 0:
                 col, y = 1, col_top[1]
             else:
                 return pdf, False
         pdf.set_xy(col_x[col], y)
-        if kind == "subhead":
+        if kind == "chart":
+            top_n = max((n for _, n in bars), default=1)
+            pdf.set_line_width(0.4)
+            pdf.line(col_x[col], y + 0.8, col_x[col] + COL_W, y + 0.8)
+            pdf.set_line_width(0.25)
+            cy = y + 2.0
+            pdf.set_font("Times", "BI", size)
+            for hl in header:
+                pdf.set_xy(col_x[col], cy)
+                pdf.cell(COL_W, 4, fpdf_sanitize(hl), align="C")
+                cy += 4.0
+            cy += 1.0
+            for label, n in bars:
+                pdf.set_xy(col_x[col], cy)
+                pdf.set_font("Times", "", size)
+                pdf.cell(27, 4, fpdf_sanitize(label), align="L")
+                bw = max(3.0, (COL_W - 27 - 9) * n / top_n)
+                pdf.set_fill_color(20, 20, 20)
+                pdf.rect(col_x[col] + 28, cy + 0.9, bw, 2.6, style="F")
+                pdf.set_xy(col_x[col] + COL_W - 8, cy)
+                pdf.cell(8, 4, str(n), align="R")
+                cy += 5.0
+            pdf.line(col_x[col], cy + 1.0, col_x[col] + COL_W, cy + 1.0)
+            y = cy + 4.0
+        elif kind == "code":
+            pdf.set_font("Courier", "", size - 1)
+            pdf.multi_cell(COL_W, 4, fpdf_sanitize(text), align="L")
+            y = pdf.get_y() + 1.2
+        elif kind == "subhead":
             pdf.set_font("Times", "B", size + 1)
             pdf.multi_cell(COL_W, leading, text.upper(), align="L")
+            y = pdf.get_y() + 1.8
         else:
             pdf.multi_cell(COL_W, leading, text, align="J")
-        y = pdf.get_y() + (1.8 if kind == "subhead" else 1.2)
+            y = pdf.get_y() + 1.2
 
     pdf.set_auto_page_break(False)
     if foot_rows:

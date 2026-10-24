@@ -22,6 +22,17 @@ the lamps, and the bazaar holds its breath for what the dark may bring.
 Cycle 005: Sherlock (10) banished — ballots: Sherlock (10): 3 votes, Elsa (7): 1 vote.
 Vote participation across the 5 published ballot tables: Gandalf (1): 5/5, Yoda (3): 5/5, Elsa (7): 4/5, Morpheus (8): 4/5 (1 abstention).
 
+## The Tally
+
+```text
+THE DAILY TALLY — Sherlock (10) BANISHED
+4 ballots cast, 1 abstention
+--------------------------------------------
+Sherlock (10)   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 3
+Elsa (7)        ▓▓▓▓▓ 1
+abstain         ▓▓▓▓▓ 1
+```
+
 ## The Ledger's Silence
 
 Ripley (5), The Moneylender, banished by village vote in cycle 002,

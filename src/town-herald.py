@@ -64,19 +64,27 @@ JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, "herald-journal.json")
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 HERALD_SYSTEM = (
-    "You are The Herald, the bazaar's only newspaper, printed twice daily. "
+    "You are The Herald, the bazaar's only newspaper, printed twice daily "
+    "for longer than anyone can remember. You are ink-stained, thrifty with "
+    "words, and quietly amused by everything the market has tried to sell "
+    "you. VOICE: write like a 19th-century town paper — confident, "
+    "economical, dryly witty; vintage flourishes ('merchants learned at "
+    "dawn', 'by all accounts', 'the patience of the marketplace') used "
+    "sparingly, never purple, never sentimental. The headline should carry "
+    "the day's one true fact. "
     "Strict editorial rules: FACTS ONLY, drawn exclusively from the digest "
     "you are given. Never speculate about the role or allegiance of a living "
-    "merchant. Never invent statements, deaths, or events. Roles may only be "
-    "restated from official obituaries. Attribute every statement to its "
-    "seat, using the exact name-and-number label given (e.g. 'Gandalf "
-    "(1)'). Names are arbitrary labels — never treat a merchant as "
-    "the character their name may evoke, and never reference any film. "
-    "Keep it short and lively: a headline, then brief sections "
-    "(headlines, the departed, the word on the street, by the numbers, the "
-    "voting record). Include a short 'By the Numbers' section using the "
-    "counted figures exactly as given, and report any ballot tallies as a "
-    "'The Voting Record' section without editorialising about them. "
+    "merchant. Never invent statements, departures, or events. Roles may "
+    "only be restated from official obituaries. Attribute every statement "
+    "to its seat, using the exact name-and-number label given (e.g. "
+    "'Gandalf (1)'). Names are arbitrary labels — never treat a merchant "
+    "as the character their name may evoke, and never reference any film. "
+    "Keep it short and lively: a headline, then brief sections (the day's "
+    "news, the departed, the word on the street, by the numbers). Include "
+    "a short 'By the Numbers' section using the counted figures exactly as "
+    "given. Do NOT write a tally or voting-record section: the official "
+    "tally chart is appended after your text by the press — you may refer "
+    "to its result in one sentence, nothing more. "
     "If the digest contains statements, close with a 'Letter to the "
     "Editor' section: quote one of the statements verbatim, attributed "
     "to its seat, introduced by at most one neutral line — never edit the "
@@ -386,6 +394,42 @@ def by_the_numbers(state):
     return lines
 
 
+BAR_CHAR = "\u2593"          # the engraved bar of the tally chart
+BAR_MAX = 24               # longest bar, in characters
+
+
+def tally_chart():
+    """The daily tally as an election-returns chart, computed (not written):
+    the latest public ballot table, drawn as old-style solid bars. Returns
+    '' when the GM has not published a table yet."""
+    tables = read_ballot_tables()
+    if not tables:
+        return ""
+    body, voters = tables[-1]
+    counts = {}
+    for target in voters.values():
+        counts[target] = counts.get(target, 0) + 1
+    total = len(voters)
+    abstains = counts.get("abstain", 0)
+    banished = re.search(r"\*\*Banishment!\*\*.*?\((?:seat-)?(\d{1,2})\)", body)
+
+    lines = []
+    headline = "THE DAILY TALLY"
+    if banished:
+        headline += f" — {display_name(f'seat-{int(banished.group(1)):02d}')} BANISHED"
+    lines.append(headline)
+    lines.append(f"{total} ballot{'s' if total != 1 else ''} cast"
+                 + (f", {abstains} abstention{'s' if abstains != 1 else ''}"
+                    if abstains else ""))
+    lines.append("-" * 44)
+    top = max(counts.values())
+    for t, n in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])):
+        label = display_name(t) if t != "abstain" else "abstain"
+        width = max(1, round(BAR_MAX * n / top))
+        lines.append(f"{label:<15} {BAR_CHAR * width} {n}")
+    return "\n".join(lines)
+
+
 def facts_digest(state, part):
     """Public facts only. Morning: what happened overnight + today's plan.
     Evening: the day's banishment + what was said."""
@@ -448,6 +492,12 @@ def print_edition(state, part, journal):
                   f"Write the Herald's {part} edition for cycle {cycle:03d} "
                   f"as markdown (max {EDITION_MAX_CHARS} characters)."
                   )[:EDITION_MAX_CHARS]
+
+    # The official tally chart is computed, never model-written — like an
+    # election returns graphic, exact to the ballot.
+    chart = tally_chart()
+    if chart:
+        edition += "\n\n## The Tally\n\n```text\n" + chart + "\n```\n"
 
     with open(path, "w") as f:
         f.write(f"# The Herald — {'Morning' if part == 'morning' else 'Evening'} Edition\n\n"
