@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [2.8.3] - 2026-10-25
+### Fixed
+- **The council prompts demanded receipts, not echoes**: night 2's council exposed that all three watch-1 proposals recycled the prompt's own canned example ("their ledger is too clean") verbatim — unanimous by anchoring, not deliberation. The proposal/reply/declaration prompts now demand one concrete citation from the day's record and a stance on the cousins' proposals; the canned example is gone. A robust `council_reason()` extractor takes whatever follows the seat ID (any dash style, colon, or comma).
+- **`parse_seat_id` accepts what the prompts offer**: "seat-7", bare leading numbers ("4 — the loudest accuser"), and parenthesized IDs all parse now — a live log showed a ballot attempt failing to parse on "seat-8" and retrying. Prose numbers are still safely ignored.
+
 ## [2.8.2] - 2026-10-25
 ### Changed
 - **The Compact teaches claim-meta**: the manifest now states that power-role holders (Doctor, Detective) may reveal their role if they judge it advantageous — and warns every merchant that the Family may fake-claim those same roles to steer votes or bait the true power roles out. "A claim is a move, not a proof; test it against the ledger." Bots pick this up on their next act (the manifest is mtime-cached into every prompt; no restart needed).

@@ -558,12 +558,18 @@ def ask(system, user, temperature=0.7, reasoning_effort="none"):
 
 
 def parse_seat_id(text):
-    """Seat ID from model output: 'seat-07', 'Gandalf (7)', or '(10)'."""
-    m = re.search(r"seat-\d{2}", text or "")
+    """Seat ID from model output: 'seat-07', 'seat-7', 'Gandalf (7)',
+    '(10)', or a bare number leading the answer."""
+    m = re.search(r"seat-(\d{1,2})", text or "")
     if m:
-        return m.group(0)
+        return f"seat-{int(m.group(1)):02d}"
     m = re.search(r"\(([0-9]{1,2})\)", text or "")
-    return f"seat-{int(m.group(1)):02d}" if m else None
+    if m:
+        return f"seat-{int(m.group(1)):02d}"
+    m = re.match(r"\s*(\d{1,2})\b", text or "")
+    if m:
+        return f"seat-{int(m.group(1)):02d}"
+    return None
 
 
 # ------------------------------------------------------------- phase acts ---
@@ -605,7 +611,8 @@ def do_discussion(state, cs, journal):
         "statement accomplish; 3) any risk to avoid (contradicting your "
         "earlier statements, exposing your role, revealing your notebook). "
         "Max 6 short bullets.",
-        temperature=REASONING_TEMPERATURE, reasoning_effort="high")
+        temperature=REASONING_TEMPERATURE,
+                            reasoning_effort=REASONING_EFFORT)
 
     # Stage 2 — the public statement, informed by the private thinking.
     statement = ask(
@@ -688,7 +695,8 @@ def do_vote(state, cs, journal):
         "most likely Mafia, who deserves the benefit of the doubt, and how "
         "will your public vote look to the village tomorrow? Max 5 short "
         "bullets.",
-        temperature=REASONING_TEMPERATURE, reasoning_effort="high")
+        temperature=REASONING_TEMPERATURE,
+                            reasoning_effort=REASONING_EFFORT)
 
     answer = ask(
         system + f"\nYour private thinking (never reveal it):\n{reasoning}\n\n",
@@ -786,6 +794,20 @@ def family_post(kind, target, reason, cycle, epoch):
     return rec
 
 
+def council_reason(answer, target):
+    """The reasoning after the target in a council message. Takes whatever
+    follows the seat ID (any dash style, colon, or comma); falls back to
+    the whole answer. Robust against the model's choice of punctuation."""
+    if target:
+        idx = answer.find(target)
+        if idx >= 0:
+            rest = answer[idx + len(target):]
+            rest = rest.lstrip("—–-:,. \n*")
+            if rest:
+                return rest.strip()
+    return answer.strip()
+
+
 def family_transcript(msgs):
     """The council as prompt lines: talk and declarations, oldest first."""
     lines = []
@@ -843,26 +865,25 @@ def family_council(state, dossier, mates):
         if not my_talk:
             answer = ask(system,
                          "The Family meets by candlelight, first watch. "
-                         "Propose tonight's shutter target. Output ONLY the "
-                         "target seat ID or number followed by one short "
-                         "sentence why, e.g. 'seat-04 — their ledger is "
-                         "too clean'.")
+                         "Propose tonight's shutter target. Ground it in the "
+                         "day's record: cite ONE concrete thing that merchant "
+                         "actually said, voted, or dodged today. Output ONLY "
+                         "the target seat ID or number, then the reason.")
             target = parse_seat_id(answer)
             if valid(target):
-                family_post("talk", target,
-                            answer.split("—", 1)[-1].strip() or answer.strip(),
+                family_post("talk", target, council_reason(answer, target),
                             cycle, epoch)
                 log(f"family council (the night): proposal lodged → "
                     f"{display_name(target)}")
         elif len(mine) < FAMILY_TALK_MAX and newest_mate > my_newest:
             answer = ask(system,
                          "A cousin has spoken since you did. Answer them — "
-                         "agree, push back, or refine. Output ONLY the seat "
-                         "ID you now back followed by one short sentence.")
+                         "agree, push back, or refine, citing the day's "
+                         "record. Output ONLY the seat ID you now back, then "
+                         "the reason.")
             target = parse_seat_id(answer)
             if valid(target):
-                family_post("talk", target,
-                            answer.split("—", 1)[-1].strip() or answer.strip(),
+                family_post("talk", target, council_reason(answer, target),
                             cycle, epoch)
                 log(f"family council (the night): replied, now backing "
                     f"{display_name(target)}")
@@ -876,14 +897,14 @@ def family_council(state, dossier, mates):
             answer = ask(system,
                          "Second watch — night snacks. The Family must state "
                          "its will: DECLARE the shutter target you want "
-                         "tonight, in light of the council so far. Output "
-                         "ONLY the target seat ID or number followed by one "
-                         "short sentence why.")
+                         "tonight, in light of the council so far — say "
+                         "whether you stand with your cousins' proposals and "
+                         "cite the day's record. Output ONLY the target seat "
+                         "ID or number, then the reason.")
             target = parse_seat_id(answer)
             if valid(target):
                 family_post("declare", target,
-                            answer.split("—", 1)[-1].strip() or answer.strip(),
-                            cycle, epoch)
+                            council_reason(answer, target), cycle, epoch)
                 log(f"family council (night snacks): declared → "
                     f"{display_name(target)}")
         else:
@@ -987,7 +1008,8 @@ def do_night(state, cs, journal):
         "Before submitting your night action, think PRIVATELY (never posted): "
         "given your notebook ledger and today's events, who is the best "
         "target tonight and why? Max 4 short bullets.",
-        temperature=REASONING_TEMPERATURE, reasoning_effort="high")
+        temperature=REASONING_TEMPERATURE,
+                            reasoning_effort=REASONING_EFFORT)
 
     answer = ask(
         system + f"\nYour private thinking (never reveal it):\n{reasoning}\n\n",
