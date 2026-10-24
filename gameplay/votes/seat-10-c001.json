@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "9c5ef90a",
+  "seat": "seat-10",
+  "target": "seat-05",
+  "rationale": "Ripley (5), your answer still stinks of yesterday’s rot when the bazaar asks plain—*whose* favor?",
+  "ts": "2026-10-24T18:00:39Z"
+ },
+ "sig": "p6NhX+IE74zndU6TPFtcD9MkjeEOePp5+G9XwGafs81FoEto5XuiDxFekm1Sd75c4RuVpUARhobdDDZ11n7dCw=="
+}
