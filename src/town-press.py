@@ -98,7 +98,8 @@ def whisper_column(meta):
     return [WHISPER_ITEMS[first], WHISPER_ITEMS[second]]
 
 
-# Woodcut-style engraving plate under the headline (generated once from
+# Woodcut-style engraving plate at the head of the first (left) column
+# (generated once from
 # docs/assets/images/bazaar_banner.png; a missing plate never breaks a paper).
 ENGRAVING_PATH = os.path.join(REPO_ROOT, "docs", "assets", "images",
                               "bazaar-engraving.png")
@@ -254,11 +255,14 @@ def build_tex(meta, date_str, size, linespread):
                 "{\\footnotesize\\itshape %s\\par}" % latex_escape(sanitize(i))
                 for i in whisper_items))
 
-    # Woodcut engraving plate under the headline (best-effort).
+    # Woodcut engraving plate: a column-width illustration at the TOP of
+    # the FIRST (left) column, above the drop cap (best-effort).
     engraving = ""
     if meta["blocks"] and os.path.exists(ENGRAVING_PATH):
-        engraving = ("\\includegraphics[width=0.55\\linewidth]{%s}\n"
+        engraving = ("\\includegraphics[width=\\linewidth]{%s}\n"
+                     "\\vspace{3pt}\n"
                      % latex_escape(ENGRAVING_PATH.replace(os.sep, "/")))
+        body.insert(0, engraving)
 
     return r"""\documentclass[{size}pt]{{extarticle}}
 \usepackage[a4paper,left=14mm,right=14mm,top=13mm,bottom=16mm]{{geometry}}
@@ -301,7 +305,6 @@ def build_tex(meta, date_str, size, linespread):
 \begin{{center}}
 {{\fontsize{{19}}{{23}}\selectfont\bfseries {headline}\par}}
 \end{{center}}
-{engraving}
 \vspace{{2pt}}
 \begin{{multicols}}{{2}}
 {body}
@@ -322,7 +325,7 @@ def build_tex(meta, date_str, size, linespread):
            edition=latex_escape(meta["part"].capitalize()),
            date=latex_escape(date_str),
            headline=latex_escape(meta["headline"]),
-           body="".join(body), foot=foot, engraving=engraving,
+           body="".join(body), foot=foot,
            colophon=latex_escape(sanitize(COLOPHON)))
 
 
@@ -448,17 +451,15 @@ def render_fpdf(meta, date_str, size):
     pdf.multi_cell(0, 10, fpdf_sanitize(meta["headline"]), align="C")
     pdf.set_y(pdf.get_y() + 1.5)
 
-    # woodcut engraving plate under the headline (best-effort)
+    # woodcut engraving plate at the top of the FIRST (left) column
     engr_h = 0.0
     if meta["blocks"] and os.path.exists(ENGRAVING_PATH):
         from PIL import Image
         with Image.open(ENGRAVING_PATH) as im:
             ew, eh = im.size
-        engr_w = 100.0
-        engr_h = engr_w * eh / ew
         try:
-            pdf.image(ENGRAVING_PATH, x=(PAGE_W - engr_w) / 2.0,
-                      y=pdf.get_y() + 2.0, w=engr_w)
+            pdf.image(ENGRAVING_PATH, x=MARGIN, y=BODY_TOP, w=COL_W)
+            engr_h = COL_W * eh / ew + 3.0
         except Exception:
             engr_h = 0.0          # a bad plate must never stop the paper
 
@@ -484,17 +485,17 @@ def render_fpdf(meta, date_str, size):
             else:
                 foot_h += _wrap_lines(pdf, full_w, text) * 4.0 + 2.0
 
-    body_top = BODY_TOP + engr_h
+    col_top = [BODY_TOP + engr_h, BODY_TOP]   # left column starts under the plate
     body_bottom = BODY_BOTTOM - foot_h
 
-    col, y = 0, body_top
+    col, y = 0, col_top[0]
     for kind, text in meta["blocks"]:
         pdf.set_font("Times", "B" if kind == "subhead" else "", size)
         block_h = (_wrap_lines(pdf, COL_W, text) * leading
                    + (3.0 if kind == "subhead" else 1.6))
         if y + block_h > body_bottom:
             if col == 0:
-                col, y = 1, body_top
+                col, y = 1, col_top[1]
             else:
                 return pdf, False
         pdf.set_xy(col_x[col], y)
