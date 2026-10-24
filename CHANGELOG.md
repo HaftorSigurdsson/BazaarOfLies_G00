@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.7.0] - 2026-10-24
+### Changed
+- **Model: `mistral-small-2409` → `mistral-small-2603`** for all villagers, with **`reasoning_effort`** wired through the new SDK: `"high"` for the two-stage private-thinking calls (discussion/vote/night reasoning), `"none"` for the public acts (statements, ballots, council proposals) — fast and in-character where the village is watching, harder reasoning where nobody sees.
+- **`mistralai` SDK 1.9.11 → 3.4.0** — 1.9.11 silently dropped `reasoning_effort` from requests; 3.4.0 sends it. The client import moved (`from mistralai.client import Mistral`) — villager and Herald updated.
+### Fixed
+- **High-effort response parsing**: with `reasoning_effort="high"` the API returns message content as a **list of chunks** (ThinkChunk thinking + TextChunk answer) instead of a plain string — `ask()` now extracts the text chunks and discards the thinking (verified live against both effort levels).
+
 ## [2.6.1] - 2026-10-24
 ### Changed
 - **Snappier villagers**: poll interval 30s → **20s** (plus the 0–5s jitter) and statement pacing 120s → **90s**, so merchants respond to the village within ~half a minute and fit ~8 statements plus several exchanges into the 25-minute discussion. To watch: git push contention (10 bots × 3 polls/min) and API rate — both behaved at 30s/120s; the push-retry loop is the safety net. Docs swept accordingly (`bot_architecture.md`, `rules.md`, `bot_deployment.md`, the example doctrines).

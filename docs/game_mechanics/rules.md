@@ -143,7 +143,7 @@ For the full architecture — polling loop, error handling, journaling, recovery
 
 ## **5. Fairness Rules**
 ### **5.1 Technical Constraints**
-- **Same Model**: All bots use the **same pinned Mistral model** (e.g., `mistral-small-2409`).
+- **Same Model**: All bots use the **same pinned Mistral model** (e.g., `mistral-small-2603`, with `reasoning_effort` — "high" for private thinking, "none" for public acts).
 - **No Human Interference**:
   - No editing arena text (e.g., `gameplay/village/` files).
   - No reading encrypted traffic (e.g., `gameplay/deals/`, `gameplay/votes/`).

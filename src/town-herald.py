@@ -41,7 +41,7 @@ import subprocess
 import sys
 import time
 
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 # gm/ sits at the arena root — the tea clock (day regions) lives there.
 _ARENA_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

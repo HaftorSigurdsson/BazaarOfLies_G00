@@ -44,7 +44,7 @@ import subprocess
 import sys
 import time
 
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 # The bot lives in src/; the gm package sits at the arena root.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -53,7 +53,7 @@ from gm.crypto import (encrypt_for_seat, load_gm_private_key, decrypt_payload,
 from gm.utils import display_name, day_region
 
 # ---------------------------------------------------------------- config ---
-MODEL = "mistral-small-2409"            # PIN the exact versioned model ID
+MODEL = "mistral-small-2603"            # PIN the exact versioned model ID
 POLL_SECONDS = 20                       # arena poll interval (per game rules)
 JITTER_SECONDS = 5                      # random extra sleep, avoids herd pushes
 MAX_STATEMENTS_PER_DAY = 8              # per game rules
@@ -71,6 +71,7 @@ NOTEBOOK_MAX_CHARS = 4000               # hard cap on stored notebook text
 # point the channel could move into the arena repo).
 FAMILY_COUNCIL_GRACE_SECONDS = 120       # wait this long for slow cousins
 REASONING_TEMPERATURE = 0.3             # private thinking runs cooler than speech
+REASONING_EFFORT = "high"
 
 # ------------------------------------------------------------------ args ---
 parser = argparse.ArgumentParser(description="Bazaar of Lies Villager")
@@ -502,7 +503,23 @@ def time_of_day_block(state):
 
 
 # ------------------------------------------------------------ model call ---
-def ask(system, user, temperature=0.7):
+def _content_text(content):
+    """Message content comes in two shapes: a plain string (no reasoning),
+    or — when the model reasons aloud at high effort — a list of chunks
+    (ThinkChunk then TextChunk). Keep the text chunks, drop the thinking."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = [c.text for c in content
+                 if getattr(c, "type", None) == "text" and getattr(c, "text", None)]
+        return "\n".join(parts)
+    return ""
+
+
+def ask(system, user, temperature=0.7, reasoning_effort="none"):
+    """One model call. reasoning_effort rides the API's reasoning control:
+    "none" for public acts (fast, in-character), "high" for private
+    thinking — the two-stage reasoning calls run the model harder."""
     r = client.chat.complete(
         model=MODEL,
         messages=[
@@ -510,8 +527,9 @@ def ask(system, user, temperature=0.7):
             {"role": "user", "content": user},
         ],
         temperature=temperature,
+        reasoning_effort=reasoning_effort,
     )
-    return (r.choices[0].message.content or "").strip()
+    return _content_text(r.choices[0].message.content).strip()
 
 
 def parse_seat_id(text):
@@ -561,7 +579,7 @@ def do_discussion(state, cs, journal):
         "statement accomplish; 3) any risk to avoid (contradicting your "
         "earlier statements, exposing your role, revealing your notebook). "
         "Max 6 short bullets.",
-        temperature=REASONING_TEMPERATURE)
+        temperature=REASONING_TEMPERATURE, reasoning_effort="high")
 
     # Stage 2 — the public statement, informed by the private thinking.
     statement = ask(
@@ -643,7 +661,7 @@ def do_vote(state, cs, journal):
         "most likely Mafia, who deserves the benefit of the doubt, and how "
         "will your public vote look to the village tomorrow? Max 5 short "
         "bullets.",
-        temperature=REASONING_TEMPERATURE)
+        temperature=REASONING_TEMPERATURE, reasoning_effort="high")
 
     answer = ask(
         system + f"\nYour private thinking (never reveal it):\n{reasoning}\n\n",
@@ -852,7 +870,7 @@ def do_night(state, cs, journal):
         "Before submitting your night action, think PRIVATELY (never posted): "
         "given your notebook ledger and today's events, who is the best "
         "target tonight and why? Max 4 short bullets.",
-        temperature=REASONING_TEMPERATURE)
+        temperature=REASONING_TEMPERATURE, reasoning_effort="high")
 
     answer = ask(
         system + f"\nYour private thinking (never reveal it):\n{reasoning}\n\n",
