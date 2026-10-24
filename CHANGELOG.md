@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
+- **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.
 - **`FUTURE.md`** — the design plan for the **Elder Council**: a post-match historian-judge that reviews the complete record (statements, ballots, graveyard, recap, Herald editions, the Family's council transcripts, and a to-be-archived truth file) and delivers a 3–4 page court-style judgment — per-seat verdicts with citations, MVP / Golden Sacrifice / Worst Misjudgment awards — plus a trilogy-end overall AI ranking ledger. Five build phases, open questions, and non-goals; designed 2026-10-25, build resumes next session.
 
 ## [2.8.3] - 2026-10-25
