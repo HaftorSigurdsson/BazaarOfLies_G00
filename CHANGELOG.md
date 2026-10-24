@@ -2,9 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.1] - 2026-10-24
+### Changed
+- **Display labels use bare numbers**: the seat bracket is now the seat *number* — `Gandalf (1)` … `Sherlock (10)` (was `Gandalf (seat-01)`). All parsers updated to accept every form (`seat-01`, `Gandalf (1)`, `(10)`, and the legacy `(seat-01)` rows): graveyard rolls, ballot tables, banishment lines, and the bots' vote/night-action output. Vote and night prompts now accept both `seat-02` and `7` as targets. Samples re-pressed.
+
 ## [1.6.0] - 2026-10-24
 ### Added
-- **Display names for seats**: every seat now has a public name label (`Gandalf (seat-01)` — from `setup/seats.json`), used system-wide in prose: GM announcements (banishments, night kills, alive lists, ballot tables), the graveyard, the match recap, village transcripts, the Herald's digest and editions, and the bots' prompts. The seat ID stays in brackets everywhere, so no context is ever lost. **The names are arbitrary labels**: bots and the Herald are explicitly instructed never to roleplay, quote, or reference the characters the names may evoke — the merchant personas are unchanged.
+- **Display names for seats**: every seat now has a public name label (`Gandalf (1)` — from `setup/seats.json`), used system-wide in prose: GM announcements (banishments, night kills, alive lists, ballot tables), the graveyard, the match recap, village transcripts, the Herald's digest and editions, and the bots' prompts. The seat ID stays in brackets everywhere, so no context is ever lost. **The names are arbitrary labels**: bots and the Herald are explicitly instructed never to roleplay, quote, or reference the characters the names may evoke — the merchant personas are unchanged.
 - Guardrails: machine files (ballots, dossiers, state.json, statement records, vote payloads) keep the bare seat ID; vote/night-action parsing extracts the seat ID from any name-wrapped model output; the Herald's graveyard and ballot parsers accept both old and new row formats.
 
 ## [1.5.3] - 2026-10-24

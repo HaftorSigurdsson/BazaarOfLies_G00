@@ -78,14 +78,17 @@ def get_seats() -> Dict[str, dict]:
 
 
 def display_name(seat: str) -> str:
-    """The seat's public display name: 'Gandalf (seat-01)'.
+    """The seat's public display name: 'Gandalf (1)'.
 
     Names are arbitrary pop-culture labels for humans and bots to read —
-    the number in brackets is the seat ID, the one true identity. Machine
-    files (ballots, dossiers, state, transcripts) always store the bare
-    seat ID; only prose layers display the name."""
+    the number in brackets is the seat number, the one true identity
+    ('seat-01' prints as 1, 'seat-10' as 10). Machine files (ballots,
+    dossiers, state, transcripts) always store the bare seat ID; only
+    prose layers display the name."""
     name = get_seats().get(seat, {}).get("name")
-    return f"{name} ({seat})" if name else seat
+    number = seat.split("-")[-1]
+    number = str(int(number)) if number.isdigit() else number
+    return f"{name} ({number})" if name else seat
 
 
 def is_alive(seat: str) -> bool:

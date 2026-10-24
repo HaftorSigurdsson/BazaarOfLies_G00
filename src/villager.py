@@ -139,7 +139,7 @@ def get_persona():
 
 
 def name_label():
-    """Your public name label, e.g. 'Gandalf (seat-01)'. Names are ARBITRARY
+    """Your public name label, e.g. 'Gandalf (1)'. Names are ARBITRARY
     LABELS ONLY — the merchant characters they may evoke never enter the
     game; your persona is the merchant in get_persona()."""
     return f"You are known as {display_name(MY_SEAT)}. This name is an " \
@@ -276,11 +276,16 @@ def graveyard_roll():
     except OSError:
         return entries
     for line in text.splitlines():
-        if not line.startswith("|") or "seat-" not in line:
+        if not line.startswith("|") or ("seat-" not in line
+                                        and not re.search(r"\(\d{1,2}\)", line)):
             continue
         cells = [c.strip() for c in line.split("|")]
         m = re.search(r"seat-\d{2}", line)
-        seat = m.group(0) if m else None
+        if m is None:
+            m = re.search(r"\(([0-9]{1,2})\)", line)
+            seat = f"seat-{int(m.group(1)):02d}" if m else None
+        else:
+            seat = m.group(0)
         if seat is None:
             continue
         role = next((c for c in cells
@@ -317,8 +322,12 @@ def ask(system, user, temperature=0.7):
 
 
 def parse_seat_id(text):
+    """Seat ID from model output: 'seat-07', 'Gandalf (7)', or '(10)'."""
     m = re.search(r"seat-\d{2}", text or "")
-    return m.group(0) if m else None
+    if m:
+        return m.group(0)
+    m = re.search(r"\(([0-9]{1,2})\)", text or "")
+    return f"seat-{int(m.group(1)):02d}" if m else None
 
 
 # ------------------------------------------------------------- phase acts ---
@@ -344,7 +353,7 @@ def do_discussion(state, cs, journal):
         f"Conversation rules: read the transcript above. If other merchants have "
         f"spoken today, engage with what they said — agree, push back, or ask "
         f"them something. Address them by their name and seat number, exactly "
-        f"as shown (e.g. 'Gandalf (seat-05)'). The names are just labels — do "
+        f"as shown (e.g. 'Gandalf (5)'). The names are just labels — do "
         f"not treat any merchant as the character their name may evoke. Only "
         f"open a new topic if the village is silent."
     )[:STATEMENT_MAX_CHARS]
@@ -380,8 +389,9 @@ def do_vote(state, cs, journal):
         f"Public facts:\n{public_facts_block(state)}\n\n"
         f"Village transcript so far today:\n{transcript_block(state['cycle'], state)}",
         "The voting window is open. Day votes are PUBLIC: every merchant will "
-        "see your ballot and your stated reason. First line: ONLY the seat ID "
-        "to banish (e.g. 'seat-02'), or 'abstain'. Second line: your public "
+        "see your ballot and your stated reason. First line: ONLY the target "
+        "seat ID or number (e.g. 'seat-02' or '7'), or 'abstain'. Second line: "
+        "your public "
         "reason, one sentence, in character."
     )
     vote = parse_seat_id(answer.splitlines()[0] if answer else "") or parse_seat_id(answer)
@@ -458,7 +468,7 @@ def do_night(state, cs, journal):
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}{result_block}\n\n{guidance}",
         "It is night. Submit your night action. "
-        "Output ONLY the target seat ID, e.g. 'seat-02'."
+        "Output ONLY the target seat ID or number, e.g. 'seat-02' or '7'."
     )
     target = parse_seat_id(answer)
     if not target:

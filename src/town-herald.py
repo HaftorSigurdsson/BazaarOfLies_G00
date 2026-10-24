@@ -70,7 +70,7 @@ HERALD_SYSTEM = (
     "merchant. Never invent statements, deaths, or events. Roles may only be "
     "restated from official obituaries. Attribute every statement to its "
     "seat, using the exact name-and-number label given (e.g. 'Gandalf "
-    "(seat-01)'). Names are arbitrary labels — never treat a merchant as "
+    "(1)'). Names are arbitrary labels — never treat a merchant as "
     "the character their name may evoke, and never reference any film. "
     "Keep it short and lively: a headline, then brief sections "
     "(headlines, the dead, the word on the street, by the numbers, the "
@@ -156,9 +156,23 @@ def seat_names():
 
 
 def display_name(seat):
-    """'Gandalf (seat-01)' — name label with the seat ID in brackets."""
+    """'Gandalf (1)' — name label with the seat NUMBER in brackets
+    ('seat-01' prints as 1, 'seat-10' as 10)."""
     name = seat_names().get(seat)
-    return f"{name} ({seat})" if name else seat
+    if not name:
+        return seat
+    number = seat.split("-")[-1]
+    number = str(int(number)) if number.isdigit() else number
+    return f"{name} ({number})"
+
+
+def seat_from_label(text):
+    """Seat ID from any label form: 'seat-04', 'Gandalf (1)', '(10)'."""
+    m = re.search(r"seat-\d{2}", text)
+    if m:
+        return m.group(0)
+    m = re.search(r"\(([0-9]{1,2})\)", text)
+    return f"seat-{int(m.group(1)):02d}" if m else None
 
 
 def graveyard_roll():
@@ -169,11 +183,11 @@ def graveyard_roll():
     except OSError:
         return entries
     for line in text.splitlines():
-        if not line.startswith("|") or "seat-" not in line:
+        if not line.startswith("|") or ("seat-" not in line
+                                        and not re.search(r"\(\d{1,2}\)", line)):
             continue
         cells = [c.strip() for c in line.split("|")]
-        m = re.search(r"seat-\d{2}", line)
-        seat = m.group(0) if m else None
+        seat = seat_from_label(line)
         if seat is None:
             continue
         role = next((c for c in cells
@@ -266,11 +280,11 @@ def read_ballot_tables():
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
             if len(cells) != 3:
                 continue
-            ms = re.search(r"seat-\d{2}", cells[0])
+            ms = seat_from_label(cells[0])
             if not ms:
                 continue
-            mt = re.search(r"seat-\d{2}", cells[1])
-            voters[ms.group(0)] = mt.group(0) if mt else cells[1].lower()
+            mt = seat_from_label(cells[1])
+            voters[ms] = mt if mt else cells[1].lower()
         if voters:
             tables.append((body, voters))
     return tables
@@ -284,9 +298,9 @@ def vote_history():
         counts = {}
         for target in voters.values():
             counts[target] = counts.get(target, 0) + 1
-        banished = re.search(r"\*\*Banishment!\*\*.*?\((seat-\d{2})\)", body)
-        result = (f"{display_name(banished.group(1))} banished" if banished
-                  else "no banishment (tie or no majority)")
+        banished = re.search(r"\*\*Banishment!\*\*.*?\((?:seat-)?(\d{1,2})\)", body)
+        result = (f"{display_name(f'seat-{int(banished.group(1)):02d}')} banished"
+                  if banished else "no banishment (tie or no majority)")
         tally = ", ".join(
             f"{display_name(t) if t != 'abstain' else 'abstain'}: "
             f"{n} vote{'s' if n != 1 else ''}"

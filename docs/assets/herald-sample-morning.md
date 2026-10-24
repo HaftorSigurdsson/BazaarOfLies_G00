@@ -12,21 +12,21 @@ business before the sun had fully cleared the minarets.
 ## By the Numbers
 
 - 5 merchants alive, 5 in the graveyard.
-- Statements this cycle: 6 (Gandalf (seat-01): 2, Yoda (seat-03): 2, Elsa (seat-07): 1, Sherlock (seat-10): 1); Morpheus (seat-08) has said nothing yet.
+- Statements this cycle: 6 (Gandalf (1): 2, Yoda (3): 2, Elsa (7): 1, Sherlock (10): 1); Morpheus (8) has said nothing yet.
 - Banished by vote so far: 4. Revealed Mafia among the dead: 2.
 - The village has banished one Villager for every Mafia — a ledger several
   merchants were heard recounting aloud.
 
 ## The Voting Record
 
-Cycle 004: Neo (seat-06) banished — ballots: Neo (seat-06): 3 votes, Gandalf (seat-01): 1 vote.
-Cycle 003: Batman (seat-04) banished — ballots: Batman (seat-04): 4 votes, Morpheus (seat-08): 1 vote.
+Cycle 004: Neo (6) banished — ballots: Neo (6): 3 votes, Gandalf (1): 1 vote.
+Cycle 003: Batman (4) banished — ballots: Batman (4): 4 votes, Morpheus (8): 1 vote.
 
 ## The Ledger's Silence
 
-Ripley (seat-05), The Moneylender, banished by village vote in cycle 002,
+Ripley (5), The Moneylender, banished by village vote in cycle 002,
 was revealed by the Game Master to have been the Town's Detective — a loss
-several merchants called "the gravest of the match." Hermione (seat-02),
+several merchants called "the gravest of the match." Hermione (2),
 The Carpet Weaver, the first to be banished, was confirmed Mafia.
 
 ## What the Birds Say
@@ -40,7 +40,7 @@ the marketplace, by all accounts, does not.
 
 ## Letter to the Editor
 
-Before the village's judgement fell, Ripley (seat-05) said: "Every debt in
+Before the village's judgement fell, Ripley (5) said: "Every debt in
 this bazaar comes due eventually — I merely kept the ledger. Mark which of
 my neighbours counts loudest today." The Herald prints it verbatim, as is
 its custom, and offers no comment.
