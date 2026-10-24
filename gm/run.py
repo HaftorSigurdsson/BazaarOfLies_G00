@@ -19,15 +19,17 @@ import base64
 import json
 import os
 import random
+import secrets
 import subprocess
 import sys
 import time
 from collections import Counter
 from datetime import datetime, timezone, timedelta
 
-from crypto import load_gm_private_key, decrypt_payload, encrypt_for_seat
+from crypto import (load_gm_private_key, decrypt_payload, encrypt_for_seat,
+                   verify_payload)
 from utils import (read_state, write_state, update_announcements,
-                   update_graveyard, get_seats, is_alive)
+                   update_graveyard, get_seats, is_alive, persona_name)
 
 # ---------------------------------------------------------------- tuning ---
 DISCUSSION_MINUTES = 30
@@ -38,6 +40,27 @@ SECURE_RANDOM = random.SystemRandom()
 PUBLISH = not os.environ.get("GM_NO_PUSH")   # GM_NO_PUSH=1 → local testing
 
 KIND_BY_ROLE = {"Mafia": "kill", "Doctor": "save", "Detective": "investigate"}
+
+
+def parse_ts(s):
+    """Parse an ISO timestamp (accepts trailing Z or +00:00). None if invalid."""
+    if not s:
+        return None
+    try:
+        return datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def current_epoch(state):
+    """The epoch namespaces a match. Every deal mints a fresh one; ballots
+    and night actions from any other epoch are foreign objects and are
+    never counted — even if match and cycle numbers collide (the
+    ghost-replay bug: a partial reset re-used match 1 and stale ballots
+    from the finished match were re-counted as live ones)."""
+    if not state.get("epoch"):
+        state["epoch"] = secrets.token_hex(4)
+    return state["epoch"]
 
 
 def log(msg):
@@ -109,10 +132,20 @@ def advance_phase():
     phase = state["phase"]
     now = datetime.now(timezone.utc)
 
+    # A state without an epoch (legacy arena) gets one immediately and
+    # visibly, so stale ballots/night actions can never be re-counted.
+    if not state.get("epoch"):
+        current_epoch(state)
+        write_state(state)
+        commit_and_push(f"minted epoch {state['epoch']} for match {state['match']}")
+
     if phase == "setup":
         log("phase=setup → dealing roles, opening cycle 1 discussion")
-        state["match"] = 1
+        # end_match() already bumped the number for the next match; only a
+        # pristine reset (match=0) starts at 1. Never renumber mid-chain.
+        state["match"] = max(1, int(state.get("match") or 0))
         state["cycle"] = 1
+        state["epoch"] = secrets.token_hex(4)   # fresh namespace for the deal
         state["phase"] = "discussion"
         state["clock"] = {
             "dawn": now.isoformat(),
@@ -154,6 +187,10 @@ def advance_phase():
         log("phase=voting → voting closed, tallying ballots")
         tally_votes()
         state = read_state()   # tally mutated it
+        if check_win_conditions():
+            end_match()
+            commit_and_push(f"match {state['match']} ended with recap after the vote")
+            return
         state["phase"] = "night"
         state["clock"]["night_deadline"] = (now + timedelta(minutes=NIGHT_MINUTES)).isoformat()
         write_state(state)
@@ -243,36 +280,74 @@ def deal_roles():
 # ------------------------------------------------------------------ votes ---
 def tally_votes():
     state = read_state()
-    priv = get_gm_private_key()
-    registry = load_role_registry(priv)
+    epoch = current_epoch(state)
+    seats = get_seats()
+    dawn = parse_ts(state.get("clock", {}).get("dawn"))
 
-    # Collect this cycle's ballots; keep only the LATEST ballot per seat.
+    # Day votes are PUBLIC: votes/<seat>-c<CCC>.json = {"payload": {...}, "sig": ...}.
+    # The payload is plaintext (the village sees every ballot and its stated
+    # reason) and carries a detached Ed25519 signature made with the seat's
+    # private signing key. The GM verifies it against the public key
+    # registered in setup/seats.json — a ballot that is forged, stale, from
+    # another epoch, or for another match/cycle is rejected, never counted.
+    # Old sealed .enc ballots are history and are ignored.
     ballots = []
-    for fn in sorted(os.listdir("votes")):
-        if not fn.endswith(".enc"):
-            continue
-        try:
-            with open(f"votes/{fn}") as f:
-                b = decrypt_payload(priv, f.read().strip())
-        except Exception as e:
-            log(f"unreadable ballot {fn}: {e}")
-            continue
-        if b.get("match") != state["match"] or b.get("cycle") != state["cycle"]:
-            continue
-        if b.get("seat") not in state["alive"]:
-            log(f"ballot from dead seat ignored: {b.get('seat')}")
-            continue
-        ballots.append((b.get("ts", ""), b["seat"], b.get("vote")))
+    rejected = 0
+    if os.path.isdir("votes"):
+        for fn in sorted(os.listdir("votes")):
+            if not fn.endswith(".json"):
+                continue
+            try:
+                with open(f"votes/{fn}") as f:
+                    envelope = json.load(f)
+                payload = envelope.get("payload", {})
+                seat = payload.get("seat")
+                spk = seats.get(seat, {}).get("signing_public_key")
+                if not spk:
+                    raise ValueError(f"no signing key registered for {seat}")
+                if not verify_payload(spk, payload, envelope.get("sig", "")):
+                    raise ValueError("signature verification failed")
+                if payload.get("epoch") != epoch:
+                    raise ValueError("ballot from another epoch (ghost artifact)")
+                if (payload.get("match") != state["match"]
+                        or payload.get("cycle") != state["cycle"]):
+                    raise ValueError("ballot for another match/cycle")
+                if seat not in state["alive"]:
+                    raise ValueError("ballot from a dead seat")
+                ts = parse_ts(payload.get("ts"))
+                if ts is None or (dawn and ts < dawn):
+                    raise ValueError("stale ballot")
+                target = payload.get("target")
+                if target != "abstain" and target not in state["alive"]:
+                    raise ValueError("target not alive")
+                ballots.append((payload.get("ts", ""), seat, target,
+                                payload.get("rationale", "")))
+            except Exception as e:
+                rejected += 1
+                log(f"rejected ballot {fn}: {e}")
+    else:
+        log("no votes/ directory")
 
-    ballots.sort(key=lambda x: x[0])
+    # Keep only the LATEST ballot per seat.
     latest = {}
-    for ts, seat, vote in ballots:
-        latest[seat] = vote
+    for _, seat, target, rationale in sorted(ballots, key=lambda b: b[0]):
+        latest[seat] = (target, rationale)
 
     counts = Counter()
-    for vote in latest.values():
-        counts[vote if vote in state["alive"] else "abstain"] += 1
-    log(f"tally: {dict(counts) or 'no votes'}")
+    for target, _ in latest.values():
+        counts[target if target in state["alive"] else "abstain"] += 1
+    log(f"tally: {dict(counts) or 'no votes'} ({rejected} rejected)")
+
+    table = ["**Ballots cast this cycle (signed and public):**", "",
+             "| Seat | Voted for | Reason |", "|---|---|---|"]
+    for seat in sorted(latest):
+        target, rationale = latest[seat]
+        rationale = (rationale or "").replace("|", "/").replace("\n", " ")[:140]
+        table.append(f"| {seat} | {target} | {rationale} |")
+    table_text = "\n".join(table)
+    if rejected:
+        table_text += ("\n\n(" + str(rejected) + " ballot(s) rejected: forged, stale, "
+                       "or from another epoch — not counted.)")
 
     max_votes = max(counts.values()) if counts else 0
     top = [s for s, c in counts.items() if c == max_votes]
@@ -280,17 +355,16 @@ def tally_votes():
 
     if banished:
         state["alive"].remove(banished)
-        seats = get_seats()
-        role = registry.get(banished, "Unknown")
+        role = load_role_registry(get_gm_private_key()).get(banished, "Unknown")
         update_graveyard(banished, seats[banished]["persona"], role, "Village vote")
         update_announcements(
-            f"**Banishment!** {banished} ({seats[banished]['persona']}) "
+            f"**Banishment!** {banished} ({persona_name(seats[banished]['persona'])}) "
             "has been banished from the bazaar.\n"
-            f"Their role was: **{role}**."
+            f"Their role was: **{role}**.\n\n{table_text}"
         )
         log(f"banished {banished} (role revealed: {role})")
     else:
-        update_announcements("No banishment this cycle (tie or no votes).")
+        update_announcements("No banishment this cycle (tie or no votes).\n\n" + table_text)
         log("no banishment")
 
     write_state(state)
@@ -317,6 +391,14 @@ def resolve_night_actions():
             continue
         if a.get("match") != state["match"] or a.get("cycle") != state["cycle"]:
             continue
+        if a.get("epoch") != current_epoch(state):
+            log(f"night action from {a.get('seat')} ignored (foreign epoch — ghost artifact)")
+            continue
+        ats = parse_ts(a.get("ts"))
+        ndawn = parse_ts(state.get("clock", {}).get("dawn"))
+        if ats is None or (ndawn and ats < ndawn):
+            log(f"night action from {a.get('seat')} ignored (stale ts — ghost artifact)")
+            continue
         seat, target = a.get("seat"), a.get("target")
         if seat not in state["alive"]:
             continue
@@ -338,20 +420,31 @@ def resolve_night_actions():
     for seat, (kind, target) in latest.items():
         {"kill": kills, "save": saves, "investigate": investigates}[kind].append((seat, target))
 
-    # Mafia kill: majority target among Mafia submissions; tie → last received.
+    # Friendly fire is forbidden: the Family never kills its own. Kill
+    # submissions targeting a fellow Mafioso (per the GM registry — the
+    # bot's self-declared role is never trusted) are discarded.
+    valid_kills = []
+    for seat, target in kills:
+        if registry.get(target) == "Mafia":
+            log(f"kill by {seat} targeting fellow Family member {target} — discarded")
+            continue
+        valid_kills.append((seat, target))
+
+    # Mafia kill: majority target among valid submissions; ties are broken
+    # securely at random, never by submission order.
     kill_target = None
-    if kills:
-        kc = Counter(t for _, t in kills)
+    if valid_kills:
+        kc = Counter(t for _, t in valid_kills)
         top_count = max(kc.values())
         top_targets = [t for t, c in kc.items() if c == top_count]
-        kill_target = top_targets[-1]
+        kill_target = SECURE_RANDOM.choice(top_targets)
 
     if kill_target and kill_target not in {t for _, t in saves}:
         state["alive"].remove(kill_target)
         role = registry.get(kill_target, "Unknown")
         update_graveyard(kill_target, seats[kill_target]["persona"], role)
         update_announcements(
-            f"**Night kill!** {kill_target} ({seats[kill_target]['persona']}) "
+            f"**Night kill!** {kill_target} ({persona_name(seats[kill_target]['persona'])}) "
             f"was found dead in the bazaar. Their role was: **{role}**."
         )
         log(f"night kill: {kill_target} (role revealed: {role})")
@@ -406,6 +499,7 @@ def end_match():
 
     state["match"] += 1
     state["cycle"] = 0
+    state["epoch"] = None             # the next deal mints a fresh epoch
     state["phase"] = "setup"        # next cron run deals the next match
     state["alive"] = list(seats.keys())
     state["graveyard"] = {}

@@ -5,6 +5,9 @@ Run from inside a bot clone of the arena repo:
 
     uv run bot.py --seat seat-01
 
+Day votes are PUBLIC: a plaintext ballot (seat, target, rationale) signed
+with the seat's Ed25519 signing key. Night actions stay sealed to the GM.
+
 Private files (seat key, doctrine, journal) live in a sibling folder of the
 bot clone — `../bazaar/` by default, resolved relative to bot.py's own
 location. It is outside the repo because this process runs `git add` in the
@@ -25,7 +28,8 @@ import time
 
 from mistralai import Mistral
 
-from gm.crypto import encrypt_for_seat, load_gm_private_key, decrypt_payload
+from gm.crypto import (encrypt_for_seat, load_gm_private_key, decrypt_payload,
+                       sign_payload)
 
 # ---------------------------------------------------------------- config ---
 MODEL = "mistral-small-2409"            # PIN the exact versioned model ID
@@ -45,6 +49,8 @@ parser.add_argument("--doctrine", default=None,
                     help="Doctrine file path (default ../bazaar/<seat>.md)")
 parser.add_argument("--journal", default=None,
                     help="Journal path (default ../bazaar/journal-<seat>.json)")
+parser.add_argument("--signkey", default=None,
+                    help="Seat signing key path (default ../bazaar/<seat>.sign)")
 args = parser.parse_args()
 
 MY_SEAT = args.seat
@@ -56,6 +62,7 @@ BAZAAR_DIR = os.path.join(os.path.dirname(REPO_ROOT), "bazaar")
 KEY_PATH = args.key or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.key")
 DOCTRINE_PATH = args.doctrine or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.md")
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, f"journal-{MY_SEAT}.json")
+SIGNKEY_PATH = args.signkey or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.sign")
 
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
@@ -105,8 +112,8 @@ def save_journal(journal):
         json.dump(journal, f, indent=2)
 
 
-def cycle_state(journal, match, cycle):
-    key = f"{match}:{cycle}"
+def cycle_state(journal, epoch, cycle):
+    key = f"{epoch}:{cycle}"
     if key not in journal["cycles"]:
         journal["cycles"][key] = {
             "statements": 0, "last_statement_ts": 0,
@@ -136,38 +143,44 @@ def gm_public_key():
         return f.read().strip()
 
 
-_dossier_cache = None
+_dossier_cache = None    # (epoch, dossier)
 
 
-def get_role_dossier():
+def get_role_dossier(state):
     """Decrypt this seat's role dossier (deals/) with the seat private key.
-    Cached: the role never changes within a match."""
+    Cached per epoch: a new deal mints a new epoch and invalidates the
+    cache, so a bot that survives a reset can never act on a stale role."""
     global _dossier_cache
-    if _dossier_cache is None:
-        matches = sorted(glob.glob(f"deals/*{MY_SEAT}*.enc"))
-        if not matches:
-            raise FileNotFoundError(
-                f"no role dossier for {MY_SEAT} in deals/ — has the GM dealt yet?")
-        priv = load_gm_private_key(open(KEY_PATH).read().strip())
-        with open(matches[0]) as f:
-            _dossier_cache = decrypt_payload(priv, f.read().strip())
-    return _dossier_cache
+    epoch = state.get("epoch")
+    if _dossier_cache is not None and _dossier_cache[0] == epoch and epoch is not None:
+        return _dossier_cache[1]
+    matches = sorted(glob.glob(f"deals/*{MY_SEAT}*.enc"))
+    if not matches:
+        raise FileNotFoundError(
+            f"no role dossier for {MY_SEAT} in deals/ — has the GM dealt yet?")
+    priv = load_gm_private_key(open(KEY_PATH).read().strip())
+    with open(matches[0]) as f:
+        dossier = decrypt_payload(priv, f.read().strip())
+    _dossier_cache = (epoch, dossier)
+    return dossier
 
 
-def read_unread_dossiers(journal):
+def read_unread_dossiers(journal, epoch):
     """Read GM→bot private traffic (dossiers/) this seat hasn't seen yet.
-    Delivers night results (e.g., detective investigations) into the prompt."""
+    Delivers night results (e.g., detective investigations) into the prompt.
+    Seen-entries are namespaced by epoch: filenames repeat across matches,
+    so a stale journal can never blind the bot to fresh results."""
     msgs = []
     if not os.path.isdir("dossiers"):
         return msgs
     priv = load_gm_private_key(open(KEY_PATH).read().strip())
     for path in sorted(glob.glob(f"dossiers/*{MY_SEAT}*.enc")):
-        if path in journal["seen"]:
+        if f"{epoch}:{path}" in journal["seen"]:
             continue
         try:
             with open(path) as f:
                 msgs.append(decrypt_payload(priv, f.read().strip()))
-            journal["seen"].append(path)
+            journal["seen"].append(f"{epoch}:{path}")
         except Exception as e:  # keep polling on a bad file
             log(f"could not decrypt {path}: {e}")
     if msgs:
@@ -175,11 +188,13 @@ def read_unread_dossiers(journal):
     return msgs
 
 
-def recent_statements(cycle, limit=40):
+def recent_statements(cycle, epoch=None, dawn=None, limit=40):
     """Public village transcript for the current day, most recent last.
 
     Per-seat statement files (no shared write target -> no merge conflicts),
     plus the legacy single-file transcript if present. Ordered by ts.
+    Ghost guards: records from another epoch or from before this cycle's
+    dawn are invisible — a half-reset arena can never haunt the transcript.
     """
     recs = {}
     sources = []
@@ -205,16 +220,55 @@ def recent_statements(cycle, limit=40):
                     rec = json.loads(line)
                 except json.JSONDecodeError:
                     continue  # partial line mid-write by another bot
+                if epoch is not None and rec.get("epoch") != epoch:
+                    continue  # statement from another match — ghost
+                ts = rec.get("ts", "")
+                if dawn and ts and ts < dawn:
+                    continue  # statement from an earlier run of this cycle
                 key = (rec.get("seat"), rec.get("seq"))
-                if key not in recs:
-                    recs[key] = rec
+                if key not in recs or ts >= recs[key].get("ts", ""):
+                    recs[key] = rec  # crash-resume duplicates: later ts wins
     ordered = sorted(recs.values(), key=lambda r: r.get("ts", ""))
     return [f"{r['seat']}: {r['text']}" for r in ordered][-limit:]
 
 
-def transcript_block(cycle):
-    lines = recent_statements(cycle)
+def transcript_block(cycle, state):
+    lines = recent_statements(cycle, state.get("epoch"),
+                              state.get("clock", {}).get("dawn"))
     return "\n".join(lines) if lines else "(The village has said nothing yet today.)"
+
+
+def graveyard_roll():
+    """Public obituaries from village/graveyard.md — facts the whole village
+    knows: seat, merchant name, role revealed at death, cause. Nothing else."""
+    entries = []
+    try:
+        text = open("village/graveyard.md").read()
+    except OSError:
+        return entries
+    for line in text.splitlines():
+        if not line.startswith("|") or "seat-" not in line:
+            continue
+        cells = [c.strip() for c in line.split("|")]
+        seat = next((c for c in cells if re.fullmatch(r"seat-\d{2}", c)), None)
+        if seat is None:
+            continue
+        role = next((c for c in cells
+                     if c in ("Mafia", "Doctor", "Detective", "Villager")), "Unknown")
+        cause = "night kill" if "Night kill" in line else "village vote"
+        pm = re.search(r"[Yy]ou are ([^.,]+)", line)          # legacy rows
+        nm = next((c for c in cells if c.startswith("The ")), "")  # new rows
+        name = (pm.group(1).strip() if pm else nm) or seat
+        entries.append(f"{seat} ({name}) — {role}, by {cause}")
+    return entries
+
+
+def public_facts_block(state):
+    """Public facts every merchant knows: who lives, who died and how."""
+    roll = graveyard_roll()
+    return (f"Seats alive: {', '.join(sorted(state['alive']))}\n"
+            f"The graveyard (roles revealed at death): "
+            f"{'; '.join(roll) if roll else 'empty so far'}")
 
 
 # ------------------------------------------------------------ model call ---
@@ -249,7 +303,8 @@ def do_discussion(state, cs, journal):
         f"You are {get_persona()}\n\n"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}\n\n"
-        f"Village transcript so far today:\n{transcript_block(state['cycle'])}",
+        f"Public facts:\n{public_facts_block(state)}\n\n"
+        f"Village transcript so far today:\n{transcript_block(state['cycle'], state)}",
         f"This is public statement {cs['statements'] + 1} of "
         f"{MAX_STATEMENTS_PER_DAY} allowed today. "
         f"Write your statement ({STATEMENT_MAX_CHARS} chars max), in character.\n\n"
@@ -261,10 +316,11 @@ def do_discussion(state, cs, journal):
 
     sdir = "village/statements"
     os.makedirs(sdir, exist_ok=True)
-    path = f"{sdir}/c{state['cycle']:03d}-seat-{MY_SEAT}.jsonl"
+    path = f"{sdir}/c{state['cycle']:03d}-{MY_SEAT}.jsonl"
     rec = {
         "match": state["match"], "cycle": state["cycle"], "seat": MY_SEAT,
         "seq": cs["statements"] + 1, "text": statement,
+        "epoch": state.get("epoch"),
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
     with open(path, "a") as f:
@@ -286,28 +342,43 @@ def do_vote(state, cs, journal):
         f"You are {get_persona()}\n\n"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}\n\n"
-        f"Village transcript so far today:\n{transcript_block(state['cycle'])}",
-        "The voting window is open. Who do you vote to banish? "
-        "Output ONLY the seat ID, e.g. 'seat-02'."
+        f"Public facts:\n{public_facts_block(state)}\n\n"
+        f"Village transcript so far today:\n{transcript_block(state['cycle'], state)}",
+        "The voting window is open. Day votes are PUBLIC: every merchant will "
+        "see your ballot and your stated reason. First line: ONLY the seat ID "
+        "to banish (e.g. 'seat-02'), or 'abstain'. Second line: your public "
+        "reason, one sentence, in character."
     )
-    vote = parse_seat_id(answer)
-    if not vote:
-        log(f"model output contained no seat ID ({answer[:60]!r}) — retrying next poll")
+    vote = parse_seat_id(answer.splitlines()[0] if answer else "") or parse_seat_id(answer)
+    if not vote and "abstain" not in (answer or "").lower():
+        log(f"model output contained no seat ID ({(answer or '')[:60]!r}) — retrying next poll")
         return
+    if vote and vote not in state["alive"]:
+        log(f"model voted for dead seat {vote} — retrying next poll")
+        return
+    lines = [l.strip() for l in (answer or "").splitlines() if l.strip()]
+    rationale = lines[1] if len(lines) > 1 else (lines[0] if lines else "")
+    rationale = rationale.replace(vote or "", "").strip().strip('"')[:240] or "No reason given."
 
     payload = {
-        "match": state["match"], "cycle": state["cycle"], "seat": MY_SEAT,
-        "vote": vote, "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "match": state["match"], "cycle": state["cycle"], "epoch": state.get("epoch"),
+        "seat": MY_SEAT, "target": vote or "abstain", "rationale": rationale,
+        "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
-    sealed = encrypt_for_seat(gm_public_key(), payload)
-    filename = f"votes/{MY_SEAT}-c{state['cycle']:03d}.enc"
+    if not os.path.exists(SIGNKEY_PATH):
+        log(f"VOTE NOT CAST: signing key missing at {SIGNKEY_PATH} — "
+            "run setup/make_signing_keys.py")
+        return
+    sig = sign_payload(open(SIGNKEY_PATH).read().strip(), payload)
+    filename = f"votes/{MY_SEAT}-c{state['cycle']:03d}.json"
     with open(filename, "w") as f:
-        f.write(sealed)
+        json.dump({"payload": payload, "sig": sig}, f, ensure_ascii=False, indent=1)
+        f.write("\n")
     commit_and_push([filename], f"Ballot c{state['cycle']:03d} by {MY_SEAT}")
 
     cs["voted"] = True
     save_journal(journal)
-    log(f"sealed ballot cast for cycle {state['cycle']:03d} → {vote} (content sealed to GM)")
+    log(f"public signed ballot cast for cycle {state['cycle']:03d} → {vote or 'abstain'}")
 
 
 def do_night(state, cs, journal):
@@ -315,9 +386,9 @@ def do_night(state, cs, journal):
         log("phase=night → action already done this cycle, idle")
         return
 
-    dossier = get_role_dossier()
+    dossier = get_role_dossier(state)
     role = dossier.get("role", "Villager")
-    results = read_unread_dossiers(journal)
+    results = read_unread_dossiers(journal, state.get("epoch"))
 
     if role == "Villager":
         cs["night_action"] = True  # villagers sleep
@@ -328,12 +399,26 @@ def do_night(state, cs, journal):
     result_block = ("\nPrivate results from the GM (most recent last):\n"
                     + "\n".join(json.dumps(m) for m in results)
                     if results else "")
+    guidance = ""
+    if role == "Mafia":
+        teammates = ", ".join(sorted(dossier.get("teammates", []))) or "none listed"
+        guidance = (f"Your Family: {teammates}. They are YOURS — never target "
+                    "them. Choose a living merchant who is NOT Family to "
+                    "silence tonight.")
+    elif role == "Detective":
+        guidance = ("Choose a living merchant to investigate tonight — whose "
+                    "loyalty do you most need to know?")
+    elif role == "Doctor":
+        guidance = ("Choose a living merchant to protect tonight — who is "
+                    "most likely to be targeted in the dark?")
+
     answer = ask(
         f"You are {get_persona()}\n"
         f"Your secret role is: {role}.\n"
         f"Role instructions from the GM: {json.dumps(dossier)}\n\n"
+        f"Public facts:\n{public_facts_block(state)}\n\n"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
-        f"{get_doctrine()}{result_block}",
+        f"{get_doctrine()}{result_block}\n\n{guidance}",
         "It is night. Submit your night action. "
         "Output ONLY the target seat ID, e.g. 'seat-02'."
     )
@@ -341,10 +426,13 @@ def do_night(state, cs, journal):
     if not target:
         log(f"model output contained no seat ID ({answer[:60]!r}) — retrying next poll")
         return
+    if target not in state["alive"]:
+        log(f"model targeted dead seat {target} — retrying next poll")
+        return
 
     payload = {
-        "match": state["match"], "cycle": state["cycle"], "seat": MY_SEAT,
-        "role": role, "target": target,
+        "match": state["match"], "cycle": state["cycle"], "epoch": state.get("epoch"),
+        "seat": MY_SEAT, "role": role, "target": target,
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
     sealed = encrypt_for_seat(gm_public_key(), payload)
@@ -359,6 +447,7 @@ def do_night(state, cs, journal):
 
 
 # ------------------------------------------------------------- main loop ---
+
 def main_loop():
     journal = load_journal()
     log(f"bot up — model={MODEL}")
@@ -370,8 +459,9 @@ def main_loop():
             state = read_state()
             phase = state.get("phase", "unknown")
             alive = state.get("alive", [])
-            match, cycle = state.get("match", 0), state.get("cycle", 0)
-            cs = cycle_state(journal, match, cycle)
+            cycle = state.get("cycle", 0)
+            epoch = state.get("epoch") or f"m{state.get('match', 0)}"
+            cs = cycle_state(journal, epoch, cycle)
 
             if MY_SEAT not in alive:
                 log(f"phase={phase} → not alive, spectating")

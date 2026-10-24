@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
@@ -24,13 +25,50 @@ def update_announcements(message: str) -> None:
         f.write(announcement)
 
 
-def update_graveyard(seat: str, persona: str, role: str, banished_by: Optional[str] = None) -> None:
-    """Add a seat to the graveyard in village/graveyard.md."""
-    match = read_state()["match"]
-    cycle = read_state()["cycle"]
-    line = f"| {match} | {cycle} | {seat} | {persona} | {role} | {banished_by or 'Night kill'} |".strip()
-    with open("village/graveyard.md", "a") as f:
-        f.write(f"{line}\n")
+_PERSONA_NAME_RE = re.compile(r"^[Yy]ou are ([^.,;]+)")
+
+
+def persona_name(persona: str) -> str:
+    """Short merchant name from a persona prompt.
+
+    'You are The Carpet Weaver. You see the pattern...' → 'The Carpet Weaver'.
+    Never dump whole persona paragraphs into announcements or the graveyard.
+    """
+    m = _PERSONA_NAME_RE.match(persona or "")
+    if m:
+        return m.group(1).strip()
+    return (persona or "").strip()[:24] or "Unknown merchant"
+
+
+GRAVEYARD_TEMPLATE = """# Bazaar Graveyard
+
+| Match | Cycle | Seat | Persona | Role | Banished By |
+|---|---|---|---|---|---|
+"""
+
+
+def update_graveyard(seat: str, persona: str, role: str,
+                     banished_by: Optional[str] = None) -> None:
+    """Add a seat to the graveyard in village/graveyard.md.
+
+    The row is inserted directly under the table header (not appended at the
+    end of the file, which lands after any later sections and used to mangle
+    the markdown). The persona column holds the short name only.
+    """
+    state = read_state()
+    line = (f"| {state['match']} | {state['cycle']} | {seat} | "
+            f"{persona_name(persona)} | {role} | {banished_by or 'Night kill'} |")
+    path = "village/graveyard.md"
+    if not os.path.exists(path):
+        with open(path, "w") as f:
+            f.write(GRAVEYARD_TEMPLATE)
+    with open(path) as f:
+        lines = f.read().splitlines()
+    idx = next((i for i, l in enumerate(lines) if l.startswith("|---")), None)
+    insert_at = idx + 1 if idx is not None else len(lines)
+    lines.insert(insert_at, line)
+    with open(path, "w") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 def get_seats() -> Dict[str, dict]:
