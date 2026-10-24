@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "9c5ef90a",
+  "seat": "seat-04",
+  "target": "seat-05",
+  "rationale": "Ripley (5) dodged plain questions with spice riddles yet the bazaar’s ledger demands a name, not syrup.",
+  "ts": "2026-10-24T18:00:16Z"
+ },
+ "sig": "XpCoD8JY6Y2ZH3EHgBioa4evmkvk4FVSKudw+8McypyRZdogyy0Cc3wHy3Z7XMmmIUqH7H0ncPoZsIwtB+9zCQ=="
+}
