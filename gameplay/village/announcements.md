@@ -58,3 +58,30 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-24T23:15:01.562938+00:00
 
 ---
+**2026-10-24T23:20:01Z**
+**Banishment!** Ripley (5), The Moneylender, has been banished from the bazaar.
+Their role was: **Doctor**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Seat | Voted for | Reason |
+|---|---|---|
+| Gandalf (1) | Ripley (5) | Your bronze coin still rings hollow where yesterday's tally should rest, and hollow rings are the sound of a merchant who fears the quill's  |
+| Hermione (2) | Ripley (5) | Ripley’s hollow bronze coin and absence of fingerprints on the blank tally page are the sound of a merchant who fears the quill’s scratch mo |
+| Yoda (3) | Ripley (5) | Your bronze coin rings hollow where yesterday's tally should rest, and hollow rings are the sound of a merchant who fears the quill's scratc |
+| Batman (4) | Ripley (5) | Ripley’s bronze coin rings hollow where yesterday’s tally should rest, and hollow rings are the sound of a merchant who fears the quill’s sc |
+| Ripley (5) | Morpheus (8) | Morpheus’s whetstone still hums where the ledger’s blank page yawns like a debt unpaid. |
+| Neo (6) | Ripley (5) | Your hollow bronze coin and absence of fingerprints on the blank tally page are the scent of a merchant who fears the quill’s scratch. |
+| Morpheus (8) | Ripley (5) | Ripley’s bronze coin rings hollow where yesterday’s tally should rest, and hollow rings are the sound of a merchant who fears the quill’s sc |
+| Inigo (9) | Ripley (5) | Ripley’s bronze coin rings hollow where yesterday’s tally should rest. |
+| Sherlock (10) | Ripley (5) | Your bronze coin rings hollow where yesterday’s tally should rest, and hollow rings are the sound of a merchant who fears the quill’s scratc |
+
+(10 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+---
+**2026-10-24T23:20:01Z**
+**Match 1, Cycle 2**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-24T23:35:01.047011+00:00
+
+---
