@@ -56,7 +56,7 @@ def update_graveyard(seat: str, persona: str, role: str,
     the markdown). The persona column holds the short name only.
     """
     state = read_state()
-    line = (f"| {state['match']} | {state['cycle']} | {seat} | "
+    line = (f"| {state['match']} | {state['cycle']} | {display_name(seat)} | "
             f"{persona_name(persona)} | {role} | {banished_by or 'Night kill'} |")
     path = "gameplay/village/graveyard.md"
     if not os.path.exists(path):
@@ -75,6 +75,17 @@ def get_seats() -> Dict[str, dict]:
     """Load seat data from setup/seats.json."""
     with open("setup/seats.json", "r") as f:
         return json.load(f)["seats"]
+
+
+def display_name(seat: str) -> str:
+    """The seat's public display name: 'Gandalf (seat-01)'.
+
+    Names are arbitrary pop-culture labels for humans and bots to read —
+    the number in brackets is the seat ID, the one true identity. Machine
+    files (ballots, dossiers, state, transcripts) always store the bare
+    seat ID; only prose layers display the name."""
+    name = get_seats().get(seat, {}).get("name")
+    return f"{name} ({seat})" if name else seat
 
 
 def is_alive(seat: str) -> bool:

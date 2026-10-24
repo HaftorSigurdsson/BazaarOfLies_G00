@@ -8,6 +8,7 @@ This guide covers configuring the **10 seats** for the Bazaar of Lies, including
 - **10 seats**: 5 for **North (Dad)** and 5 for **South (Son)**.
 - Each seat has:
   - A **persona** (e.g., *The Spice Merchant*).
+  - A **name** (e.g., *Gandalf*) — the public display name, shown everywhere as `Gandalf (seat-01)`. The name is an **arbitrary label**: no matter which film character it evokes, that character never enters the game; the seat ID in brackets is the one true identity. Machine files (ballots, dossiers, state, transcripts) always store the bare seat ID.
   - A **public key** (for encryption).
   - A **Git identity** (for commits).
 

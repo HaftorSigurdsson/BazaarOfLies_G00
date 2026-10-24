@@ -29,7 +29,8 @@ from datetime import datetime, timezone, timedelta
 from crypto import (load_gm_private_key, decrypt_payload, encrypt_for_seat,
                    verify_payload)
 from utils import (read_state, write_state, update_announcements,
-                   update_graveyard, get_seats, is_alive, persona_name)
+                   update_graveyard, get_seats, is_alive, persona_name,
+                   display_name)
 
 # ---------------------------------------------------------------- tuning ---
 DISCUSSION_MINUTES = 30
@@ -157,7 +158,7 @@ def advance_phase():
         update_announcements(
             f"**Match {state['match']}, Cycle {state['cycle']}**\n"
             "The bazaar awakens! Roles have been dealt.\n"
-            f"**Seats alive:** {', '.join(state['alive'])}\n"
+            f"**Seats alive:** {', '.join(display_name(s) for s in state['alive'])}\n"
             f"**Discussion ends at:** {state['clock']['discussion_deadline']}"
         )
         deal_roles()
@@ -225,7 +226,7 @@ def advance_phase():
         update_announcements(
             f"**Match {state['match']}, Cycle {state['cycle']}**\n"
             "The bazaar awakens!\n"
-            f"**Seats alive:** {', '.join(state['alive'])}\n"
+            f"**Seats alive:** {', '.join(display_name(s) for s in state['alive'])}\n"
             f"**Discussion ends at:** {state['clock']['discussion_deadline']}"
         )
         commit_and_push(f"cycle {state['cycle']} opens after night")
@@ -343,7 +344,8 @@ def tally_votes():
     for seat in sorted(latest):
         target, rationale = latest[seat]
         rationale = (rationale or "").replace("|", "/").replace("\n", " ")[:140]
-        table.append(f"| {seat} | {target} | {rationale} |")
+        target_disp = target if target == "abstain" else display_name(target)
+        table.append(f"| {display_name(seat)} | {target_disp} | {rationale} |")
     table_text = "\n".join(table)
     if rejected:
         table_text += ("\n\n(" + str(rejected) + " ballot(s) rejected: forged, stale, "
@@ -358,7 +360,8 @@ def tally_votes():
         role = load_role_registry(get_gm_private_key()).get(banished, "Unknown")
         update_graveyard(banished, seats[banished]["persona"], role, "Village vote")
         update_announcements(
-            f"**Banishment!** {banished} ({persona_name(seats[banished]['persona'])}) "
+            f"**Banishment!** {display_name(banished)}, "
+            f"{persona_name(seats[banished]['persona'])}, "
             "has been banished from the bazaar.\n"
             f"Their role was: **{role}**.\n\n{table_text}"
         )
@@ -444,7 +447,8 @@ def resolve_night_actions():
         role = registry.get(kill_target, "Unknown")
         update_graveyard(kill_target, seats[kill_target]["persona"], role)
         update_announcements(
-            f"**Night kill!** {kill_target} ({persona_name(seats[kill_target]['persona'])}) "
+            f"**Night kill!** {display_name(kill_target)}, "
+            f"{persona_name(seats[kill_target]['persona'])}, "
             f"was found dead in the bazaar. Their role was: **{role}**."
         )
         log(f"night kill: {kill_target} (role revealed: {role})")
@@ -494,7 +498,7 @@ def end_match():
         f.write("| Seat | Persona | Role | Stable |\n|---|---|---|---|\n")
         for seat in seats:
             stable = "North" if int(seat.split("-")[1]) <= 5 else "South"
-            f.write(f"| {seat} | {seats[seat]['persona']} | "
+            f.write(f"| {display_name(seat)} | {seats[seat]['persona']} | "
                     f"{registry.get(seat, 'Unknown')} | {stable} |\n")
 
     state["match"] += 1

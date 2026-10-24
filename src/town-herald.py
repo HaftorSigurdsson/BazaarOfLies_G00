@@ -69,7 +69,10 @@ HERALD_SYSTEM = (
     "you are given. Never speculate about the role or allegiance of a living "
     "merchant. Never invent statements, deaths, or events. Roles may only be "
     "restated from official obituaries. Attribute every statement to its "
-    "seat. Keep it short and lively: a headline, then brief sections "
+    "seat, using the exact name-and-number label given (e.g. 'Gandalf "
+    "(seat-01)'). Names are arbitrary labels — never treat a merchant as "
+    "the character their name may evoke, and never reference any film. "
+    "Keep it short and lively: a headline, then brief sections "
     "(headlines, the dead, the word on the street, by the numbers, the "
     "voting record). Include a short 'By the Numbers' section using the "
     "counted figures exactly as given, and report any ballot tallies as a "
@@ -142,6 +145,22 @@ def read_state():
         return json.load(f)
 
 
+def seat_names():
+    """Public name labels from setup/seats.json (arbitrary pop-culture
+    labels; the seat ID is the one true identity)."""
+    try:
+        with open("setup/seats.json") as f:
+            return {k: v.get("name", "") for k, v in json.load(f)["seats"].items()}
+    except (OSError, KeyError, json.JSONDecodeError):
+        return {}
+
+
+def display_name(seat):
+    """'Gandalf (seat-01)' — name label with the seat ID in brackets."""
+    name = seat_names().get(seat)
+    return f"{name} ({seat})" if name else seat
+
+
 def graveyard_roll():
     """Public obituaries: seat, merchant name, role revealed at death, cause."""
     entries = []
@@ -153,16 +172,17 @@ def graveyard_roll():
         if not line.startswith("|") or "seat-" not in line:
             continue
         cells = [c.strip() for c in line.split("|")]
-        seat = next((c for c in cells if re.fullmatch(r"seat-\d{2}", c)), None)
+        m = re.search(r"seat-\d{2}", line)
+        seat = m.group(0) if m else None
         if seat is None:
             continue
         role = next((c for c in cells
                      if c in ("Mafia", "Doctor", "Detective", "Villager")), "Unknown")
         cause = "night kill" if "Night kill" in line else "village vote"
-        pm = re.search(r"[Yy]ou are ([^.,]+)", line)              # legacy rows
+        pm = re.search(r"[Yy]ou are ([^.,]+)", line)          # legacy rows
         nm = next((c for c in cells if c.startswith("The ")), "")  # new rows
         name = (pm.group(1).strip() if pm else nm) or seat
-        entries.append(f"{seat} ({name}) — {role}, by {cause}")
+        entries.append(f"{display_name(seat)} ({name}) — {role}, by {cause}")
     return entries
 
 
@@ -223,13 +243,14 @@ def read_statements(state):
 
 def statements_digest(state):
     """The current cycle's public statements (facts, attributed to seats)."""
-    return [f"{r['seat']}: {r['text']}" for r in read_statements(state)]
+    return [f"{display_name(r['seat'])}: {r['text']}" for r in read_statements(state)]
 
 
 def read_ballot_tables():
     """Published ballot tables from the announcements, in order: a list of
     (announcement body, {seat: target}) — the GM publishes one signed,
-    public table per vote."""
+    public table per vote. Seats appear as name labels ('Gandalf (seat-01)');
+    the seat ID inside the brackets is the identity."""
     try:
         text = open("gameplay/village/announcements.md").read()
     except OSError:
@@ -243,9 +264,13 @@ def read_ballot_tables():
         voters = {}
         for line in body.splitlines():
             cells = [c.strip() for c in line.strip().strip("|").split("|")]
-            if len(cells) != 3 or not re.fullmatch(r"seat-\d{2}", cells[0]):
+            if len(cells) != 3:
                 continue
-            voters[cells[0]] = cells[1]
+            ms = re.search(r"seat-\d{2}", cells[0])
+            if not ms:
+                continue
+            mt = re.search(r"seat-\d{2}", cells[1])
+            voters[ms.group(0)] = mt.group(0) if mt else cells[1].lower()
         if voters:
             tables.append((body, voters))
     return tables
@@ -259,12 +284,13 @@ def vote_history():
         counts = {}
         for target in voters.values():
             counts[target] = counts.get(target, 0) + 1
-        banished = re.search(r"\*\*Banishment!\*\* (seat-\d{2})", body)
-        result = (f"{banished.group(1)} banished" if banished
+        banished = re.search(r"\*\*Banishment!\*\*.*?\((seat-\d{2})\)", body)
+        result = (f"{display_name(banished.group(1))} banished" if banished
                   else "no banishment (tie or no majority)")
-        tally = ", ".join(f"{t}: {n} vote{'s' if n != 1 else ''}"
-                          for t, n in sorted(counts.items(),
-                                             key=lambda kv: -kv[1]))
+        tally = ", ".join(
+            f"{display_name(t) if t != 'abstain' else 'abstain'}: "
+            f"{n} vote{'s' if n != 1 else ''}"
+            for t, n in sorted(counts.items(), key=lambda kv: -kv[1]))
         rejected = re.search(r"(\d+) ballot\(s\) rejected", body)
         line = f"{result} — ballots: {tally}"
         if rejected:
@@ -284,11 +310,11 @@ def vote_participation():
     for _, voters in tables:
         for seat, target in voters.items():
             casts[seat] = casts.get(seat, 0) + 1
-            if target.lower() == "abstain":
+            if target == "abstain":
                 abstentions[seat] = abstentions.get(seat, 0) + 1
     parts = []
     for seat in sorted(casts):
-        p = f"{seat}: {casts[seat]}/{n}"
+        p = f"{display_name(seat)}: {casts[seat]}/{n}"
         if abstentions.get(seat):
             p += f" ({abstentions[seat]} abstention" \
                  f"{'s' if abstentions[seat] != 1 else ''})"
@@ -324,11 +350,12 @@ def by_the_numbers(state):
         per_seat = {}
         for r in stmts:
             per_seat[r.get("seat")] = per_seat.get(r.get("seat"), 0) + 1
-        counts = ", ".join(f"{s}: {n}" for s, n in sorted(per_seat.items()))
+        counts = ", ".join(f"{display_name(s)}: {n}" for s, n in sorted(per_seat.items()))
         silent = [s for s in alive if s not in per_seat]
         lines.append(f"Statements this cycle: {len(stmts)} ({counts}).")
         if silent:
-            lines.append(f"Silent so far this cycle: {', '.join(silent)}.")
+            lines.append("Silent so far this cycle: "
+                         + ", ".join(display_name(s) for s in silent) + ".")
     else:
         lines.append("No public statements this cycle yet.")
     streak = quiet_night_streak()
@@ -344,7 +371,8 @@ def facts_digest(state, part):
     """Public facts only. Morning: what happened overnight + today's plan.
     Evening: the day's banishment + what was said."""
     digest = [f"Match {state['match']}, cycle {state['cycle']} ({part} edition)."]
-    digest.append(f"Seats alive: {', '.join(sorted(state['alive']))}.")
+    digest.append("Seats alive: "
+                  + ", ".join(display_name(s) for s in sorted(state["alive"])) + ".")
     roll = graveyard_roll()
     digest.append("Official obituaries (roles revealed at death): "
                   + ("; ".join(roll) if roll else "none so far."))
