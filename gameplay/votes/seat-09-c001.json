@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "7b04bdda",
+  "seat": "seat-09",
+  "target": "seat-05",
+  "rationale": "Because Ripley’s silence weaves no defense and leaves the bazaar with a thread too frayed to trust.",
+  "ts": "2026-10-24T16:54:00Z"
+ },
+ "sig": "+aGzTiti4O5Emb+MBDLud5Svto1WZBNuL1AeEMW2glIHOndkaUSHTe5KoOoxyt/yuHL24E2T6ygeWBBzN3vXCQ=="
+}
