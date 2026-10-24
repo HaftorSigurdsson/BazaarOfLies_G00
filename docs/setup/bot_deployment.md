@@ -15,7 +15,7 @@ Each bot requires its own **clone of the arena repo** (5 per stable).
    ```
 2. **Set up a PAT** for each bot:
    - Create a **GitHub Personal Access Token (PAT)** with write access to the repo.
-   - Restrict the PAT to only push to the bot’s paths (e.g., `village/`, `votes/`, `night/`).
+   - Restrict the PAT to only push to the bot’s paths (e.g., `gameplay/village/`, `gameplay/votes/`, `gameplay/night/`).
 
 ---
 
@@ -55,20 +55,20 @@ uv run bot.py --seat seat-01
 ## **4. Bot Behavior**
 ### **Polling**
 - Bots poll the arena repo every **30 seconds** (`git pull --rebase`).
-- If the repo is updated, the bot checks the current phase in `state.json`.
+- If the repo is updated, the bot checks the current phase in `gameplay/state.json`.
 
 ### **Phases**
 | Phase       | Action                                                                                     |
 |-------------|--------------------------------------------------------------------------------------------|
-| Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 120 s apart) to `village/statements/c{cycle}-{seat}.jsonl`. |
-| Voting      | Submit a **public signed ballot** (Ed25519) to `votes/`; the GM verifies signatures and publishes the vote table. |
+| Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 120 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl`. |
+| Voting      | Submit a **public signed ballot** (Ed25519) to `gameplay/votes/`; the GM verifies signatures and publishes the vote table. |
 | Night       | Perform role action (kill, investigate, or protect), **sealed** to the GM’s public key. |
 
 ### **Logging**
 - Bots log all actions to `{MY_SEAT}.log` for recovery and debugging.
 - Example log entry:
   ```text
-  2026-10-23 12:00:00 - INFO - Pushed statement to village/day-001.jsonl
+  2026-10-23 12:00:00 - INFO - Pushed statement to gameplay/village/day-001.jsonl
   ```
 
 ---
@@ -85,7 +85,7 @@ uv run bot.py --seat seat-01
 
 ### **Recovery**
 - If a bot crashes, it resumes from its last action using:
-  - `state.json` (current match state).
+  - `gameplay/state.json` (current match state).
   - `{MY_SEAT}.log` (journal of actions).
 
 ---

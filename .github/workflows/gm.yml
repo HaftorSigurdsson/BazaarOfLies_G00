@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'votes/**'
-      - 'night/**'
-      - 'village/**'          # ← NEW: statements tick the clock too
+      - 'gameplay/votes/**'
+      - 'gameplay/night/**'
+      - 'gameplay/village/**'      # ← NEW: statements tick the clock too
   schedule:
     - cron: '*/5 * * * *'
 

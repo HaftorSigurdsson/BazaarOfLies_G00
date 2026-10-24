@@ -31,7 +31,7 @@ Day votes are **public plaintext ballots signed** with a per-seat Ed25519 signin
               "target": "seat-02", "rationale": "deflected twice", "ts": "..."}
    signature = sign_payload(seat_signing_key, payload)
    ```
-2. **Bot writes** the signed payload to `votes/`.
+2. **Bot writes** the signed payload to `gameplay/votes/`.
 3. **GM verifies** the signature and the epoch before counting:
    ```python
    from gm.crypto import verify_payload
@@ -45,7 +45,7 @@ Day votes are **public plaintext ballots signed** with a per-seat Ed25519 signin
    encrypted = encrypt_for_gm({"match": 1, "cycle": 1, "epoch": "...",
                                 "seat": "seat-01", "action": "kill", "target": "seat-03"})
    ```
-2. **Bot writes** the sealed payload to `night/`.
+2. **Bot writes** the sealed payload to `gameplay/night/`.
 3. **GM opens** the payload using its private key:
    ```python
    from gm.crypto import decrypt_payload

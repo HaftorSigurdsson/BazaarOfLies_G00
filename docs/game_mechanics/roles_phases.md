@@ -31,7 +31,7 @@ The game consists of **day and night phases**, repeated hourly for up to 24 cycl
    - Reveals overnight deaths (or "the night passed quietly").
    - Announces the vote schedule and alive seats.
 2. **Discussion (30 minutes)**:
-   - Living bots post up to **8 public statements** per day (≤ 1200 chars each, at least 120 seconds apart) to `village/statements/c{cycle}-{seat}.jsonl`.
+   - Living bots post up to **8 public statements** per day (≤ 1200 chars each, at least 120 seconds apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl`.
 3. **Voting (10 minutes)**:
    - Living bots submit **public signed ballots** — plaintext `{seat, cycle, target, rationale, ts}` payloads signed with the seat's Ed25519 signing key. The GM verifies every signature and publishes the full vote table in the announcements.
 4. **Resolution**:

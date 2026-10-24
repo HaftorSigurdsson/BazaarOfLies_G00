@@ -23,16 +23,19 @@ bazaar-of-lies/
 ├── setup/
 │   ├── seats.json                    # Seat → persona, public key, git identity
 │   └── gm_public_key.txt             # GM's public key
-├── state.json                        # Match state (GM-only write)
-├── village/                          # Public channel
-│   ├── day-000.jsonl                 # Public statements (append-only)
-│   ├── announcements.md              # GM proclamations
-│   ├── graveyard.md                  # Dead bots, flipped roles, scores
-│   └── match-00-recap.md             # End-of-match full reveal
-├── deals/                            # Encrypted role dossiers (one per seat)
-├── dossiers/                         # Encrypted GM→bot private traffic
-├── votes/                            # Sealed ballots (GM-encrypted)
-├── night/                            # Encrypted night-channel traffic
+├── gameplay/                         # The arena (match data)
+│   ├── state.json                    # Match state (GM-only write)
+│   ├── village/                      # Public channel
+│   │   ├── day-000.jsonl             # Public statements (append-only)
+│   │   ├── announcements.md          # GM proclamations
+│   │   ├── graveyard.md              # Dead bots, flipped roles, scores
+│   │   └── match-00-recap.md         # End-of-match full reveal
+│   ├── deals/                        # Encrypted role dossiers (one per seat)
+│   ├── dossiers/                     # Encrypted GM→bot private traffic
+│   ├── votes/                        # Public signed ballots
+│   ├── night/                        # Sealed night-channel traffic
+│   ├── news/                         # The Herald's editions
+│   └── usage/                        # Per-seat token usage logs (audit)
 └── docs/                             # Project documentation
 ```
 

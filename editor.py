@@ -122,7 +122,7 @@ def mark_edition(journal, epoch, cycle, part):
 
 # ---------------------------------------------------------- arena readers ---
 def read_state():
-    with open("state.json") as f:
+    with open("gameplay/state.json") as f:
         return json.load(f)
 
 
@@ -130,7 +130,7 @@ def graveyard_roll():
     """Public obituaries: seat, merchant name, role revealed at death, cause."""
     entries = []
     try:
-        text = open("village/graveyard.md").read()
+        text = open("gameplay/village/graveyard.md").read()
     except OSError:
         return entries
     for line in text.splitlines():
@@ -156,7 +156,7 @@ _ANNOUNCEMENT_SPLIT = re.compile(r"\*\*(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)\*\
 def announcements_since(journal):
     """Public GM announcements published since the last processed one."""
     try:
-        text = open("village/announcements.md").read()
+        text = open("gameplay/village/announcements.md").read()
     except OSError:
         return []
     parts = _ANNOUNCEMENT_SPLIT.split(text)
@@ -175,7 +175,7 @@ def statements_digest(state):
     dawn = state.get("clock", {}).get("dawn")
     recs = {}
     sources = []
-    sdir = "village/statements"
+    sdir = "gameplay/village/statements"
     if os.path.isdir(sdir):
         pref = f"c{cycle:03d}-seat-"
         sources += [os.path.join(sdir, p) for p in sorted(os.listdir(sdir))
@@ -238,7 +238,7 @@ def ask(user):
 def print_edition(state, part, journal):
     cycle = state["cycle"]
     epoch = state.get("epoch")
-    news_dir = "news"
+    news_dir = "gameplay/news"
     os.makedirs(news_dir, exist_ok=True)
     path = f"{news_dir}/herald-c{cycle:03d}-{part}.md"
     if os.path.exists(path):        # one writer per file, even if the journal is lost

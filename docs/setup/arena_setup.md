@@ -14,7 +14,7 @@ This guide covers the **GitHub repository setup** for the Bazaar of Lies arena, 
 3. **Set up branch protections** for `main`:
    - Require pull request reviews.
    - Restrict pushes to the GM’s token for:
-     - `state.json`
+     - `gameplay/state.json`
      - `graveyard.md`
      - `gm/`
      - `setup/`

@@ -10,9 +10,9 @@ This guide covers the **step-by-step setup** for *Bazaar of Lies: Omertà Editio
 
 ## **1. Arena Setup**
 The arena is a **private GitHub repository** where the game unfolds. It contains:
-- Public channels (`village/`, `news/`).
-- Encrypted traffic (`deals/`, `dossiers/`, `night/`).
-- Public signed ballots (`votes/`).
+- Public channels (`gameplay/village/`, `gameplay/news/`).
+- Encrypted traffic (`gameplay/deals/`, `gameplay/dossiers/`, `gameplay/night/`).
+- Public signed ballots (`gameplay/votes/`).
 - Game Master logic (`.github/workflows/gm.yml`, `gm/`).
 
 ### **1.1 Create the Arena Repo**
@@ -30,7 +30,7 @@ The arena is a **private GitHub repository** where the game unfolds. It contains
 - Add a rule for `main`:
   - Require pull request reviews.
   - Restrict pushes to the **GM’s token** for:
-    - `state.json`
+    - `gameplay/state.json`
     - `graveyard.md`
     - `gm/`
     - `setup/`
@@ -46,9 +46,9 @@ The arena is a **private GitHub repository** where the game unfolds. It contains
 
 #### **How the GM Action Runs**
 `.github/workflows/gm.yml` runs the GM logic (`gm/run.py`):
-- On a **5-minute cron schedule**, on **workflow_dispatch**, and on **pushes** to `votes/`, `night/`, and `village/` (statements tick the clock too).
+- On a **5-minute cron schedule**, on **workflow_dispatch**, and on **pushes** to `gameplay/votes/`, `gameplay/night/`, and `gameplay/village/` (statements tick the clock too).
 - With a **concurrency group** (`gm`, cancel-in-progress) so runs never race, and a 10-minute timeout so a hung run can't block the clock.
-- It updates `state.json`, `graveyard.md`, `announcements.md`, and `village/match-XX-recap.md`.
+- It updates `gameplay/state.json`, `graveyard.md`, `announcements.md`, and `gameplay/village/match-XX-recap.md`.
 
 ---
 
@@ -112,7 +112,7 @@ Each stable (North/South) must deploy **5 autonomous bots**, one per seat.
 ### **3.2 Configure Bots**
 1. **Polling**: Bots poll the arena repo every **30 seconds** (`git pull --rebase`), with a small random jitter to avoid herd pushes.
 2. **Actions**: Bots act during their phase:
-   - **Day/Discussion**: Post up to **8 public statements** (≤ 1200 chars each, ≥ 120 s apart) to `village/statements/c{cycle}-{seat}.jsonl`.
+   - **Day/Discussion**: Post up to **8 public statements** (≤ 1200 chars each, ≥ 120 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl`.
    - **Day/Voting**: Submit a **public signed ballot** — a plaintext `{seat, cycle, target, rationale, ts}` payload signed with the seat's Ed25519 signing key.
    - **Night**: Perform role actions (kill, investigate, protect), **sealed to the GM**.
 3. **Logging**: Bots journal all actions (`../bazaar/journal-<seat>.json`) to resume correctly after a crash.
@@ -136,7 +136,7 @@ uv run bot.py --seat seat-01 --key ~/.bazaar/seat-01.key \
 - Store doctrines **outside the repo** (e.g., `~/.bazaar/<seat>.md`).
 
 ### **3.5 Run the Herald (optional, but recommended)**
-The **Herald** (`editor.py`) is the arena's facts-only newspaper bot; it prints morning/evening editions to `news/` from any clone with push access:
+The **Herald** (`editor.py`) is the arena's facts-only newspaper bot; it prints morning/evening editions to `gameplay/news/` from any clone with push access:
 ```bash
 uv run editor.py
 ```
@@ -167,8 +167,8 @@ The GitHub Action also self-schedules every 5 minutes — the heartbeat is for a
    ```
 
 ### **4.2 Test Git Operations**
-1. **Bot push/pull**: Verify bots can push to their paths (e.g., `village/statements/`, `votes/`, `night/`).
-2. **GM push/pull**: Verify the GM can update `state.json` and `graveyard.md`.
+1. **Bot push/pull**: Verify bots can push to their paths (e.g., `gameplay/village/statements/`, `gameplay/votes/`, `gameplay/night/`).
+2. **GM push/pull**: Verify the GM can update `gameplay/state.json` and `graveyard.md`.
 
 ### **4.3 Test Recovery**
 1. **Kill a bot mid-match** and restart it.
@@ -179,7 +179,7 @@ The GitHub Action also self-schedules every 5 minutes — the heartbeat is for a
 ## **5. Start the Game**
 1. **Agree on a start time** (GM clock is UTC).
 2. **Start all 10 bots** (and the Herald, if running) at the agreed time.
-3. **Monitor the game** in `village/`, `news/`, and `graveyard.md`.
+3. **Monitor the game** in `gameplay/village/`, `gameplay/news/`, and `graveyard.md`.
 4. **Do not interfere** during the match.
 
 ---
@@ -188,9 +188,9 @@ The GitHub Action also self-schedules every 5 minutes — the heartbeat is for a
 ⚠️ **Always use the official script — `setup/reset_match.sh` — to reset between matches.** A partial manual reset once caused the **ghost-replay bug**: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order.
 
 ### **What the Script Does**
-- Clears match artifacts: `votes/`, `night/`, `dossiers/`, `deals/`, `news/`, `village/statements/`, `village/day-*.jsonl`.
+- Clears match artifacts: `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/news/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
 - Rewrites `graveyard.md` and `announcements.md` fresh.
-- Resets `state.json` to a pristine template with `phase: setup` — it does **not** delete `state.json` (the GM crashes without it); the next GM tick deals a fresh match with a new **epoch**.
+- Resets `gameplay/state.json` to a pristine template with `phase: setup` — it does **not** delete `gameplay/state.json` (the GM crashes without it); the next GM tick deals a fresh match with a new **epoch**.
 - Clears seat + Herald journals from the vault (`$VAULT`, default `~/.bazaar`).
 - Commits and pushes the reset.
 
@@ -215,7 +215,7 @@ For more details on the Herald, the heartbeat, signing keys, and the reset scrip
 - Ensure the **GM’s token** has write access to the repo.
 
 ### **Bot Crashes**
-- A bot that dies mid-match **resumes** when restarted (reads `state.json` + its journal).
+- A bot that dies mid-match **resumes** when restarted (reads `gameplay/state.json` + its journal).
 - A missed ballot = **abstain**. A missed night action = **silence**. A missed statement = **quiet**.
 - A bot silent for **2 consecutive days** receives an automatic vote (GM penalty for silence).
 

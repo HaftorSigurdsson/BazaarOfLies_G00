@@ -84,8 +84,8 @@ def commit_and_push(label, attempts=3):
     if not PUBLISH:
         log(f"GM_NO_PUSH set — not publishing: {label}")
         return
-    paths = [p for p in ["state.json", "graveyard.md", "village",
-                         "deals", "dossiers", GM_ROLES_FILE]
+    paths = [p for p in ["gameplay/state.json", "gameplay/village",
+                         "gameplay/deals", "gameplay/dossiers", GM_ROLES_FILE]
              if os.path.exists(p)]
     for attempt in range(1, attempts + 1):
         r = subprocess.run(["git", "pull", "--rebase", "--autostash"],
@@ -270,7 +270,7 @@ def deal_roles():
             "night_channel_key": mafia_key if assignment[seat] == "Mafia" else None,
         }
         sealed = encrypt_for_seat(seats[seat]["public_key"], dossier)
-        with open(f"deals/{seat}.enc", "w") as f:
+        with open(f"gameplay/deals/{seat}.enc", "w") as f:
             f.write(sealed)
 
     save_role_registry(priv, assignment)
@@ -293,12 +293,12 @@ def tally_votes():
     # Old sealed .enc ballots are history and are ignored.
     ballots = []
     rejected = 0
-    if os.path.isdir("votes"):
-        for fn in sorted(os.listdir("votes")):
+    if os.path.isdir("gameplay/votes"):
+        for fn in sorted(os.listdir("gameplay/votes")):
             if not fn.endswith(".json"):
                 continue
             try:
-                with open(f"votes/{fn}") as f:
+                with open(f"gameplay/votes/{fn}") as f:
                     envelope = json.load(f)
                 payload = envelope.get("payload", {})
                 seat = payload.get("seat")
@@ -326,7 +326,7 @@ def tally_votes():
                 rejected += 1
                 log(f"rejected ballot {fn}: {e}")
     else:
-        log("no votes/ directory")
+        log("no gameplay/votes/ directory")
 
     # Keep only the LATEST ballot per seat.
     latest = {}
@@ -380,11 +380,11 @@ def resolve_night_actions():
     # Collect actions; classify by the REGISTRY role of the sender
     # (a bot's self-declared role is never trusted). Latest per seat wins.
     actions = []
-    for fn in sorted(os.listdir("night")):
+    for fn in sorted(os.listdir("gameplay/night")):
         if not fn.endswith(".enc"):
             continue
         try:
-            with open(f"night/{fn}") as f:
+            with open(f"gameplay/night/{fn}") as f:
                 a = decrypt_payload(priv, f.read().strip())
         except Exception as e:
             log(f"unreadable night action {fn}: {e}")
@@ -460,7 +460,7 @@ def resolve_night_actions():
             "kind": "investigation", "target": target, "result": result,
         }
         sealed = encrypt_for_seat(seats[detective]["public_key"], payload)
-        fn = f"dossiers/{detective}-c{state['cycle']:03d}-result.enc"
+        fn = f"gameplay/dossiers/{detective}-c{state['cycle']:03d}-result.enc"
         with open(fn, "w") as f:
             f.write(sealed)
         log(f"investigation result sealed to {detective} about {target}")
@@ -489,7 +489,7 @@ def end_match():
     registry = load_role_registry(get_gm_private_key())
     seats = get_seats()
 
-    with open(f"village/match-{state['match']:02d}-recap.md", "w") as f:
+    with open(f"gameplay/village/match-{state["match"]:02d}-recap.md", "w") as f:
         f.write("# Match Recap\n\n**Full Reveal**\n\n")
         f.write("| Seat | Persona | Role | Stable |\n|---|---|---|---|\n")
         for seat in seats:

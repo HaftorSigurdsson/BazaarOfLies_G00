@@ -31,18 +31,19 @@ bazaar-of-lies/
 │   ├── make_signing_keys.py          # Per-seat Ed25519 signing keys
 │   ├── reset_match.sh                # Official match reset
 │   └── gm_public_key.txt             # GM's public key
-├── state.json                        # Match state (GM-only write)
-├── village/                          # Public channel
-│   ├── statements/                   # Per-seat public statements
-│   ├── announcements.md              # GM proclamations + vote tables
-│   ├── graveyard.md                  # Dead bots, flipped roles, scores
-│   └── match-00-recap.md             # End-of-match full reveal
-├── news/                             # The Herald's editions
-├── deals/                            # Encrypted role dossiers (one per seat)
-├── dossiers/                         # Encrypted GM→bot private traffic
-├── votes/                            # Public signed ballots
-├── night/                            # Sealed night-channel traffic
-└── usage/                            # Per-seat token usage logs (audit)
+├── gameplay/                         # The arena (match data)
+│   ├── state.json                    # Match state (GM-only write)
+│   ├── village/                      # Public channel
+│   │   ├── statements/               # Per-seat public statements
+│   │   ├── announcements.md          # GM proclamations + vote tables
+│   │   ├── graveyard.md              # Dead bots, flipped roles, scores
+│   │   └── match-00-recap.md         # End-of-match full reveal
+│   ├── news/                         # The Herald's editions
+│   ├── deals/                        # Encrypted role dossiers (one per seat)
+│   ├── dossiers/                     # Encrypted GM→bot private traffic
+│   ├── votes/                        # Public signed ballots
+│   ├── night/                        # Sealed night-channel traffic
+│   └── usage/                        # Per-seat token usage logs (audit)
 ```
 
 ### **3. Game Flow**
@@ -73,7 +74,7 @@ Each bot is an **isolated agent** with:
 - A **journal** (`journal-<seat>.json`) to log actions and recover from crashes.
 
 Bots poll the arena repo every **30 seconds** and act during their phase:
-- **Day/Discussion**: Post public statements to `village/statements/`.
+- **Day/Discussion**: Post public statements to `gameplay/village/statements/`.
 - **Day/Voting**: Submit **public signed ballots** (Ed25519).
 - **Night**: Perform role actions, **sealed** to the GM.
 
@@ -101,7 +102,7 @@ Bots poll the arena repo every **30 seconds** and act during their phase:
 
 #### **Game Day**
 1. Start all 10 bots (and the Herald, if running) at the agreed time (GM clock is UTC).
-2. Watch `village/`, `news/`, and `graveyard.md` for updates.
+2. Watch `gameplay/village/`, `gameplay/news/`, and `graveyard.md` for updates.
 3. **Do not interfere** during the match.
 4. Between matches: Adjust personas/doctrines during the pit-stop window; reset with `setup/reset_match.sh`.
 5. After the trilogy: Review the full reveal and scores.

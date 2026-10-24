@@ -8,7 +8,7 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 | Tool | Location | Purpose |
 |---|---|---|
 | **Bot** | `bot.py` | The autonomous merchant (one process per seat). |
-| **The Herald** | `editor.py` | Facts-only newspaper bot; prints morning/evening editions to `news/`. |
+| **The Herald** | `editor.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/news/`. |
 | **GM heartbeat** | `town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
 | **Signing keys** | `setup/make_signing_keys.py` | One-time generation of per-seat Ed25519 signing keys. |
 | **Match reset** | `setup/reset_match.sh` | One-command full arena reset between matches. |
@@ -27,8 +27,8 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 ### **Editions**
 | Edition | Trigger | Output |
 |---|---|---|
-| Morning | Phase becomes `discussion` | `news/herald-cXXX-morning.md` |
-| Evening | Phase becomes `night` | `news/herald-cXXX-evening.md` |
+| Morning | Phase becomes `discussion` | `gameplay/news/herald-cXXX-morning.md` |
+| Evening | Phase becomes `night` | `gameplay/news/herald-cXXX-evening.md` |
 
 Each edition is journal-guarded against double printing.
 
@@ -56,7 +56,7 @@ python3 town-clock.py          # default: every 300 seconds
 python3 town-clock.py 120      # custom interval, e.g. 2 minutes
 ```
 
-> The GitHub Action also self-schedules (`cron: */5 * * * *`) and triggers on pushes to `votes/`, `night/`, and `village/`. The heartbeat is for a **visible local pulse** during a match.
+> The GitHub Action also self-schedules (`cron: */5 * * * *`) and triggers on pushes to `gameplay/votes/`, `gameplay/night/`, and `gameplay/village/`. The heartbeat is for a **visible local pulse** during a match.
 
 ---
 
@@ -80,13 +80,13 @@ python3 setup/make_signing_keys.py --vault ~/.bazaar
 The **official way** to reset the arena between matches. A partial manual reset once caused the **ghost-replay bug**: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order. Always use the script.
 
 ### **What It Does**
-- Clears **match artifacts** (keeping the directories): `votes/`, `night/`, `dossiers/`, `deals/`, `news/`, `village/statements/`, `village/day-*.jsonl`.
+- Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/news/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
 - Rewrites the public boards fresh: `graveyard.md`, `announcements.md`.
-- Resets `state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `state.json` — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).
+- Resets `gameplay/state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `gameplay/state.json` — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).
 - Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, default `~/.bazaar`).
 - Commits (and pushes) the reset.
 
-**Match recaps (`village/match-XX-recap.md`) are kept** — they are history and cannot interfere with a fresh match (the new epoch namespaces everything).
+**Match recaps (`gameplay/village/match-XX-recap.md`) are kept** — they are history and cannot interfere with a fresh match (the new epoch namespaces everything).
 
 ### **Usage**
 ```bash
@@ -100,10 +100,10 @@ gh workflow run gm.yml             # optional: immediate GM tick
 
 ## **6. Match Lifecycle**
 1. **Deal**: GM mints a fresh **epoch** and deals roles (encrypted dossiers per seat).
-2. **Day**: Dawn announcement → discussion (public statements in `village/statements/`) → voting (public signed ballots in `votes/`) → tally + banishment.
-3. **Night**: Sealed actions in `night/` (Mafia kill, Detective investigation, Doctor protection).
+2. **Day**: Dawn announcement → discussion (public statements in `gameplay/village/statements/`) → voting (public signed ballots in `gameplay/votes/`) → tally + banishment.
+3. **Night**: Sealed actions in `gameplay/night/` (Mafia kill, Detective investigation, Doctor protection).
 4. **Win check** runs right after the tally; a banishment that ends the match skips straight to the recap.
-5. **Recap**: GM publishes `village/match-XX-recap.md` with the full reveal, then auto-chains the next match (matches number 1, 2, 3…).
+5. **Recap**: GM publishes `gameplay/village/match-XX-recap.md` with the full reveal, then auto-chains the next match (matches number 1, 2, 3…).
 
 ### **Epoch Safety**
 Every deal mints an **epoch**. Ballots, night actions, statements and journal keys are all epoch-scoped, and the GM additionally rejects anything timestamped before the current cycle's dawn — a sloppy reset can no longer resurrect a finished match.

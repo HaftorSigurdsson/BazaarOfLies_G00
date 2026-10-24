@@ -2,7 +2,7 @@
 # Bazaar of Lies — full arena reset (v1.2).
 #
 # Resets EVERYTHING a match touches so the next GM tick deals a clean game:
-#   votes/ night/ dossiers/ deals/ news/ village/statements/ day-*.jsonl
+#   gameplay/{votes,night,dossiers,deals,news}/ gameplay/village/statements/ day-*.jsonl
 #   graveyard.md, announcements.md, state.json (pristine template)
 #   local journals (seats + herald) in the vault
 #
@@ -18,7 +18,7 @@
 #   ./bazaar-launch.sh start                 # bots + Herald back up
 #   gh workflow run gm.yml                   # optional: immediate GM tick
 #
-# Match recaps (village/match-XX-recap.md) are KEPT — they are history and
+# Match recaps (gameplay/village/match-XX-recap.md) are KEPT — they are history and
 # cannot interfere with a fresh match (the new epoch namespaces everything).
 set -euo pipefail
 
@@ -29,22 +29,22 @@ command -v git >/dev/null || { echo "git not found"; exit 1; }
 echo "==> Resetting arena (vault: $VAULT)"
 
 # 1) Clear match artifacts tracked in git, but keep the directories.
-for d in votes night dossiers deals news village/statements; do
+for d in gameplay/votes gameplay/night gameplay/dossiers gameplay/deals gameplay/news gameplay/village/statements; do
   git rm -rq --ignore-unmatch "$d" 2>/dev/null || true
   mkdir -p "$d"
   touch "$d/.gitkeep"
 done
-git rm -q --ignore-unmatch village/day-*.jsonl 2>/dev/null || true
-rm -f village/day-*.jsonl 2>/dev/null || true
+git rm -q --ignore-unmatch gameplay/village/day-*.jsonl 2>/dev/null || true
+rm -f gameplay/village/day-*.jsonl 2>/dev/null || true
 
 # 2) Fresh public notice boards.
-cat > village/graveyard.md <<'EOF'
+cat > gameplay/village/graveyard.md <<'EOF'
 # Bazaar Graveyard
 
 | Match | Cycle | Seat | Persona | Role | Banished By |
 |---|---|---|---|---|---|
 EOF
-cat > village/announcements.md <<'EOF'
+cat > gameplay/village/announcements.md <<'EOF'
 # Bazaar Announcements
 
 The Game Master speaks:
@@ -69,7 +69,7 @@ state = {
     "alive": sorted(seats.keys()),
     "graveyard": {},
 }
-with open("state.json", "w") as f:
+with open("gameplay/state.json", "w") as f:
     json.dump(state, f, indent=2)
     f.write("\n")
 
@@ -78,7 +78,7 @@ for name in sorted(os.listdir(vault)):
     if name.startswith(("journal-seat-", "herald-journal")):
         os.remove(os.path.join(vault, name))
         removed += 1
-print(f"state.json reset to phase=setup; {removed} journal(s) cleared from vault")
+print(f"gameplay/state.json reset to phase=setup; {removed} journal(s) cleared from vault")
 EOF
 
 # 4) Commit the reset (deletions + fresh boards + state template).

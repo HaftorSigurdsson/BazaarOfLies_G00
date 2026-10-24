@@ -1717,7 +1717,7 @@
 <tr>
 <td><strong>The Herald</strong></td>
 <td><code>editor.py</code></td>
-<td>Facts-only newspaper bot; prints morning/evening editions to <code>news/</code>.</td>
+<td>Facts-only newspaper bot; prints morning/evening editions to <code>gameplay/news/</code>.</td>
 </tr>
 <tr>
 <td><strong>GM heartbeat</strong></td>
@@ -1763,12 +1763,12 @@
 <tr>
 <td>Morning</td>
 <td>Phase becomes <code>discussion</code></td>
-<td><code>news/herald-cXXX-morning.md</code></td>
+<td><code>gameplay/news/herald-cXXX-morning.md</code></td>
 </tr>
 <tr>
 <td>Evening</td>
 <td>Phase becomes <code>night</code></td>
-<td><code>news/herald-cXXX-evening.md</code></td>
+<td><code>gameplay/news/herald-cXXX-evening.md</code></td>
 </tr>
 </tbody>
 </table>
@@ -1791,7 +1791,7 @@
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python3<span class="w"> </span>town-clock.py<span class="w"> </span><span class="m">120</span><span class="w">      </span><span class="c1"># custom interval, e.g. 2 minutes</span>
 </code></pre></div>
 <blockquote>
-<p>The GitHub Action also self-schedules (<code>cron: */5 * * * *</code>) and triggers on pushes to <code>votes/</code>, <code>night/</code>, and <code>village/</code>. The heartbeat is for a <strong>visible local pulse</strong> during a match.</p>
+<p>The GitHub Action also self-schedules (<code>cron: */5 * * * *</code>) and triggers on pushes to <code>gameplay/votes/</code>, <code>gameplay/night/</code>, and <code>gameplay/village/</code>. The heartbeat is for a <strong>visible local pulse</strong> during a match.</p>
 </blockquote>
 <hr />
 <h2 id="4-signing-keys-setupmake_signing_keyspy"><strong>4. Signing Keys (<code>setup/make_signing_keys.py</code>)</strong><a class="headerlink" href="#4-signing-keys-setupmake_signing_keyspy" title="Permanent link">&para;</a></h2>
@@ -1810,13 +1810,13 @@
 <p>The <strong>official way</strong> to reset the arena between matches. A partial manual reset once caused the <strong>ghost-replay bug</strong>: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order. Always use the script.</p>
 <h3 id="what-it-does"><strong>What It Does</strong><a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Clears <strong>match artifacts</strong> (keeping the directories): <code>votes/</code>, <code>night/</code>, <code>dossiers/</code>, <code>deals/</code>, <code>news/</code>, <code>village/statements/</code>, <code>village/day-*.jsonl</code>.</li>
+<li>Clears <strong>match artifacts</strong> (keeping the directories): <code>gameplay/votes/</code>, <code>gameplay/night/</code>, <code>gameplay/dossiers/</code>, <code>gameplay/deals/</code>, <code>gameplay/news/</code>, <code>gameplay/village/statements/</code>, <code>gameplay/village/day-*.jsonl</code>.</li>
 <li>Rewrites the public boards fresh: <code>graveyard.md</code>, <code>announcements.md</code>.</li>
-<li>Resets <code>state.json</code> to a <strong>pristine template</strong> with <code>phase: setup</code> (⚠️ it does <strong>not</strong> delete <code>state.json</code> — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).</li>
+<li>Resets <code>gameplay/state.json</code> to a <strong>pristine template</strong> with <code>phase: setup</code> (⚠️ it does <strong>not</strong> delete <code>gameplay/state.json</code> — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).</li>
 <li>Clears <strong>local journals</strong> (seat journals + Herald journal) from the vault (<code>$VAULT</code>, default <code>~/.bazaar</code>).</li>
 <li>Commits (and pushes) the reset.</li>
 </ul>
-<p><strong>Match recaps (<code>village/match-XX-recap.md</code>) are kept</strong> — they are history and cannot interfere with a fresh match (the new epoch namespaces everything).</p>
+<p><strong>Match recaps (<code>gameplay/village/match-XX-recap.md</code>) are kept</strong> — they are history and cannot interfere with a fresh match (the new epoch namespaces everything).</p>
 <h3 id="usage"><strong>Usage</strong><a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./bazaar-launch.sh<span class="w"> </span>stop<span class="w">            </span><span class="c1"># bots must be down first</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python3<span class="w"> </span>setup/reset_match.sh<span class="w">       </span><span class="c1"># run from the arena repo root</span>
@@ -1827,10 +1827,10 @@
 <h2 id="6-match-lifecycle"><strong>6. Match Lifecycle</strong><a class="headerlink" href="#6-match-lifecycle" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>Deal</strong>: GM mints a fresh <strong>epoch</strong> and deals roles (encrypted dossiers per seat).</li>
-<li><strong>Day</strong>: Dawn announcement → discussion (public statements in <code>village/statements/</code>) → voting (public signed ballots in <code>votes/</code>) → tally + banishment.</li>
-<li><strong>Night</strong>: Sealed actions in <code>night/</code> (Mafia kill, Detective investigation, Doctor protection).</li>
+<li><strong>Day</strong>: Dawn announcement → discussion (public statements in <code>gameplay/village/statements/</code>) → voting (public signed ballots in <code>gameplay/votes/</code>) → tally + banishment.</li>
+<li><strong>Night</strong>: Sealed actions in <code>gameplay/night/</code> (Mafia kill, Detective investigation, Doctor protection).</li>
 <li><strong>Win check</strong> runs right after the tally; a banishment that ends the match skips straight to the recap.</li>
-<li><strong>Recap</strong>: GM publishes <code>village/match-XX-recap.md</code> with the full reveal, then auto-chains the next match (matches number 1, 2, 3…).</li>
+<li><strong>Recap</strong>: GM publishes <code>gameplay/village/match-XX-recap.md</code> with the full reveal, then auto-chains the next match (matches number 1, 2, 3…).</li>
 </ol>
 <h3 id="epoch-safety"><strong>Epoch Safety</strong><a class="headerlink" href="#epoch-safety" title="Permanent link">&para;</a></h3>
 <p>Every deal mints an <strong>epoch</strong>. Ballots, night actions, statements and journal keys are all epoch-scoped, and the GM additionally rejects anything timestamped before the current cycle's dawn — a sloppy reset can no longer resurrect a finished match.</p>

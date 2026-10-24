@@ -7,13 +7,13 @@ from typing import Dict, List, Optional
 
 def read_state() -> dict:
     """Read the current game state from state.json."""
-    with open("state.json", "r") as f:
+    with open("gameplay/state.json", "r") as f:
         return json.load(f)
 
 
 def write_state(state: dict) -> None:
     """Write the game state to state.json."""
-    with open("state.json", "w") as f:
+    with open("gameplay/state.json", "w") as f:
         json.dump(state, f, indent=2)
 
 
@@ -21,7 +21,7 @@ def update_announcements(message: str) -> None:
     """Append a message to village/announcements.md."""
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     announcement = f"**{timestamp}**\n{message}\n\n---\n"
-    with open("village/announcements.md", "a") as f:
+    with open("gameplay/village/announcements.md", "a") as f:
         f.write(announcement)
 
 
@@ -58,7 +58,7 @@ def update_graveyard(seat: str, persona: str, role: str,
     state = read_state()
     line = (f"| {state['match']} | {state['cycle']} | {seat} | "
             f"{persona_name(persona)} | {role} | {banished_by or 'Night kill'} |")
-    path = "village/graveyard.md"
+    path = "gameplay/village/graveyard.md"
     if not os.path.exists(path):
         with open(path, "w") as f:
             f.write(GRAVEYARD_TEMPLATE)

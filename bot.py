@@ -124,7 +124,7 @@ def cycle_state(journal, epoch, cycle):
 
 # ---------------------------------------------------------- arena readers ---
 def read_state():
-    with open("state.json") as f:
+    with open("gameplay/state.json") as f:
         return json.load(f)
 
 
@@ -154,10 +154,10 @@ def get_role_dossier(state):
     epoch = state.get("epoch")
     if _dossier_cache is not None and _dossier_cache[0] == epoch and epoch is not None:
         return _dossier_cache[1]
-    matches = sorted(glob.glob(f"deals/*{MY_SEAT}*.enc"))
+    matches = sorted(glob.glob(f"gameplay/deals/*{MY_SEAT}*.enc"))
     if not matches:
         raise FileNotFoundError(
-            f"no role dossier for {MY_SEAT} in deals/ — has the GM dealt yet?")
+            f"no role dossier for {MY_SEAT} in gameplay/deals/ — has the GM dealt yet?")
     priv = load_gm_private_key(open(KEY_PATH).read().strip())
     with open(matches[0]) as f:
         dossier = decrypt_payload(priv, f.read().strip())
@@ -171,10 +171,10 @@ def read_unread_dossiers(journal, epoch):
     Seen-entries are namespaced by epoch: filenames repeat across matches,
     so a stale journal can never blind the bot to fresh results."""
     msgs = []
-    if not os.path.isdir("dossiers"):
+    if not os.path.isdir("gameplay/dossiers"):
         return msgs
     priv = load_gm_private_key(open(KEY_PATH).read().strip())
-    for path in sorted(glob.glob(f"dossiers/*{MY_SEAT}*.enc")):
+    for path in sorted(glob.glob(f"gameplay/dossiers/*{MY_SEAT}*.enc")):
         if f"{epoch}:{path}" in journal["seen"]:
             continue
         try:
@@ -198,10 +198,10 @@ def recent_statements(cycle, epoch=None, dawn=None, limit=40):
     """
     recs = {}
     sources = []
-    legacy = f"village/day-{cycle:03d}.jsonl"
+    legacy = f"gameplay/village/day-{cycle:03d}.jsonl"
     if os.path.exists(legacy):
         sources.append(legacy)
-    sdir = "village/statements"
+    sdir = "gameplay/village/statements"
     if os.path.isdir(sdir):
         pref = f"c{cycle:03d}-seat-"
         sources += [os.path.join(sdir, p) for p in sorted(os.listdir(sdir))
@@ -243,7 +243,7 @@ def graveyard_roll():
     knows: seat, merchant name, role revealed at death, cause. Nothing else."""
     entries = []
     try:
-        text = open("village/graveyard.md").read()
+        text = open("gameplay/village/graveyard.md").read()
     except OSError:
         return entries
     for line in text.splitlines():
@@ -314,7 +314,7 @@ def do_discussion(state, cs, journal):
         f"new topic if the village is silent."
     )[:STATEMENT_MAX_CHARS]
 
-    sdir = "village/statements"
+    sdir = "gameplay/village/statements"
     os.makedirs(sdir, exist_ok=True)
     path = f"{sdir}/c{state['cycle']:03d}-{MY_SEAT}.jsonl"
     rec = {
@@ -370,7 +370,7 @@ def do_vote(state, cs, journal):
             "run setup/make_signing_keys.py")
         return
     sig = sign_payload(open(SIGNKEY_PATH).read().strip(), payload)
-    filename = f"votes/{MY_SEAT}-c{state['cycle']:03d}.json"
+    filename = f"gameplay/votes/{MY_SEAT}-c{state['cycle']:03d}.json"
     with open(filename, "w") as f:
         json.dump({"payload": payload, "sig": sig}, f, ensure_ascii=False, indent=1)
         f.write("\n")
@@ -436,7 +436,7 @@ def do_night(state, cs, journal):
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
     sealed = encrypt_for_seat(gm_public_key(), payload)
-    filename = f"night/{MY_SEAT}-c{state['cycle']:03d}.enc"
+    filename = f"gameplay/night/{MY_SEAT}-c{state['cycle']:03d}.enc"
     with open(filename, "w") as f:
         f.write(sealed)
     commit_and_push([filename], f"Night action c{state['cycle']:03d} by {MY_SEAT}")

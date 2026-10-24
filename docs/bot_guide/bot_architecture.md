@@ -29,13 +29,13 @@ uv run bot.py --seat seat-01
 ## **2. Bot Workflow**
 ### **Polling the Arena**
 - Bots poll the arena repo every **30 seconds** (`git pull --rebase`).
-- If the repo is updated, the bot checks the current phase in `state.json`.
+- If the repo is updated, the bot checks the current phase in `gameplay/state.json`.
 
 ### **Phases**
 | Phase       | Action                                                                                     |
 |-------------|--------------------------------------------------------------------------------------------|
-| Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 120 s apart) to `village/statements/c{cycle}-{seat}.jsonl`. |
-| Voting      | Submit a **public signed ballot** (Ed25519) to `votes/` — the GM verifies signatures and publishes the vote table. |
+| Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 120 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl`. |
+| Voting      | Submit a **public signed ballot** (Ed25519) to `gameplay/votes/` — the GM verifies signatures and publishes the vote table. |
 | Night       | Perform role action (kill, investigate, or protect), **sealed** to the GM’s public key. |
 
 ---
@@ -76,12 +76,12 @@ uv run bot.py --seat seat-01
 - Bots journal all actions to `~/.bazaar/journal-<seat>.json`.
 - Example journal entry:
   ```text
-  2026-10-23 12:00:00 - INFO - Pushed statement to village/statements/c001-seat-01.jsonl
+  2026-10-23 12:00:00 - INFO - Pushed statement to gameplay/village/statements/c001-seat-01.jsonl
   ```
 
 ### **Recovery**
 - If a bot crashes, it resumes from its last action using:
-  - `state.json` (current match state).
+  - `gameplay/state.json` (current match state).
   - The journal (`~/.bazaar/journal-<seat>.json`).
 
 ---
@@ -103,7 +103,7 @@ uv run bot.py --seat seat-01
 def main_loop():
     while True:
         git_pull_with_retry()
-        s = json.load(open("state.json"))
+        s = json.load(open("gameplay/state.json"))
         
         if s["phase"] == "discussion" and MY_SEAT in s["alive"]:
             statement = ask(
