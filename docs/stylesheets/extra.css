@@ -2,9 +2,12 @@
  *
  * 1. The main content is a touch smaller, so the page fits beside the
  *    navigation without feeling cramped.
- * 2. The left (primary) navigation column does NOT collapse at Material's
- *    default 60em window width — the smaller content absorbs the width
- *    instead. It only folds into the drawer on actual phone widths (<40em).
+ * 2. Material turns the left (primary) navigation into an off-canvas
+ *    drawer below ~1220px (76.234375em): position:fixed; left:-12.1rem.
+ *    That is the "collapses too soon" behaviour. This override restores
+ *    the in-flow sticky column down to 40em — the smaller content absorbs
+ *    the width instead of the link column folding away. Below 40em (real
+ *    phones) the drawer behaves normally.
  */
 
 /* Content: default Material is .8rem; a step smaller buys the sidebar room */
@@ -17,16 +20,39 @@
   font-size: .68rem;
 }
 
-/* Keep the left navigation past Material's default fold point */
-@media screen and (max-width: 60em) {
-  .md-sidebar--primary {
-    display: block;
-  }
-}
+/* Keep the left navigation in flow between phone width and Material's fold */
+@media screen and (min-width: 40em) and (max-width: 76.234375em) {
+  /* undo the off-canvas parking */
+  [dir=ltr] .md-sidebar--primary { left: 0; }
+  [dir=rtl] .md-sidebar--primary { right: 0; }
 
-/* Real phones: fold into the drawer as usual */
-@media screen and (max-width: 40em) {
+  /* undo the drawer: restore the wide-mode sticky column */
   .md-sidebar--primary {
-    display: none;
+    background: none;
+    height: auto;
+    position: sticky;
+    top: 2.4rem;
+    transform: none;
+    z-index: 1;
   }
+  .md-sidebar--primary .md-sidebar__scrollwrap {
+    overflow: visible;
+    position: static;
+    scroll-snap-type: none;
+  }
+  [data-md-toggle=drawer]:checked~.md-container .md-sidebar--primary {
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* restore the content gutter Material only reserves above its fold */
+  [dir=ltr] .md-sidebar--primary:not([hidden])~.md-content>.md-content__inner {
+    margin-left: 1.2rem;
+  }
+  [dir=rtl] .md-sidebar--primary:not([hidden])~.md-content>.md-content__inner {
+    margin-right: 1.2rem;
+  }
+
+  /* the nav is always visible here — the drawer hamburger would be dead */
+  .md-header__button[for=__drawer] { display: none; }
 }

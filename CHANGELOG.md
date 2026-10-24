@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.3] - 2026-10-24
+### Fixed
+- **Left navigation actually stays** below Material's ~1220px fold: the first override (`display:block`) was a no-op — Material doesn't hide the sidebar there, it turns it into an off-canvas drawer (`position:fixed; left:-12.1rem`). The override now reverses each drawer property in the 40em–76.25em range (sticky in-flow column restored, content gutter reserved, dead hamburger hidden), so the sidebar only folds on real phones (<40em).
+
 ## [1.8.2] - 2026-10-24
 ### Changed
 - **Docs layout** (new `docs/stylesheets/extra.css`): the main content is a step smaller (`.74rem` typeset, nav `.68rem`), and the left navigation column no longer collapses at Material's default 60em window width — the smaller content absorbs the width instead. The sidebar only folds into the drawer below 40em (actual phone widths).
