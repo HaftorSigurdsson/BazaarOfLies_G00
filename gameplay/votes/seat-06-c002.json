@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "bb6846e0",
+  "seat": "seat-06",
+  "target": "seat-05",
+  "rationale": "Your bronze coin still rings hollow where yesterday's tally should rest, and hollow rings are the scent of a merchant who fears the quill's scratch.",
+  "ts": "2026-10-24T23:10:14Z"
+ },
+ "sig": "V8l2+5yYdzL6d8vD1/9kaWjriCe6QffmldJaNYSc8BB9noOvG5qQk9oxQJjZGXLg62Mj1UMBXPf8icf5XjZUDQ=="
+}
