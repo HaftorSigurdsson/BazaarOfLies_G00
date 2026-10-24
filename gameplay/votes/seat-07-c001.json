@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "9c5ef90a",
+  "seat": "seat-07",
+  "target": "seat-03",
+  "rationale": "My birds didn’t like how she pivoted from defending Yoda (3) to spice riddles today.",
+  "ts": "2026-10-24T18:00:32Z"
+ },
+ "sig": "LZaG7heWq0hpPJ4MIGdYLyHGw0oTHllXThUgWBIo1Ia1vbt60ZIZm0Nw3ppDlNgREwqoaMqkHERccqNRGlivCQ=="
+}
