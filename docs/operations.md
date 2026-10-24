@@ -114,7 +114,7 @@ The **official way** to reset the arena between matches. A partial manual reset 
 - Repairs the arena's shape: every folder that is supposed to exist is recreated if missing and gets a **`.gitkeep`** if it doesn't have one.
 - Commits the reset — **only after asking**: the script confirms before removing anything, before committing, and before pushing (`--push`).
 
-**Match recaps (`gameplay/village/match-XX-recap.md`) are kept** — they are history and cannot interfere with a fresh match (the new epoch namespaces everything).
+**Match recaps (`gameplay/village/match-XX-recap.md`) are kept by default** — they are history and cannot interfere with a fresh match (the new epoch namespaces everything). Pass `--wipe-recaps` to remove them too.
 
 ### **Usage**
 ```bash
@@ -122,6 +122,7 @@ tools/bazaar-launch.sh stop        # bots must be down first
 python3 src/town-reset.py              # asks "Are you sure?" (y/n) before wiping
 python3 src/town-reset.py --dry-run    # preview: show what would be wiped, touch nothing, no prompts
 python3 src/town-reset.py --push       # after committing, asks before pushing
+python3 src/town-reset.py --wipe-recaps  # also remove match-XX-recap.md history
 tools/bazaar-launch.sh start       # bots + Herald back up (Windows: tools/bazaar-launch.bat)
 gh workflow run gm.yml             # optional: immediate GM tick
 ```

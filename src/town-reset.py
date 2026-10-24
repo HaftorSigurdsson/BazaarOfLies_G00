@@ -12,9 +12,9 @@ touches so the next GM tick deals a clean game:
   - journals:   seat + Herald journals cleared from the vault
                 ($VAULT or ~/.bazaar)
 
-Match recaps (gameplay/village/match-XX-recap.md) are KEPT — they are
-history and cannot interfere with a fresh match (the new epoch namespaces
-everything).
+Match recaps (gameplay/village/match-XX-recap.md) are KEPT by default —
+they are history and cannot interfere with a fresh match (the new epoch
+namespaces everything). Pass --wipe-recaps to remove them too.
 
 Every folder that is supposed to exist gets a .gitkeep if it is missing
 one, so the arena keeps its shape even when a directory is emptied.
@@ -27,6 +27,7 @@ Usage (from the arena repo root):
     python3 town-reset.py             # reset + commit (asks y/n at each step)
     python3 town-reset.py --dry-run   # show what would happen, touch nothing
     python3 town-reset.py --push      # also push the reset commit (asks first)
+    python3 town-reset.py --wipe-recaps  # also remove match recaps
 """
 import argparse
 import json
@@ -70,6 +71,7 @@ BOARDS = {
 STATE_FILE = "gameplay/state.json"
 SEATS_FILE = "setup/seats.json"
 DAY_TRANSCRIPT_GLOB = "gameplay/village/day-*.jsonl"
+RECAP_GLOB = "gameplay/village/match-*-recap.md"
 JOURNAL_PREFIXES = ("journal-seat-", "herald-journal")
 
 COMMIT_MESSAGE = "Reset arena for a fresh match (full artifact + journal wipe)"
@@ -129,6 +131,16 @@ def remove_day_transcripts(dry):
     import glob as globmod
     removed = 0
     for path in sorted(globmod.glob(os.path.join(REPO_ROOT, DAY_TRANSCRIPT_GLOB))):
+        if remove(path, dry):
+            removed += 1
+    return removed
+
+
+def remove_recaps(dry):
+    """Match recaps are history — only removed with an explicit flag."""
+    import glob as globmod
+    removed = 0
+    for path in sorted(globmod.glob(os.path.join(REPO_ROOT, RECAP_GLOB))):
         if remove(path, dry):
             removed += 1
     return removed
@@ -247,6 +259,9 @@ def main():
                     help="Show what would be removed; touch nothing.")
     ap.add_argument("--push", action="store_true",
                     help="Push the reset commit to the remote after committing.")
+    ap.add_argument("--wipe-recaps", action="store_true",
+                    help="Also remove match recaps "
+                         "(gameplay/village/match-XX-recap.md).")
     args = ap.parse_args()
 
     os.chdir(REPO_ROOT)
@@ -261,7 +276,11 @@ def main():
               "day transcripts), rewrite graveyard.md and announcements.md, "
               f"reset gameplay/state.json to the pristine setup template, and "
               f"clear seat + Herald journals from {vault}.")
-        print("Match recaps are kept. There is no undo.")
+        if args.wipe_recaps:
+            print("Match recaps WILL ALSO be removed (--wipe-recaps).")
+        else:
+            print("Match recaps are kept.")
+        print("There is no undo.")
         if not confirm("Are you sure you want to reset the arena?"):
             log("Aborted — nothing was touched.")
             return 1
@@ -271,6 +290,9 @@ def main():
     log(f"Cleared {n} artifact entries from {len(ARTIFACT_DIRS)} directories")
     n = remove_day_transcripts(args.dry_run)
     log(f"Removed {n} legacy day transcript(s)")
+    if args.wipe_recaps:
+        n = remove_recaps(args.dry_run)
+        log(f"Removed {n} match recap(s)")
     n = rewrite_boards(args.dry_run)
     log(f"Rewrote {n} public board(s) to template")
     n = reset_state(args.dry_run)

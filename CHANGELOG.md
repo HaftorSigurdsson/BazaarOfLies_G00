@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.1] - 2026-10-24
+### Added
+- **`--wipe-recaps` for `src/town-reset.py`**: the full reset also removes match recaps (`gameplay/village/match-XX-recap.md`) when the flag is passed. Without it, recaps are kept exactly as before (history, namespaced by epoch, harmless to a fresh match). The confirmation banner states which way it's going; `--dry-run` previews the recap removal too.
+
 ## [2.3.0] - 2026-10-24
 ### Added
 - **Statement mirror tool** (`tools/statements_assemble.py`): assembles the per-seat statements of a cycle into one local transcript — `gameplay/village/statements/_assembled-cXXX.jsonl`, gitignored (never committed or pushed), always overwritten on run; `--watch [SEC]` keeps it fresh, `--cycle N` picks a cycle, `--ignore-epoch` reads finished matches. Runs from any clone (arena = cwd). Dedupes crash-resume duplicates and hides foreign epochs, mirroring the bots' own transcript view. Deliberately a mirror only: the bots already assemble the transcript into their prompts, and the per-seat files remain the single source of truth (one writer per file = no merge conflicts).
