@@ -131,6 +131,13 @@ PLATE_RULES = [
     (re.compile(r"caravan|camel", re.I), "camel-caravan.png"),
     (re.compile(r"fountain", re.I), "fountain-with-camel.png"),
     (re.compile(r"lantern", re.I), "lantern-in-the-dark.png"),
+    (re.compile(r"butcher|\bcow\b|meat", re.I), "cow-in-butchers-shop.png"),
+    (re.compile(r"town square|crowd|gathered", re.I), "market-place-city.png"),
+    (re.compile(r"clock|noon\b|hour", re.I), "old-stree-with-clock.png"),
+    (re.compile(r"girl|child|apprentice", re.I), "girl-at-marked.png"),
+    (re.compile(r"\bmarket|stalls", re.I), "market-street.png"),
+    (re.compile(r"spice market|buyers|haggling", re.I),
+     "spice-market-people-buying.png"),
 ]
 PLATE_DEFAULTS = {
     "morning": "sunrise-over-domes.png",

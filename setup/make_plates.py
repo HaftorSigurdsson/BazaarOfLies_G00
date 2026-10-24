@@ -69,6 +69,20 @@ def process(path, out_path):
     return plate.size
 
 
+def find_raw_art(plates_dir, raw_dir):
+    """Unprocessed art: images in the plates dir plus anything in raw/
+    that has no finished plate yet (jpg/jpeg/png)."""
+    art = sorted(glob.glob(os.path.join(plates_dir, "*.jpg"))
+                 + glob.glob(os.path.join(plates_dir, "*.jpeg")))
+    for path in sorted(glob.glob(os.path.join(raw_dir, "*"))):
+        if not path.lower().endswith((".jpg", ".jpeg", ".png")):
+            continue
+        name = os.path.splitext(os.path.basename(path))[0]
+        if not os.path.exists(os.path.join(plates_dir, name + ".png")):
+            art.append(path)
+    return art
+
+
 def main():
     ap = argparse.ArgumentParser(description="Ingest Herald plate art")
     ap.add_argument("--dir", default=DEFAULT_DIR,
@@ -78,13 +92,13 @@ def main():
     raw_dir = os.path.join(plates_dir, "raw")
     os.makedirs(raw_dir, exist_ok=True)
 
-    jpgs = sorted(glob.glob(os.path.join(plates_dir, "*.jpg"))
-                  + glob.glob(os.path.join(plates_dir, "*.jpeg")))
-    if not jpgs:
-        print("no raw art found (expecting *.jpg in", plates_dir + ")")
+    art_paths = find_raw_art(plates_dir, raw_dir)
+    if not art_paths:
+        print("no raw art found (expecting *.jpg in", plates_dir,
+              "or unprocessed art in", raw_dir + ")")
         return 0
 
-    for path in jpgs:
+    for path in art_paths:
         name = os.path.splitext(os.path.basename(path))[0]
         out_path = os.path.join(plates_dir, name + ".png")
         try:
@@ -95,7 +109,8 @@ def main():
         if size is None:
             print(f"SKIP  {name}: image appears blank")
             continue
-        shutil.move(path, os.path.join(raw_dir, os.path.basename(path)))
+        if os.path.dirname(path) == plates_dir:
+            shutil.move(path, os.path.join(raw_dir, os.path.basename(path)))
         print(f"OK    {name}.png  {size[0]}x{size[1]}  "
               f"(grayscale, trimmed, 3:1 band)")
     return 0
