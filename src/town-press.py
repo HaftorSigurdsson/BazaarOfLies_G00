@@ -26,8 +26,9 @@ column, content-keyed to the edition (a stall-shuttered paper gets a
 different plate than a quiet market morning) from the motif pool in
 docs/assets/plates/ — ingested from raw art by setup/make_plates.py,
 with docs/assets/images/bazaar-engraving.png as the static fallback —
-plus two deterministic filler boxes at the foot of the page: the
-weather & the market, and "The Bazaar Whisper" humour column.
+plus three deterministic filler boxes at the foot of the page: the
+weather & the market, PERSONALS classifieds, and "The Bazaar Whisper"
+humour column.
 """
 import argparse
 import os
@@ -222,6 +223,43 @@ def weather_market(meta):
             MARKET_ITEMS[(seed + 1) % len(MARKET_ITEMS)])
 
 
+PERSONALS_ITEMS = [
+    "LOST: one brass key, opens nothing the owner will admit. Reward and "
+    "questions at the fountain.",
+    "WANTED: apprentice for the lantern stall. Must not fear the dark or "
+    "its customers.",
+    "FOR SALE: slightly singed rug, story included at no extra cost.",
+    "SEEKING WORK: scribe, discreet, remembers nothing by morning.",
+    "FOUND: a goat with excellent manners. Claim at the spice gate before "
+    "it claims you.",
+    "NOTICE: the perfumer's 'Eau de Alibi' is sold out again.",
+    "WANTED: witnesses to nothing in particular. Apply at the Herald.",
+    "FOR SALE: telescope, sees only what you expect. Slightly bent.",
+    "LOST: a nightingale that sings only rumours. Answers to no one.",
+    "WANTED: porter for the night shift. Applicants must have a night.",
+    "MATRIMONIAL: merchant seeks someone who counts higher than three.",
+    "LOST: camel, answers to no name. Finder may keep the grudge.",
+    "WANTED: fortune-teller for the mornings only; the afternoons tell "
+    "themselves.",
+    "NOTICE: someone keeps leaving mint on the moneylender's doorstep.",
+]
+
+
+def personals_column(meta):
+    """Two deterministic classifieds for the PDF-only foot (invented
+    flavour — like the Whisper, never game input)."""
+    part_no = 0 if meta["part"] == "morning" else 1
+    try:
+        seed = int(meta["match"]) * 41 + int(meta["cycle"]) * 13 + part_no
+    except ValueError:
+        seed = part_no
+    first = seed % len(PERSONALS_ITEMS)
+    second = (first + 5 + seed % 4) % len(PERSONALS_ITEMS)
+    if second == first:
+        second = (first + 1) % len(PERSONALS_ITEMS)
+    return [PERSONALS_ITEMS[first], PERSONALS_ITEMS[second]]
+
+
 # ------------------------------------------------------------- parsing ----
 def sanitize(text):
     """Keep typographic quotes/dashes that LaTeX likes; drop the rest."""
@@ -381,6 +419,7 @@ def build_tex(meta, date_str, size, linespread):
     whisper_items = whisper_column(meta) if meta["blocks"] else []
     foot = ""
     if whisper_items:
+        personals = personals_column(meta)
         foot = (
             "\\vspace{4pt}\\hrule height .5pt\n"
             "{\\footnotesize\\bfseries\\itshape THE WEATHER "
@@ -388,9 +427,16 @@ def build_tex(meta, date_str, size, linespread):
             "\\vspace{2pt}{\\footnotesize\\itshape %s\\par}\n"
             "\\vspace{2pt}{\\footnotesize\\itshape %s\\par}\n"
             "\\vspace{4pt}\\hrule height .5pt\n"
+            "{\\footnotesize\\bfseries\\itshape PERSONALS\\par}\n"
+            "\\vspace{2pt}{\\footnotesize\\itshape %s\\par}\n"
+            "\\vspace{2pt}{\\footnotesize\\itshape %s\\par}\n"
+            "\\vspace{4pt}\\hrule height .5pt\n"
             "{\\footnotesize\\bfseries\\itshape THE BAZAAR WHISPER\\par}\n"
-            "\\vspace{2pt}\n" % (latex_escape(sanitize(weather)),
-                                 latex_escape(sanitize(market))) +
+            "\\vspace{2pt}\n"
+            % (latex_escape(sanitize(weather)),
+               latex_escape(sanitize(market)),
+               latex_escape(sanitize(personals[0])),
+               latex_escape(sanitize(personals[1]))) +
             "\n\\vspace{2pt}\n".join(
                 "{\\footnotesize\\itshape %s\\par}" % latex_escape(sanitize(i))
                 for i in whisper_items))
@@ -622,8 +668,11 @@ def render_fpdf(meta, date_str, size):
     if meta["blocks"]:
         weather, market = weather_market(meta)
         foot_rows = [("B", "The Weather & The Market"),
-                     ("I", weather), ("I", market), ("S", "")]
-        foot_rows += [("B", "The Bazaar Whisper")]
+                     ("I", weather), ("I", market), ("S", ""),
+                     ("B", "Personals"),
+                     ("I", personals_column(meta)[0]),
+                     ("I", personals_column(meta)[1]), ("S", ""),
+                     ("B", "The Bazaar Whisper")]
         foot_rows += [("I", i) for i in whisper_column(meta)]
         for kind, text in foot_rows:
             if kind == "S":

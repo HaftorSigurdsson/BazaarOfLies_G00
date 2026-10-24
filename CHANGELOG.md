@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026-10-24
+### Added
+- **PERSONALS** (press, PDF-only): a classifieds box between the Weather & Market and the Whisper — two in-theme ads per edition from a 14-item deterministic pool ("LOST: one brass key, opens nothing the owner will admit", "SEEKING WORK: scribe, discreet, remembers nothing by morning"). Never enters the markdown the merchants read. Rendered in both engines; samples re-pressed, still one A4 page.
+- **Editorial continuity** (Herald): before writing, the Herald re-reads its own last two editions (public record, most recent first, truncated to 1600 chars each) and the system prompt invites a one-line follow-up on its own reporting — or a plain statement when today's facts differ from yesterday's paper. Same-match only; cycle 1 mornings start clean.
+
 ## [2.0.0] - 2026-10-24
 ### Added
 - **The Herald has a voice**: the system prompt now writes as a 19th-century town paper — ink-stained, thrifty with words, dryly witty, vintage flourishes used sparingly — while keeping the facts-only doctrine byte-for-byte.

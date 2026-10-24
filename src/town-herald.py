@@ -89,6 +89,11 @@ HERALD_SYSTEM = (
     "Editor' section: quote one of the statements verbatim, attributed "
     "to its seat, introduced by at most one neutral line — never edit the "
     "quote and never comment on the writer's role or allegiance. "
+    "CONTINUITY: the digest may include your own previous editions. "
+    "You may follow up on your own reporting in one brief line ('as we "
+    "reported at dawn', 'this paper noted yesterday') — never re-quote "
+    "yesterday's paper at length, and if today's facts differ from what "
+    "you printed before, say so plainly and without embarrassment. "
     "No advice on how to vote."
 )
 
@@ -466,6 +471,33 @@ def ask(user):
 
 
 # ------------------------------------------------------------------ work ---
+PREVIOUS_CHARS = 1600       # how much of each old edition to re-read
+
+
+def previous_editions(state, part):
+    """The Herald's own last two editions, most recent first — the paper
+    reads itself so it can follow up on yesterday's reporting. Same-match
+    only: the reset clears gameplay/herald/ between matches."""
+    cycle = state["cycle"]
+    if part == "evening":
+        order = [(cycle, "morning"), (cycle - 1, "evening")]
+    else:
+        order = [(cycle - 1, "evening"), (cycle - 1, "morning")]
+    parts_out = []
+    for c, p in order:
+        if c < 1:
+            continue
+        path = f"gameplay/herald/herald-c{c:03d}-{p}.md"
+        try:
+            text = open(path).read().strip()
+        except OSError:
+            continue
+        label = ("this cycle's morning paper" if (c, p) == (cycle, "morning")
+                 else f"cycle {c:03d}'s {p} paper")
+        parts_out.append(f"[{label}]\n{text[:PREVIOUS_CHARS]}")
+    return "\n\n".join(parts_out)
+
+
 def print_edition(state, part, journal):
     cycle = state["cycle"]
     epoch = state.get("epoch")
@@ -487,6 +519,13 @@ def print_edition(state, part, journal):
     if stmts:
         digest += "\n\nStatements made in the bazaar this cycle (verbatim):\n" + \
             "\n".join(stmts)[-6000:]
+
+    # The Herald re-reads its own last two editions (public record —
+    # continuity is facts, not invention).
+    previous = previous_editions(state, part)
+    if previous:
+        digest += "\n\nYour own previous editions (public record of this match, "
+        digest += "most recent first):\n" + previous
 
     edition = ask(f"Public facts digest:\n\n{digest}\n\n"
                   f"Write the Herald's {part} edition for cycle {cycle:03d} "
