@@ -41,6 +41,12 @@ from utils import (read_state, write_state, update_announcements,
 DISCUSSION_MINUTES = 25
 VOTING_MINUTES = 5
 NIGHT_MINUTES = 15
+# Park the arena instead of auto-chaining into the next match when the
+# match number passes this limit (0 = unlimited, the default). Set it in
+# the GM's environment (e.g. BAZAAR_MATCH_LIMIT=1 for a single match) —
+# a halted arena waits in phase "halted" until an operator resets or
+# raises the limit.
+MATCH_LIMIT = int(os.environ.get("BAZAAR_MATCH_LIMIT", "0"))
 GM_ROLES_FILE = "gm/roles.enc"
 SECURE_RANDOM = random.SystemRandom()
 PUBLISH = not os.environ.get("GM_NO_PUSH")   # GM_NO_PUSH=1 → local testing
@@ -146,6 +152,15 @@ def advance_phase():
         commit_and_push(f"minted epoch {state['epoch']} for match {state['match']}")
 
     if phase == "setup":
+        if MATCH_LIMIT and int(state.get("match") or 0) > MATCH_LIMIT:
+            log(f"match limit {MATCH_LIMIT} reached — arena parked, no deal")
+            state["phase"] = "halted"
+            write_state(state)
+            update_announcements(
+                f"Match {MATCH_LIMIT} has ended. The arena rests — the "
+                f"bazaar is closed until the operators open it again.")
+            commit_and_push(f"arena parked: match limit {MATCH_LIMIT} reached")
+            return
         log("phase=setup → dealing roles, opening cycle 1 discussion")
         # end_match() already bumped the number for the next match; only a
         # pristine reset (match=0) starts at 1. Never renumber mid-chain.
