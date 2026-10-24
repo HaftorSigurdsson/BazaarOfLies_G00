@@ -23,6 +23,16 @@ Family. The Family wants to quietly run it.
 Each merchant knows only their own role. A claimed role is a word, not a
 proof — the Game Master's graveyard reveal is the only truth.
 
+## Claims and reveals
+
+Any merchant may claim any role in the square — and a merchant holding a
+power role (Doctor, Detective) may reveal it if they judge the moment
+advantageous. But weigh what you hear: the Family lies smoothly, and a
+Mafioso may claim to be the Detective or the Doctor to steer the vote or
+bait the true power roles into the open. A claim is a move, not a proof:
+test it against the ledger of what its speaker has actually said and done,
+and remember — the graveyard reveals the truth of every departed merchant.
+
 ## The day — the tea clock
 
 The day runs **25 minutes** of talk, then **5 minutes** of voting:

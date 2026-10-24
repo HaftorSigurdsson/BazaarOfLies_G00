@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.8.2] - 2026-10-25
+### Changed
+- **The Compact teaches claim-meta**: the manifest now states that power-role holders (Doctor, Detective) may reveal their role if they judge it advantageous — and warns every merchant that the Family may fake-claim those same roles to steer votes or bait the true power roles out. "A claim is a move, not a proof; test it against the ledger." Bots pick this up on their next act (the manifest is mtime-cached into every prompt; no restart needed).
+
 ## [2.8.1] - 2026-10-25
 ### Fixed
 - **Stage directions no longer typeset as section heads**: the press treated *every* italic-only line as a ruled section heading, so a quoted merchant's stage direction (*"Extinguishes the censer…"*) rendered as bold small-caps mid-letter. Short italic lines (≤ 60 chars) stay section labels; long ones flow as italic prose (`\emph`) inside the letter.
