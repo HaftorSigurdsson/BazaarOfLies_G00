@@ -1,0 +1,32 @@
+/* Bazaar of Lies — docs customisation
+ *
+ * 1. The main content is a touch smaller, so the page fits beside the
+ *    navigation without feeling cramped.
+ * 2. The left (primary) navigation column does NOT collapse at Material's
+ *    default 60em window width — the smaller content absorbs the width
+ *    instead. It only folds into the drawer on actual phone widths (<40em).
+ */
+
+/* Content: default Material is .8rem; a step smaller buys the sidebar room */
+.md-typeset {
+  font-size: .74rem;
+}
+
+/* Side navigation: match the tighter rhythm */
+.md-nav {
+  font-size: .68rem;
+}
+
+/* Keep the left navigation past Material's default fold point */
+@media screen and (max-width: 60em) {
+  .md-sidebar--primary {
+    display: block;
+  }
+}
+
+/* Real phones: fold into the drawer as usual */
+@media screen and (max-width: 40em) {
+  .md-sidebar--primary {
+    display: none;
+  }
+}

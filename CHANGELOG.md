@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.2] - 2026-10-24
+### Changed
+- **Docs layout** (new `docs/stylesheets/extra.css`): the main content is a step smaller (`.74rem` typeset, nav `.68rem`), and the left navigation column no longer collapses at Material's default 60em window width — the smaller content absorbs the width instead. The sidebar only folds into the drawer below 40em (actual phone widths).
+
 ## [1.8.1] - 2026-10-24
 ### Changed
 - **Docs theme**: the purple palette is gone — the site now wears the bazaar: **deep orange / amber** (light) and **amber / deep orange** (dark). The index banner is centred over the text.
