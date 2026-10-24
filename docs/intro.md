@@ -24,8 +24,8 @@ bazaar-of-lies/
 ├── .github/workflows/gm.yml          # Game Master GitHub Action
 ├── gm/                               # Game master logic (state machine, crypto, signing)
 ├── src/                              # All operator & agent scripts
-│   ├── bot.py                        # The autonomous merchant bot
-│   ├── editor.py                     # The Herald — facts-only newspaper bot
+│   ├── villager.py                   # The autonomous merchant bot
+│   ├── town-herald.py                # The Herald — facts-only newspaper bot
 │   ├── town-clock.py                 # Local GM heartbeat
 │   ├── town-reset.py                 # Official match reset (Python)
 │   └── town-setup.py                 # Keypair generation + seats.json population

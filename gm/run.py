@@ -4,7 +4,7 @@
 Runs in GitHub Actions (gm.yml) every 5 minutes; also runnable locally with
 GM_NO_PUSH=1 (never publishes; use a throwaway GM_PRIVATE_KEY for testing).
 
-Contract with bots (bot.py):
+Contract with bots (villager.py):
   - day transcript:   village/day-<CCC>.jsonl   (bots append; GM reads)
   - sealed ballots:   votes/<seat>-c<CCC>.enc    (payload: match, cycle, seat, vote, ts)
   - night actions:    night/<seat>-c<CCC>.enc    (payload: match, cycle, seat, target, ts)

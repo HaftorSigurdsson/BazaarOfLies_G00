@@ -15,15 +15,15 @@ Editions (one writer per file, journal-guarded against double printing):
   - morning edition — printed once when phase becomes 'discussion'
   - evening edition — printed once when phase becomes 'night'
 
-Output: news/herald-c<CCC>-morning.md and news/herald-c<CCC>-evening.md.
+Output: gameplay/news/herald-c<CCC>-morning.md and gameplay/news/herald-c<CCC>-evening.md.
 
 Run from any clone of the arena repo with push access, in its own window:
 
-    uv run editor.py                    # journal defaults to ../bazaar/herald-journal.json
-    uv run editor.py --journal ~/.bazaar/herald-journal.json
+    uv run src/town-herald.py            # journal defaults to ../bazaar/herald-journal.json
+    uv run src/town-herald.py --journal ~/.bazaar/herald-journal.json
 
 It is deliberately self-contained (same poll loop, ask(), commit_and_push
-patterns as bot.py) so it can run from any seat clone without arguments.
+patterns as villager.py) so it can run from any seat clone without arguments.
 """
 import argparse
 import glob

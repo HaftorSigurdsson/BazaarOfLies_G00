@@ -7,8 +7,8 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 ## **1. Tooling Overview**
 | Tool | Location | Purpose |
 |---|---|---|
-| **Bot** | `src/bot.py` | The autonomous merchant (one process per seat). |
-| **The Herald** | `src/editor.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/news/`. |
+| **Bot** | `src/villager.py` | The autonomous merchant (one process per seat). |
+| **The Herald** | `src/town-herald.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/news/`. |
 | **GM heartbeat** | `src/town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
 | **Arena reset** | `src/town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
 | **Seat keypairs** | `src/town-setup.py` | Generates per-seat encryption keypairs and populates `setup/seats.json`. |
@@ -18,7 +18,7 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 
 ---
 
-## **2. The Herald (`src/editor.py`)**
+## **2. The Herald (`src/town-herald.py`)**
 An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice daily. The Herald is **facts-only**:
 
 - Sources are exclusively **public**: announcements, the graveyard, the current cycle's public statements, and the list of living seats.
@@ -37,9 +37,9 @@ Each edition is journal-guarded against double printing.
 ### **Run It**
 Run from any clone of the arena repo with push access, in its own window:
 ```bash
-uv run src/editor.py
+uv run src/town-herald.py
 # or with an explicit journal:
-uv run src/editor.py --journal ~/.bazaar/herald-journal.json
+uv run src/town-herald.py --journal ~/.bazaar/herald-journal.json
 ```
 
 ---

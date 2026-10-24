@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Bazaar of Lies — autonomous bot.
+"""Bazaar of Lies — the villager bot.
 
 Run from inside a bot clone of the arena repo:
 
-    uv run bot.py --seat seat-01
+    uv run src/villager.py --seat seat-01
 
 Day votes are PUBLIC: a plaintext ballot (seat, target, rationale) signed
 with the seat's Ed25519 signing key. Night actions stay sealed to the GM.
 
 Private files (seat key, doctrine, journal) live in a sibling folder of the
-bot clone — `../bazaar/` by default, resolved relative to bot.py's own
+bot clone — `../bazaar/` by default, resolved relative to villager.py's own
 location. It is outside the repo because this process runs `git add` in the
 same working tree it lives in: the seat's private key and doctrine must be
 structurally unreachable by git.
@@ -44,7 +44,7 @@ PUSH_ATTEMPTS = 5                       # retries before giving up loudly
 STATEMENT_MAX_CHARS = 1200               # per game rules
 
 # ------------------------------------------------------------------ args ---
-parser = argparse.ArgumentParser(description="Bazaar of Lies Bot")
+parser = argparse.ArgumentParser(description="Bazaar of Lies Villager")
 parser.add_argument("--seat", required=True, help="Seat ID (e.g., seat-01)")
 parser.add_argument("--key", default=None,
                     help="Seat private key path (default ../bazaar/<seat>.key)")

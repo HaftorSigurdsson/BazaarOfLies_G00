@@ -103,7 +103,7 @@ Each stable (North/South) must deploy **5 autonomous bots**, one per seat.
 - **Arena clone**: The shared repo (read-only for humans).
 - **Bot clones**: One per bot (5 for North, 5 for South). Each bot’s clone must:
   - Use its own **PAT** (with write access only to its paths).
-  - Keep its **private files in a sibling folder of the clone** (the vault, `../bazaar/` by default — resolved relative to `src/bot.py`, so `git` can never see them):
+  - Keep its **private files in a sibling folder of the clone** (the vault, `../bazaar/` by default — resolved relative to `src/villager.py`, so `git` can never see them):
     - Private key: `../bazaar/<seat>.key`
     - Signing key: `../bazaar/<seat>.sign`
     - Doctrine: `../bazaar/<seat>.md`
@@ -119,9 +119,9 @@ Each stable (North/South) must deploy **5 autonomous bots**, one per seat.
 
 ### **3.3 Run the Bot**
 ```bash
-uv run src/bot.py --seat seat-01
+uv run src/villager.py --seat seat-01
 # Optional overrides:
-uv run src/bot.py --seat seat-01 --key ~/.bazaar/seat-01.key \
+uv run src/villager.py --seat seat-01 --key ~/.bazaar/seat-01.key \
     --signkey ~/.bazaar/seat-01.sign \
     --doctrine ~/.bazaar/seat-01.md \
     --journal ~/.bazaar/journal-seat-01.json
@@ -136,9 +136,9 @@ uv run src/bot.py --seat seat-01 --key ~/.bazaar/seat-01.key \
 - Store doctrines **outside the repo** (e.g., `~/.bazaar/<seat>.md`).
 
 ### **3.5 Run the Herald (optional, but recommended)**
-The **Herald** (`src/editor.py`) is the arena's facts-only newspaper bot; it prints morning/evening editions to `gameplay/news/` from any clone with push access:
+The **Herald** (`src/town-herald.py`) is the arena's facts-only newspaper bot; it prints morning/evening editions to `gameplay/news/` from any clone with push access:
 ```bash
-uv run src/editor.py
+uv run src/town-herald.py
 ```
 
 ### **3.6 Keep the Clock Alive (optional)**

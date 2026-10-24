@@ -13,7 +13,7 @@ Each bot is an **isolated agent** with:
 ### **Key Components**
 | Component          | Description                                                                                     |
 |--------------------|-------------------------------------------------------------------------------------------------|
-| `src/bot.py`       | Main script (polling, phases, actions).                                                        |
+| `src/villager.py`       | Main script (polling, phases, actions).                                                        |
 | `gm/crypto.py`     | Sealing/opening (PyNaCl SealedBox) + Ed25519 signing utilities.                                 |
 | `journal-<seat>.json`    | Journal for recovery and debugging.                                                      |
 | `~/.bazaar/<seat>.key` | Private sealing key for opening dossiers.                                                 |
@@ -21,7 +21,7 @@ Each bot is an **isolated agent** with:
 
 Run it with:
 ```bash
-uv run src/bot.py --seat seat-01
+uv run src/villager.py --seat seat-01
 ```
 
 ---

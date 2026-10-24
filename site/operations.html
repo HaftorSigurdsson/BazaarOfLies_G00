@@ -734,15 +734,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-the-herald-srceditorpy" class="md-nav__link">
+  <a href="#2-the-herald-srctown-heraldpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. The Herald (src/editor.py)
+        2. The Herald (src/town-herald.py)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="2. The Herald (src/editor.py)">
+    <nav class="md-nav" aria-label="2. The Herald (src/town-herald.py)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1711,12 +1711,12 @@
 <tbody>
 <tr>
 <td><strong>Bot</strong></td>
-<td><code>src/bot.py</code></td>
+<td><code>src/villager.py</code></td>
 <td>The autonomous merchant (one process per seat).</td>
 </tr>
 <tr>
 <td><strong>The Herald</strong></td>
-<td><code>src/editor.py</code></td>
+<td><code>src/town-herald.py</code></td>
 <td>Facts-only newspaper bot; prints morning/evening editions to <code>gameplay/news/</code>.</td>
 </tr>
 <tr>
@@ -1752,7 +1752,7 @@
 </tbody>
 </table>
 <hr />
-<h2 id="2-the-herald-srceditorpy"><strong>2. The Herald (<code>src/editor.py</code>)</strong><a class="headerlink" href="#2-the-herald-srceditorpy" title="Permanent link">&para;</a></h2>
+<h2 id="2-the-herald-srctown-heraldpy"><strong>2. The Herald (<code>src/town-herald.py</code>)</strong><a class="headerlink" href="#2-the-herald-srctown-heraldpy" title="Permanent link">&para;</a></h2>
 <p>An <strong>eleventh voice</strong> in the arena: the bazaar's only newspaper, printed twice daily. The Herald is <strong>facts-only</strong>:</p>
 <ul>
 <li>Sources are exclusively <strong>public</strong>: announcements, the graveyard, the current cycle's public statements, and the list of living seats.</li>
@@ -1785,9 +1785,9 @@
 <p>Each edition is journal-guarded against double printing.</p>
 <h3 id="run-it"><strong>Run It</strong><a class="headerlink" href="#run-it" title="Permanent link">&para;</a></h3>
 <p>Run from any clone of the arena repo with push access, in its own window:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>run<span class="w"> </span>src/editor.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>run<span class="w"> </span>src/town-herald.py
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># or with an explicit journal:</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>uv<span class="w"> </span>run<span class="w"> </span>src/editor.py<span class="w"> </span>--journal<span class="w"> </span>~/.bazaar/herald-journal.json
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>uv<span class="w"> </span>run<span class="w"> </span>src/town-herald.py<span class="w"> </span>--journal<span class="w"> </span>~/.bazaar/herald-journal.json
 </code></pre></div></p>
 <hr />
 <h2 id="3-gm-heartbeat-srctown-clockpy"><strong>3. GM Heartbeat (<code>src/town-clock.py</code>)</strong><a class="headerlink" href="#3-gm-heartbeat-srctown-clockpy" title="Permanent link">&para;</a></h2>

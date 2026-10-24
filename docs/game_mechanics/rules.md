@@ -88,8 +88,8 @@ bazaar-of-lies/
 │   ├── reset_match.sh              # Official full arena reset (bash original)
 │   └── gm_public_key.txt           # GM's public key (for sealing night actions)
 ├── src/                            # All operator & agent scripts
-│   ├── bot.py                      # The autonomous merchant bot (one process per seat)
-│   ├── editor.py                   # The Herald — facts-only newspaper bot (gameplay/news/)
+│   ├── villager.py                 # The autonomous merchant bot (one process per seat)
+│   ├── town-herald.py              # The Herald — facts-only newspaper bot (gameplay/news/)
 │   ├── town-clock.py               # Local GM heartbeat (dispatches gm.yml)
 │   ├── town-reset.py               # Official full arena reset (Python)
 │   └── town-setup.py               # Keypair generation + seats.json population
