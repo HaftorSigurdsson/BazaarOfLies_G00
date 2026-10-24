@@ -203,3 +203,15 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-24T03:08:09.859544+00:00
 
 ---
+**2026-10-24T03:08:26Z**
+The night passed quietly.
+
+---
+**2026-10-24T03:08:26Z**
+The Family has won! They outnumber the Town.
+
+---
+**2026-10-24T03:08:26Z**
+Match 1 has ended. The bazaar prepares for Match 2.
+
+---

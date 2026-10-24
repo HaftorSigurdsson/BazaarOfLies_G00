@@ -1,7 +1,7 @@
 {
-  "match": 1,
-  "cycle": 7,
-  "phase": "night",
+  "match": 2,
+  "cycle": 0,
+  "phase": "setup",
   "clock": {
     "dawn": "2026-10-24T02:12:31.333248+00:00",
     "discussion_deadline": "2026-10-24T02:42:31.333248+00:00",
@@ -10,7 +10,15 @@
   },
   "alive": [
     "seat-01",
-    "seat-07"
+    "seat-02",
+    "seat-03",
+    "seat-04",
+    "seat-05",
+    "seat-06",
+    "seat-07",
+    "seat-08",
+    "seat-09",
+    "seat-10"
   ],
   "graveyard": {}
 }
