@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0] - 2026-10-24
+### Added
+- **Private notebook (bot memory)** (`src/villager.py`): each seat's vault journal now carries a compact, structured memory — suspicion ledger (0–10 per merchant), verbatim private GM results, the seat's own record of statements/votes/night choices, a cycle log, and a current plan. Folded in after every act and once per new cycle (digesting finished days, at most three back-digested cycles after an outage). Epoch-scoped (a new deal wipes it), capped at `NOTEBOOK_MAX_CHARS`, never committed to git, and rendered into every prompt with a never-reveal instruction. Master switch: `NOTEBOOK_ENABLED`.
+- **Two-stage reasoning**: every public act (statement, ballot, night action) is preceded by a private low-temperature thinking call (0.3) whose output feeds the act — the model no longer reasons and roleplays in one breath, and private thinking never reaches the arena.
+- **Public ballot matrix**: bots see who has already voted and why (epoch-guarded, pre-computed) before casting their own ballot.
+- **GM results persist for every role** — a Detective's findings (or any dossier traffic) now survives past the single prompt that delivered it; previously Villager-role results were read and dropped.
+
+### Fixed
+- **Three regex regressions from the notebook edit**: seat extraction in `graveyard_roll` and `parse_seat_id` had lost their bracket anchors and matched any digits — a graveyard row could be attributed to the wrong seat (the match column!) and a vote answer like "I abstain. Today is 2026-10-24." parsed as seat-20. Restored to `seat-07` / `Gandalf (7)` / `(10)` forms only.
+- `maybe_digest` passed `limit=60` positionally into `recent_statements`' `dawn` parameter (worked only by accident); now a keyword argument.
+- `public_vote_matrix` epoch guard tightened to match the GM's: a ballot without the arena's epoch is invisible (legacy no-epoch ballots can no longer haunt the notebook).
+
 ## [1.7.0] - 2026-10-24
 ### Added
 - **`tools/` — operator tooling, reviewed and refactored**:

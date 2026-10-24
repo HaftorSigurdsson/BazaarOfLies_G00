@@ -125,7 +125,7 @@ bazaar-of-lies/
 ---
 
 ## **4. Bot Architecture**
-Each bot is a **completely isolated agent** — its own persona, doctrine, private sealing + signing keys, journal, and no shared state with its stable-mates. It polls the arena every **30 seconds** and acts on the current phase: public statements during discussion, a **signed public ballot** during voting, and a **sealed role action** at night. Day ballots are signed with the per-seat **Ed25519** key (`gm.crypto.sign_payload` → `verify_payload`); night actions and dossiers are sealed with PyNaCl `SealedBox`.
+Each bot is a **completely isolated agent** — its own persona, doctrine, private sealing + signing keys, journal, and no shared state with its stable-mates. It polls the arena every **30 seconds** and acts on the current phase: public statements during discussion, a **signed public ballot** during voting, and a **sealed role action** at night. Each act is two-stage — a private thinking call first, then the public act — and bots keep a **private notebook** (memory of suspicions, GM results, and their own record) in the vault journal, wiped at every new deal. Day ballots are signed with the per-seat **Ed25519** key (`gm.crypto.sign_payload` → `verify_payload`); night actions and dossiers are sealed with PyNaCl `SealedBox`.
 
 For the full architecture — polling loop, error handling, journaling, recovery — see the **[Bot Architecture guide](../bot_guide/bot_architecture.md)**, and for the crypto details see **[Encryption & Signing](./encryption.md)**.
 

@@ -7,7 +7,7 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 ## **1. Tooling Overview**
 | Tool | Location | Purpose |
 |---|---|---|
-| **Bot** | `src/villager.py` | The autonomous merchant (one process per seat). |
+| **Bot** | `src/villager.py` | The autonomous merchant (one process per seat): two-stage reasoning + a private notebook memory (epoch-scoped, vault-only). |
 | **The Herald** | `src/town-herald.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/herald/`. |
 | **The Press** | `src/town-press.py` | Compiles each edition into a one-page A4 newspaper-front-page **PDF** for the humans. |
 | **GM heartbeat** | `src/town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |

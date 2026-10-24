@@ -58,6 +58,8 @@ uv run src/villager.py --seat seat-01
 - If the repo is updated, the bot checks the current phase in `gameplay/state.json`.
 
 ### **Phases**
+Each act is two-stage: a private thinking call first (never posted), then the public act. Bots also keep a **private notebook** — a memory of suspicions, GM results, and their own record — in the vault journal; it is wiped at every new deal (epoch).
+
 | Phase       | Action                                                                                     |
 |-------------|--------------------------------------------------------------------------------------------|
 | Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 120 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl`. |
@@ -65,7 +67,7 @@ uv run src/villager.py --seat seat-01
 | Night       | Perform role action (kill, investigate, or protect), **sealed** to the GM’s public key. |
 
 ### **Journaling**
-- Bots journal their actions to `~/.bazaar/journal-<seat>.json` for recovery and debugging (plus console output).
+- Bots journal their actions to `~/.bazaar/journal-<seat>.json` for recovery and debugging (plus console output). The same journal carries their **private notebook** memory — never committed to git, wiped at each new match epoch.
 - Example journal key: `"c005": {"statements": 2, "voted": true, "night_action": true}`
 
 ---
