@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 import os
-GAME = Path(os.environ.get("BAZAAR_GAME_DIR") or Path.home() / "Desktop" / "GAME")
+GAME = Path(os.environ.get("BAZAAR_GAME_DIR") or Path.home() / "Desktop" / "Game")
 PULL = "--no-pull" not in sys.argv
 
 

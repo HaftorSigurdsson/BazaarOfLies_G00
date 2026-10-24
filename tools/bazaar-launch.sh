@@ -3,4 +3,4 @@
 # Python (tmux on macOS/Linux, console windows on Windows). See
 # bazaar_launch.py for usage and environment variables.
 set -euo pipefail
-exec python3 "$(dirname "$0")/bazaar_launch.py" "$@"
+exec python3 "$(dirname "$0")/bazaar-launch.py" "$@"
