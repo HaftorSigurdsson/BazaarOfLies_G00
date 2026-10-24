@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "9c5ef90a",
+  "seat": "seat-09",
+  "target": "seat-05",
+  "rationale": "Ripley (5) pivoted from defending Yoda (3) to spice/ledger riddles without naming debt, while Hermione (2) called the edges frayed and stepped back—yet the bazaar’s ledger demands a name, not syrup.",
+  "ts": "2026-10-24T18:00:22Z"
+ },
+ "sig": "q7yln70l+sndqa6tOnsl/UlUWSHzOC/MJjFAx5FAIDz1Gs9OG6u6aSEQwNS6b+gH95VUz0iL9e1qUmTCNXvJCg=="
+}
