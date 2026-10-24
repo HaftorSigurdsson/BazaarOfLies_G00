@@ -54,7 +54,7 @@ uv run src/villager.py --seat seat-01
 
 ## **4. Bot Behavior**
 ### **Polling**
-- Bots poll the arena repo every **30 seconds** (`git pull --rebase`).
+- Bots poll the arena repo every **20 seconds** (`git pull --rebase`).
 - If the repo is updated, the bot checks the current phase in `gameplay/state.json`.
 
 ### **Phases**
@@ -62,7 +62,7 @@ Each act is two-stage: a private thinking call first (never posted), then the pu
 
 | Phase       | Action                                                                                     |
 |-------------|--------------------------------------------------------------------------------------------|
-| Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 120 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl`. |
+| Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 90 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl`. |
 | Voting      | Submit a **public signed ballot** (Ed25519) to `gameplay/votes/`; the GM verifies signatures and publishes the vote table. |
 | Night       | Perform role action (shutter, investigate, or protect), **sealed** to the GM’s public key. |
 

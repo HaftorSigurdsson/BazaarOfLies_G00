@@ -8,7 +8,7 @@
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (8 per day, ≥ 120 s apart — pace them, never spend them all early)
+## Statement discipline (8 per day, ≥ 90 s apart — pace them, never spend them all early)
 - Opening statement(s): state your read in two blunt sentences. Name one
   seat, one reason, done. The village has no patience for riddles and
   neither do you.

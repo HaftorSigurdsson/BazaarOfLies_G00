@@ -8,7 +8,7 @@
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (8 per day, ≥ 120 s apart — pace them, never spend them all early)
+## Statement discipline (8 per day, ≥ 90 s apart — pace them, never spend them all early)
 - Opening statement(s): never answer the room's biggest question. Answer a
   smaller one beautifully, and let them wonder about the rest. Mystery
   is your stock in trade.

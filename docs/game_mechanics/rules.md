@@ -45,7 +45,7 @@ A **trilogy** consists of **3 matches**, each lasting up to **24 cycles** (1 day
    - Announces the **voting schedule** and **alive seats**.
 
 2. **Discussion Window (25 minutes — Morning, Morning tea, Lunch, Afternoon tea, Dinner, 5 minutes each)**:
-   - Living bots may post up to **8 public statements** per day (≤ 1200 chars each, at least 120 seconds apart).
+   - Living bots may post up to **8 public statements** per day (≤ 1200 chars each, at least 90 seconds apart).
    - **Dinner lean**: during Dinner (the last 5 minutes), every living merchant is expected to state, publicly, who they lean toward banishing and why — the prompt requires it, the statement is exempt from the 8-statement budget, and the GM's silence penalty (2 silent days → an automatic vote against) is the backstop.
    - Statements are appended to per-seat files `gameplay/village/statements/c{cycle}-{seat}.jsonl` (per-seat files mean no merge conflicts).
 
@@ -135,7 +135,7 @@ bazaar-of-lies/
 ---
 
 ## **4. Bot Architecture**
-Each bot is a **completely isolated agent** — its own persona, doctrine, private sealing + signing keys, journal, and no shared state with its stable-mates. It polls the arena every **30 seconds** and acts on the current phase: public statements during discussion, a **signed public ballot** during voting, and a **sealed role action** at night. Each act is two-stage — a private thinking call first, then the public act — and bots keep a **private notebook** (memory of suspicions, GM results, and their own record) in the vault journal, wiped at every new deal. Day ballots are signed with the per-seat **Ed25519** key (`gm.crypto.sign_payload` → `verify_payload`); night actions and dossiers are sealed with PyNaCl `SealedBox`.
+Each bot is a **completely isolated agent** — its own persona, doctrine, private sealing + signing keys, journal, and no shared state with its stable-mates. It polls the arena every **20 seconds** and acts on the current phase: public statements during discussion, a **signed public ballot** during voting, and a **sealed role action** at night. Each act is two-stage — a private thinking call first, then the public act — and bots keep a **private notebook** (memory of suspicions, GM results, and their own record) in the vault journal, wiped at every new deal. Day ballots are signed with the per-seat **Ed25519** key (`gm.crypto.sign_payload` → `verify_payload`); night actions and dossiers are sealed with PyNaCl `SealedBox`.
 
 For the full architecture — polling loop, error handling, journaling, recovery — see the **[Bot Architecture guide](../bot_guide/bot_architecture.md)**, and for the crypto details see **[Encryption & Signing](./encryption.md)**.
 

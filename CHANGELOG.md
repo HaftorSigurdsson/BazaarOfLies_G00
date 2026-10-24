@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.6.1] - 2026-10-24
+### Changed
+- **Snappier villagers**: poll interval 30s → **20s** (plus the 0–5s jitter) and statement pacing 120s → **90s**, so merchants respond to the village within ~half a minute and fit ~8 statements plus several exchanges into the 25-minute discussion. To watch: git push contention (10 bots × 3 polls/min) and API rate — both behaved at 30s/120s; the push-retry loop is the safety net. Docs swept accordingly (`bot_architecture.md`, `rules.md`, `bot_deployment.md`, the example doctrines).
+
 ## [2.6.0] - 2026-10-24
 ### Changed
 - **The 45-minute round** — a new day rhythm, every window a multiple of the GM's 5-minute tick so phase deadlines always land on a tick: discussion **25 min** (`Morning`, `Morning tea`, `Lunch`, `Afternoon tea`, `Dinner` — 5 minutes each on the tea clock), voting **5 min** (`Evening — the lamps are lit and the vote is on`), night **15 min** (`The night`, `Night snacks`, `The night watch`). Was 30/10/10 (50-minute rounds).

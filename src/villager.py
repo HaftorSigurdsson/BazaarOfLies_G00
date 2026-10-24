@@ -54,10 +54,10 @@ from gm.utils import display_name, day_region
 
 # ---------------------------------------------------------------- config ---
 MODEL = "mistral-small-2409"            # PIN the exact versioned model ID
-POLL_SECONDS = 30                       # arena poll interval (per game rules)
+POLL_SECONDS = 20                       # arena poll interval (per game rules)
 JITTER_SECONDS = 5                      # random extra sleep, avoids herd pushes
 MAX_STATEMENTS_PER_DAY = 8              # per game rules
-MIN_SECONDS_BETWEEN_STATEMENTS = 120    # pace the two statements out
+MIN_SECONDS_BETWEEN_STATEMENTS = 90     # pace the statements out
 PUSH_ATTEMPTS = 5                       # retries before giving up loudly
 STATEMENT_MAX_CHARS = 1200               # per game rules
 
