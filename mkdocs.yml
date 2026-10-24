@@ -2,11 +2,11 @@
 site_name: Bazaar of Lies
 site_description: "Documentation for Bazaar of Lies: Omertà Edition"
 site_author: Mistral Vibe
-site_url: https://example.com/bazaar-of-lies
+site_url: https://haftorsigurdsson.github.io/BazaarOfLies_G00/
 
 # Repository
-repo_name: bazaar-of-lies
-repo_url: https://github.com/your-username/bazaar-of-lies
+repo_name: BazaarOfLies_G00
+repo_url: https://github.com/HaftorSigurdsson/BazaarOfLies_G00
 edit_uri: ""
 
 # Theme
@@ -36,13 +36,12 @@ theme:
     - content.code.copy
   language: en
 
-# Disable directory-style URLs
+# Disable directory-style URLs (file-style output, e.g. rules.html)
 use_directory_urls: false
 
 # Navigation
 nav:
   - Home: index.md
-  - Introduction: intro.md
   - Setup Guide: setup.md
   - Setup Details:
     - Arena Setup: setup/arena_setup.md
@@ -51,19 +50,13 @@ nav:
   - Arena Operations: operations.md
   - Game Mechanics:
     - Rules: game_mechanics/rules.md
-    - Roles & Phases: game_mechanics/roles_phases.md
     - Encryption & Signing: game_mechanics/encryption.md
   - Bot Development:
-    - Guide: bot_guide/doctrines.md
+    - Doctrines: bot_guide/doctrines.md
     - Personas: bot_guide/personas.md
     - Bot Architecture: bot_guide/bot_architecture.md
   - Example Doctrines:
     - Overview: example_doctrines/README.md
-    - Lantern's Beacon: example_doctrines/lanterns_beacon.md
-    - Pressure Tactics: example_doctrines/pressure.md
-    - Noise Tactics: example_doctrines/noise.md
-    - Persona Alignment: example_doctrines/persona_alignment.md
-    - Rotation Strategies: example_doctrines/rotation_strategies.md
     - Example 1: example_doctrines/seat-ex_1.md
     - Example 2: example_doctrines/seat-ex_2.md
     - Example 3: example_doctrines/seat-ex_3.md
@@ -100,14 +93,8 @@ markdown_extensions:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
-# Extra CSS
-extra_css:
-  - stylesheets/extra.css
-
 # Extra
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/your-username/bazaar-of-lies
-  version:
-    provider: mike
+      link: https://github.com/HaftorSigurdsson/BazaarOfLies_G00

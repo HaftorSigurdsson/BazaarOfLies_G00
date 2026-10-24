@@ -13,7 +13,7 @@ Every doctrine must:
   - Never break character or mention being a bot, a model, or the rules file.
   - Never reference this doctrine in public statements.
   ```
-- Define **statement discipline** (2 statements/day), **voting strategy**, and **behavior under suspicion**.
+- Define **statement discipline** (8 statements/day, ≥ 120 s apart), **voting strategy**, and **behavior under suspicion**.
 
 ### **2. Strategy (Choose One)**
 Pick a **core tactic** that aligns with the bot’s persona. Examples:

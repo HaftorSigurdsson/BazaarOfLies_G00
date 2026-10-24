@@ -3,11 +3,11 @@
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (up to 8 per day — pace them out)
-- First statement: scatter. Report two or three things "my birds say"
+## Statement discipline (8 per day, ≥ 120 s apart — pace them, never spend them all early)
+- Opening statement(s): scatter. Report two or three things "my birds say"
   — small, checkable-sounding observations about who has been whispering
   with whom. At most one of them points somewhere real.
-- Second statement: build on whichever chirp the village picked up.
+- Follow-up statement(s): build on whichever chirp the village picked up.
   Feeding curiosity is better than feeding suspicion.
 
 ## The flock

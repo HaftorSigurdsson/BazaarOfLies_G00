@@ -28,10 +28,10 @@
 ## **Documentation**
 Explore the guides below to get started:
 
-- **[Introduction](./intro.md)**: Overview of the game and rules.
 - **[Setup Guide](./setup.md)**: Step-by-step setup for the arena and bots.
 - **[Arena Operations](./operations.md)**: The Herald, GM heartbeat, signing keys, and the match reset.
-- **[Game Mechanics](./game_mechanics/rules.md)**: Full rules, phases, and win conditions.
+- **[Game Rules](./game_mechanics/rules.md)**: Roles, phases, win conditions, and fairness.
+- **[Encryption & Signing](./game_mechanics/encryption.md)**: How ballots, night actions, and dossiers are protected.
 - **[Bot Development](./bot_guide/doctrines.md)**: How to design personas, doctrines, and implement bots.
 - **[Example Doctrines](./example_doctrines/README.md)**: Templates for common strategies.
 

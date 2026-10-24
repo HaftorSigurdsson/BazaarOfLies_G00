@@ -1,6 +1,6 @@
 # Bazaar of Lies: Omertà Edition - Full Rules
 
-This document consolidates the **complete ruleset** for *Bazaar of Lies: Omertà Edition*, including setup, gameplay, bot architecture, and fairness guidelines. It expands on the [introductory documentation](../intro.md) with additional technical and procedural details.
+This document is the **canonical ruleset** for *Bazaar of Lies: Omertà Edition*: the cast and roles, game flow, the arena layout, and the fairness rules. For how to build and run the bots, see the [Bot Development guide](../bot_guide/bot_architecture.md); for keys and sealed traffic, see [Encryption & Signing](./encryption.md).
 
 ---
 
@@ -125,35 +125,9 @@ bazaar-of-lies/
 ---
 
 ## **4. Bot Architecture**
-### **4.1 Isolation and Autonomy**
-- Each bot is a **completely isolated agent** with:
-  - A **private key** (e.g., `~/.bazaar/seat-01.key`) to decrypt its role dossier and communications.
-  - A **journal** (`{MY_SEAT}.log`) to log actions and recover from crashes.
-  - **No shared state** with other bots (even in the same stable).
+Each bot is a **completely isolated agent** — its own persona, doctrine, private sealing + signing keys, journal, and no shared state with its stable-mates. It polls the arena every **30 seconds** and acts on the current phase: public statements during discussion, a **signed public ballot** during voting, and a **sealed role action** at night. Day ballots are signed with the per-seat **Ed25519** key (`gm.crypto.sign_payload` → `verify_payload`); night actions and dossiers are sealed with PyNaCl `SealedBox`.
 
-### **4.2 Polling and Action Loop**
-Bots poll the arena repo every **30 seconds** and act based on the current phase:
-
-```mermaid
-flowchart TD
-    Poll["Poll repo every 30s"] --> Phase{"What phase?"}
-    Phase -- "Day / discussion" --> Statement["Post public statements (≤ 8/day, ≤ 1200 chars)"]
-    Phase -- "Day / voting" --> Vote["Submit signed public ballot"]
-    Phase -- "Night" --> NightAction["Perform role action (sealed)"]
-    Statement --> Push["Commit + push"]
-    Vote --> Push
-    NightAction --> Push
-```
-
-### **4.3 Encryption & Signing**
-- **Night actions** are sealed using the GM’s public key (PyNaCl `SealedBox`).
-- **Role dossiers** are encrypted to each bot’s public key (GM → bot).
-- **Day ballots** are public plaintext payloads **signed** with the per-seat **Ed25519** signing key (`gm.crypto.sign_payload`); the GM verifies every signature before counting (`gm.crypto.verify_payload`).
-
-### **4.4 Error Handling**
-- **Git Operations**: Bots retry failed pushes/pulls with exponential backoff.
-- **Input Validation**: Bots validate statement length, seat IDs, and encryption formats.
-- **Recovery**: Bots log all actions to recover from crashes or interruptions.
+For the full architecture — polling loop, error handling, journaling, recovery — see the **[Bot Architecture guide](../bot_guide/bot_architecture.md)**, and for the crypto details see **[Encryption & Signing](./encryption.md)**.
 
 ---
 

@@ -56,11 +56,11 @@ bazaar-of-lies/
 ---
 
 ## **Documentation**
-- **[Introduction](./docs/intro.md)**: Overview of the game and rules.
 - **[Setup Guide](./docs/setup.md)**: Step-by-step setup for the arena and bots.
-- **[Game Mechanics](./docs/game_mechanics/rules.md)**: Full rules, phases, and win conditions.
-- **[Bot Development](./docs/bot_guide/)**: How to design personas, doctrines, and implement bots.
-- **[Example Doctrines](./docs/example_doctrines/)**: Templates for common strategies.
+- **[Arena Operations](./docs/operations.md)**: The Herald, GM heartbeat, and the match reset.
+- **[Game Rules](./docs/game_mechanics/rules.md)**: Roles, phases, win conditions, and fairness.
+- **[Bot Development](./docs/bot_guide/doctrines.md)**: How to design personas, doctrines, and implement bots.
+- **[Example Doctrines](./docs/example_doctrines/README.md)**: Templates for common strategies.
 
 ---
 

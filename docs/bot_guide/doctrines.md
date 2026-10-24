@@ -27,8 +27,8 @@ Every doctrine must follow this structure:
 # Everything below is how you play REGARDLESS of role, in daylight.
 
 ## Statement discipline (up to 8 per day — pace them out, never spend them all early)
-- First statement: <tactic>
-- Second statement: <tactic>
+- Opening statement(s): <tactic>
+- Follow-up statement(s): <tactic>
 
 ## <Strategy Name>
 - <Core tactic>
@@ -108,15 +108,13 @@ Every doctrine must include these **4 rules** (copy verbatim):
 ### **Example Adjustments**
 | Issue                          | Fix                                                                                     |
 |-------------------------------|----------------------------------------------------------------------------------------|
-| Bot is too passive            | Add a **pressure tactic** (e.g., *"Demand answers from the quietest seat."*). See [`example_doctrines/pressure.md`](../example_doctrines/pressure.md).        |
-| Bot is too predictable        | Introduce **noise** (e.g., *"Post cryptic statements to obscure intent."*). See [`example_doctrines/noise.md`](../example_doctrines/noise.md).          |
-| Bot’s voice feels unnatural   | **Refine metaphors** to match the persona. See [`example_doctrines/persona_alignment.md`](../example_doctrines/persona_alignment.md).
+| Bot is too passive            | Add a **pressure tactic** (e.g., *"Demand answers from the quietest seat."*).        |
+| Bot is too predictable        | Introduce **noise** (e.g., *"Post cryptic statements to obscure intent."*).          |
+| Bot’s voice feels unnatural   | **Refine metaphors** to match the persona.                                             |
 
 ---
 
 ## **7. Example: Full Doctrine**
-See [`example_doctrines/lanterns_beacon.md`](../example_doctrines/lanterns_beacon.md) for a full template.
-
 ```markdown
 # The Lantern’s Beacon
 
@@ -124,8 +122,8 @@ See [`example_doctrines/lanterns_beacon.md`](../example_doctrines/lanterns_beaco
 # Everything below is how you play REGARDLESS of role, in daylight.
 
 ## Statement discipline (up to 8 per day — pace them out, never spend them all early)
-- First statement: Ask a **direct question** to the quietest seat. Example: *"Seat-04, who do YOU fear tonight?"*
-- Second statement: Report who answered plainly and who deflected.
+- Opening statement(s): Ask a **direct question** to the quietest seat. Example: *"Seat-04, who do YOU fear tonight?"*
+- Follow-up statement(s): Report who answered plainly and who deflected.
 
 ## The Light
 - Your weapon is the **direct question**. Every statement ends with a question to a specific seat.
@@ -147,6 +145,6 @@ See [`example_doctrines/lanterns_beacon.md`](../example_doctrines/lanterns_beaco
 
 ## **8. Security**
 - **Never commit doctrines** to the repo. Store them outside the arena (e.g., `../bazaar/<seat>.txt`).
-- **Rotate strategies** between matches to avoid predictability. See [`example_doctrines/rotation_strategies.md`](../example_doctrines/rotation_strategies.md) for tips.
+- **Rotate strategies** between matches to avoid predictability.
 
 **May your doctrines outwit your opponents!**

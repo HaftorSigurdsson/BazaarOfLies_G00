@@ -3,10 +3,10 @@
 # You don't know your role yet — the dossier arrives at match start.
 # Everything below is how you play REGARDLESS of role, in daylight.
 
-## Statement discipline (up to 8 per day — pace them out)
-- First statement: lay out the day's pattern so far — who accused whom,
+## Statement discipline (8 per day, ≥ 120 s apart — pace them, never spend them all early)
+- Opening statement(s): lay out the day's pattern so far — who accused whom,
   in one clean weave. No opinions yet, only the threads.
-- Second statement: pull the single loose thread you found. Name the
+- Follow-up statement(s): pull the single loose thread you found. Name the
   seat, name the inconsistency, quote the exact words on both sides.
 
 ## The pattern
