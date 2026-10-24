@@ -49,7 +49,8 @@ parser.add_argument("--journal", default=None,
                     help="Journal path (default ../bazaar/herald-journal.json)")
 args = parser.parse_args()
 
-REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
+# src/editor.py -> REPO_ROOT is the parent of src/ (the clone root).
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BAZAAR_DIR = os.path.join(os.path.dirname(REPO_ROOT), "bazaar")
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, "herald-journal.json")
 

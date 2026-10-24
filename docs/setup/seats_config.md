@@ -14,12 +14,12 @@ This guide covers configuring the **10 seats** for the Bazaar of Lies, including
 ---
 
 ## **2. Generate Keypairs**
-Use the `town-setup.py` script to generate keypairs for all seats:
+Use the `src/town-setup.py` script to generate keypairs for all seats:
 
 ### **Steps**
 1. Run the script:
    ```bash
-   uv run town-setup.py --seats 10 --output setup/seats.json
+   uv run src/town-setup.py --seats 10 --output setup/seats.json
    ```
 2. **Private keys** are saved to `seat-XX.key` (keep these secure!).
 3. **Public keys** are added to `seats.json`.

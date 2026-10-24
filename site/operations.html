@@ -734,15 +734,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-the-herald-editorpy" class="md-nav__link">
+  <a href="#2-the-herald-srceditorpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. The Herald (editor.py)
+        2. The Herald (src/editor.py)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="2. The Herald (editor.py)">
+    <nav class="md-nav" aria-label="2. The Herald (src/editor.py)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -773,15 +773,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-gm-heartbeat-town-clockpy" class="md-nav__link">
+  <a href="#3-gm-heartbeat-srctown-clockpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. GM Heartbeat (town-clock.py)
+        3. GM Heartbeat (src/town-clock.py)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3. GM Heartbeat (town-clock.py)">
+    <nav class="md-nav" aria-label="3. GM Heartbeat (src/town-clock.py)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -829,15 +829,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-match-reset-town-resetpy" class="md-nav__link">
+  <a href="#5-match-reset-srctown-resetpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Match Reset (town-reset.py)
+        5. Match Reset (src/town-reset.py)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Match Reset (town-reset.py)">
+    <nav class="md-nav" aria-label="5. Match Reset (src/town-reset.py)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1711,27 +1711,27 @@
 <tbody>
 <tr>
 <td><strong>Bot</strong></td>
-<td><code>bot.py</code></td>
+<td><code>src/bot.py</code></td>
 <td>The autonomous merchant (one process per seat).</td>
 </tr>
 <tr>
 <td><strong>The Herald</strong></td>
-<td><code>editor.py</code></td>
+<td><code>src/editor.py</code></td>
 <td>Facts-only newspaper bot; prints morning/evening editions to <code>gameplay/news/</code>.</td>
 </tr>
 <tr>
 <td><strong>GM heartbeat</strong></td>
-<td><code>town-clock.py</code></td>
+<td><code>src/town-clock.py</code></td>
 <td>Locally dispatches the GM workflow on an interval and prints live status.</td>
 </tr>
 <tr>
 <td><strong>Arena reset</strong></td>
-<td><code>town-reset.py</code></td>
+<td><code>src/town-reset.py</code></td>
 <td>One-command full arena reset in Python (artifacts + boards + state template + journals + <code>.gitkeep</code> repairs).</td>
 </tr>
 <tr>
 <td><strong>Seat keypairs</strong></td>
-<td><code>town-setup.py</code></td>
+<td><code>src/town-setup.py</code></td>
 <td>Generates per-seat encryption keypairs and populates <code>setup/seats.json</code>.</td>
 </tr>
 <tr>
@@ -1752,7 +1752,7 @@
 </tbody>
 </table>
 <hr />
-<h2 id="2-the-herald-editorpy"><strong>2. The Herald (<code>editor.py</code>)</strong><a class="headerlink" href="#2-the-herald-editorpy" title="Permanent link">&para;</a></h2>
+<h2 id="2-the-herald-srceditorpy"><strong>2. The Herald (<code>src/editor.py</code>)</strong><a class="headerlink" href="#2-the-herald-srceditorpy" title="Permanent link">&para;</a></h2>
 <p>An <strong>eleventh voice</strong> in the arena: the bazaar's only newspaper, printed twice daily. The Herald is <strong>facts-only</strong>:</p>
 <ul>
 <li>Sources are exclusively <strong>public</strong>: announcements, the graveyard, the current cycle's public statements, and the list of living seats.</li>
@@ -1785,20 +1785,20 @@
 <p>Each edition is journal-guarded against double printing.</p>
 <h3 id="run-it"><strong>Run It</strong><a class="headerlink" href="#run-it" title="Permanent link">&para;</a></h3>
 <p>Run from any clone of the arena repo with push access, in its own window:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>run<span class="w"> </span>editor.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>run<span class="w"> </span>src/editor.py
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># or with an explicit journal:</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>uv<span class="w"> </span>run<span class="w"> </span>editor.py<span class="w"> </span>--journal<span class="w"> </span>~/.bazaar/herald-journal.json
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>uv<span class="w"> </span>run<span class="w"> </span>src/editor.py<span class="w"> </span>--journal<span class="w"> </span>~/.bazaar/herald-journal.json
 </code></pre></div></p>
 <hr />
-<h2 id="3-gm-heartbeat-town-clockpy"><strong>3. GM Heartbeat (<code>town-clock.py</code>)</strong><a class="headerlink" href="#3-gm-heartbeat-town-clockpy" title="Permanent link">&para;</a></h2>
+<h2 id="3-gm-heartbeat-srctown-clockpy"><strong>3. GM Heartbeat (<code>src/town-clock.py</code>)</strong><a class="headerlink" href="#3-gm-heartbeat-srctown-clockpy" title="Permanent link">&para;</a></h2>
 <p>A local heartbeat that <strong>dispatches the GM workflow</strong> (<code>gm.yml</code>) every interval and prints a live status line each tick:
 - Dispatch result (skipped if a GM run is still in progress).
 - Live <strong>phase + cycle</strong>, read from the repo via the GitHub API.
 - Latest GM run status.</p>
 <p><code>Ctrl-C</code> stops it cleanly.</p>
 <h3 id="run-it_1"><strong>Run It</strong><a class="headerlink" href="#run-it_1" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python3<span class="w"> </span>town-clock.py<span class="w">          </span><span class="c1"># default: every 300 seconds</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python3<span class="w"> </span>town-clock.py<span class="w"> </span><span class="m">120</span><span class="w">      </span><span class="c1"># custom interval, e.g. 2 minutes</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python3<span class="w"> </span>src/town-clock.py<span class="w">          </span><span class="c1"># default: every 300 seconds</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python3<span class="w"> </span>src/town-clock.py<span class="w"> </span><span class="m">120</span><span class="w">      </span><span class="c1"># custom interval, e.g. 2 minutes</span>
 </code></pre></div>
 <blockquote>
 <p>The GitHub Action also self-schedules (<code>cron: */5 * * * *</code>) and triggers on pushes to <code>gameplay/votes/</code>, <code>gameplay/night/</code>, and <code>gameplay/village/</code>. The heartbeat is for a <strong>visible local pulse</strong> during a match.</p>
@@ -1816,7 +1816,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python3<span class="w"> </span>setup/make_signing_keys.py<span class="w"> </span>--vault<span class="w"> </span>~/.bazaar
 </code></pre></div>
 <hr />
-<h2 id="5-match-reset-town-resetpy"><strong>5. Match Reset (<code>town-reset.py</code>)</strong><a class="headerlink" href="#5-match-reset-town-resetpy" title="Permanent link">&para;</a></h2>
+<h2 id="5-match-reset-srctown-resetpy"><strong>5. Match Reset (<code>src/town-reset.py</code>)</strong><a class="headerlink" href="#5-match-reset-srctown-resetpy" title="Permanent link">&para;</a></h2>
 <p>The <strong>official way</strong> to reset the arena between matches. A partial manual reset once caused the <strong>ghost-replay bug</strong>: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order. Always use the script.</p>
 <h3 id="what-it-does"><strong>What It Does</strong><a class="headerlink" href="#what-it-does" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1830,13 +1830,13 @@
 <p><strong>Match recaps (<code>gameplay/village/match-XX-recap.md</code>) are kept</strong> — they are history and cannot interfere with a fresh match (the new epoch namespaces everything).</p>
 <h3 id="usage"><strong>Usage</strong><a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>./bazaar-launch.sh<span class="w"> </span>stop<span class="w">            </span><span class="c1"># bots must be down first</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python3<span class="w"> </span>town-reset.py<span class="w">              </span><span class="c1"># asks "Are you sure?" (y/n) before wiping</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>python3<span class="w"> </span>town-reset.py<span class="w"> </span>--dry-run<span class="w">    </span><span class="c1"># preview: show what would be wiped, touch nothing, no prompts</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>python3<span class="w"> </span>town-reset.py<span class="w"> </span>--push<span class="w">       </span><span class="c1"># after committing, asks before pushing</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python3<span class="w"> </span>src/town-reset.py<span class="w">              </span><span class="c1"># asks "Are you sure?" (y/n) before wiping</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>python3<span class="w"> </span>src/town-reset.py<span class="w"> </span>--dry-run<span class="w">    </span><span class="c1"># preview: show what would be wiped, touch nothing, no prompts</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>python3<span class="w"> </span>src/town-reset.py<span class="w"> </span>--push<span class="w">       </span><span class="c1"># after committing, asks before pushing</span>
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>./bazaar-launch.sh<span class="w"> </span>start<span class="w">           </span><span class="c1"># bots + Herald back up</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>gh<span class="w"> </span>workflow<span class="w"> </span>run<span class="w"> </span>gm.yml<span class="w">             </span><span class="c1"># optional: immediate GM tick</span>
 </code></pre></div>
-<p>The original bash version (<code>setup/reset_match.sh</code>) does the same wipe; <code>town-reset.py</code> adds the dry-run, the <code>.gitkeep</code> repairs, and a push-only-on-request commit.</p>
+<p>The original bash version (<code>setup/reset_match.sh</code>) does the same wipe; <code>src/town-reset.py</code> adds the dry-run, the <code>.gitkeep</code> repairs, and a push-only-on-request commit.</p>
 <hr />
 <h2 id="6-match-lifecycle"><strong>6. Match Lifecycle</strong><a class="headerlink" href="#6-match-lifecycle" title="Permanent link">&para;</a></h2>
 <ol>

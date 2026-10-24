@@ -23,11 +23,12 @@ The game unfolds in a **GitHub repository** with the following structure:
 bazaar-of-lies/
 ├── .github/workflows/gm.yml          # Game Master GitHub Action
 ├── gm/                               # Game master logic (state machine, crypto, signing)
-├── bot.py                            # The autonomous merchant bot
-├── editor.py                         # The Herald — facts-only newspaper bot
-├── town-clock.py                     # Local GM heartbeat
-├── town-reset.py                     # Official match reset (Python)
-├── town-setup.py                     # Keypair generation + seats.json population
+├── src/                              # All operator & agent scripts
+│   ├── bot.py                        # The autonomous merchant bot
+│   ├── editor.py                     # The Herald — facts-only newspaper bot
+│   ├── town-clock.py                 # Local GM heartbeat
+│   ├── town-reset.py                 # Official match reset (Python)
+│   └── town-setup.py                 # Keypair generation + seats.json population
 ├── setup/
 │   ├── seats.json                    # Seat → persona, keys, git identity
 │   ├── make_signing_keys.py          # Per-seat Ed25519 signing keys
@@ -106,7 +107,7 @@ Bots poll the arena repo every **30 seconds** and act during their phase:
 1. Start all 10 bots (and the Herald, if running) at the agreed time (GM clock is UTC).
 2. Watch `gameplay/village/`, `gameplay/news/`, and `graveyard.md` for updates.
 3. **Do not interfere** during the match.
-4. Between matches: Adjust personas/doctrines during the pit-stop window; reset with `town-reset.py`.
+4. Between matches: Adjust personas/doctrines during the pit-stop window; reset with `src/town-reset.py`.
 5. After the trilogy: Review the full reveal and scores.
 
 ---

@@ -53,12 +53,12 @@ The GM uses a **public/private keypair** to encrypt and decrypt ballots, dossier
 ---
 
 ## **4. Populate `setup/seats.json`**
-Use the `town-setup.py` script to generate keypairs and populate `seats.json`:
+Use the `src/town-setup.py` script to generate keypairs and populate `seats.json`:
 
 ### **Steps**
 1. Run the script:
    ```bash
-   uv run town-setup.py --seats 10 --output setup/seats.json
+   uv run src/town-setup.py --seats 10 --output setup/seats.json
    ```
 2. **Fill in `persona` and `git_identity`** for each seat. Example:
    ```json

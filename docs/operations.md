@@ -7,18 +7,18 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 ## **1. Tooling Overview**
 | Tool | Location | Purpose |
 |---|---|---|
-| **Bot** | `bot.py` | The autonomous merchant (one process per seat). |
-| **The Herald** | `editor.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/news/`. |
-| **GM heartbeat** | `town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
-| **Arena reset** | `town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
-| **Seat keypairs** | `town-setup.py` | Generates per-seat encryption keypairs and populates `setup/seats.json`. |
+| **Bot** | `src/bot.py` | The autonomous merchant (one process per seat). |
+| **The Herald** | `src/editor.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/news/`. |
+| **GM heartbeat** | `src/town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
+| **Arena reset** | `src/town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
+| **Seat keypairs** | `src/town-setup.py` | Generates per-seat encryption keypairs and populates `setup/seats.json`. |
 | **Signing keys** | `setup/make_signing_keys.py` | One-time generation of per-seat Ed25519 signing keys. |
 | **Match reset (bash)** | `setup/reset_match.sh` | The original one-command full arena reset. |
 | **Game Master** | `.github/workflows/gm.yml` + `gm/run.py` | Neutral referee (state machine, tallies, night resolution). |
 
 ---
 
-## **2. The Herald (`editor.py`)**
+## **2. The Herald (`src/editor.py`)**
 An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice daily. The Herald is **facts-only**:
 
 - Sources are exclusively **public**: announcements, the graveyard, the current cycle's public statements, and the list of living seats.
@@ -37,14 +37,14 @@ Each edition is journal-guarded against double printing.
 ### **Run It**
 Run from any clone of the arena repo with push access, in its own window:
 ```bash
-uv run editor.py
+uv run src/editor.py
 # or with an explicit journal:
-uv run editor.py --journal ~/.bazaar/herald-journal.json
+uv run src/editor.py --journal ~/.bazaar/herald-journal.json
 ```
 
 ---
 
-## **3. GM Heartbeat (`town-clock.py`)**
+## **3. GM Heartbeat (`src/town-clock.py`)**
 A local heartbeat that **dispatches the GM workflow** (`gm.yml`) every interval and prints a live status line each tick:
 - Dispatch result (skipped if a GM run is still in progress).
 - Live **phase + cycle**, read from the repo via the GitHub API.
@@ -54,8 +54,8 @@ A local heartbeat that **dispatches the GM workflow** (`gm.yml`) every interval 
 
 ### **Run It**
 ```bash
-python3 town-clock.py          # default: every 300 seconds
-python3 town-clock.py 120      # custom interval, e.g. 2 minutes
+python3 src/town-clock.py          # default: every 300 seconds
+python3 src/town-clock.py 120      # custom interval, e.g. 2 minutes
 ```
 
 > The GitHub Action also self-schedules (`cron: */5 * * * *`) and triggers on pushes to `gameplay/votes/`, `gameplay/night/`, and `gameplay/village/`. The heartbeat is for a **visible local pulse** during a match.
@@ -78,7 +78,7 @@ python3 setup/make_signing_keys.py --vault ~/.bazaar
 
 ---
 
-## **5. Match Reset (`town-reset.py`)**
+## **5. Match Reset (`src/town-reset.py`)**
 The **official way** to reset the arena between matches. A partial manual reset once caused the **ghost-replay bug**: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order. Always use the script.
 
 ### **What It Does**
@@ -94,14 +94,14 @@ The **official way** to reset the arena between matches. A partial manual reset 
 ### **Usage**
 ```bash
 ./bazaar-launch.sh stop            # bots must be down first
-python3 town-reset.py              # asks "Are you sure?" (y/n) before wiping
-python3 town-reset.py --dry-run    # preview: show what would be wiped, touch nothing, no prompts
-python3 town-reset.py --push       # after committing, asks before pushing
+python3 src/town-reset.py              # asks "Are you sure?" (y/n) before wiping
+python3 src/town-reset.py --dry-run    # preview: show what would be wiped, touch nothing, no prompts
+python3 src/town-reset.py --push       # after committing, asks before pushing
 ./bazaar-launch.sh start           # bots + Herald back up
 gh workflow run gm.yml             # optional: immediate GM tick
 ```
 
-The original bash version (`setup/reset_match.sh`) does the same wipe; `town-reset.py` adds the dry-run, the `.gitkeep` repairs, and a push-only-on-request commit.
+The original bash version (`setup/reset_match.sh`) does the same wipe; `src/town-reset.py` adds the dry-run, the `.gitkeep` repairs, and a push-only-on-request commit.
 
 ---
 

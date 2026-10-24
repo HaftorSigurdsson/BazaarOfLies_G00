@@ -34,7 +34,8 @@ import os
 import subprocess
 import sys
 
-REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
+# src/town-reset.py -> REPO_ROOT is the parent of src/ (the arena root).
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Directories whose CONTENTS are pure match artifacts. Kept (with a
 # .gitkeep) but emptied. statements/ and day-*.jsonl are the village's
