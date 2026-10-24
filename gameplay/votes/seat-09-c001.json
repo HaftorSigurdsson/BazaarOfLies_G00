@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "bb6846e0",
+  "seat": "seat-09",
+  "target": "seat-05",
+  "rationale": "Ripley (5), your flute’s endless song hums where the ledger stays blank—yet the bazaar trades in ink, not echoes.",
+  "ts": "2026-10-24T22:20:24Z"
+ },
+ "sig": "cWjS3leDr6LsKTnv3usm2uGd0YzcN24MucFam7aN7cOcmxWPfxHHFRYgXIuvs21Iv+KEgBx/l0vysNaBngn/AA=="
+}
