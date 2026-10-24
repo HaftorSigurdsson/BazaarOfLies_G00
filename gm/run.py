@@ -33,9 +33,14 @@ from utils import (read_state, write_state, update_announcements,
                    display_name)
 
 # ---------------------------------------------------------------- tuning ---
-DISCUSSION_MINUTES = 30
-VOTING_MINUTES = 10
-NIGHT_MINUTES = 10
+# One round = 45 minutes, every window a multiple of the GM's 5-minute
+# tick, so phase deadlines always land on a tick:
+#   day   25 min — Morning, Morning tea, Lunch, Afternoon tea, Dinner
+#    +     5 min — Evening (the vote)
+#   night 15 min — The night, Night snacks, The night watch
+DISCUSSION_MINUTES = 25
+VOTING_MINUTES = 5
+NIGHT_MINUTES = 15
 GM_ROLES_FILE = "gm/roles.enc"
 SECURE_RANDOM = random.SystemRandom()
 PUBLISH = not os.environ.get("GM_NO_PUSH")   # GM_NO_PUSH=1 → local testing

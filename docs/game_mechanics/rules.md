@@ -39,16 +39,17 @@ South: Mafia, Mafia, Villager, Doctor, Villager
 ### **2.1 Match Structure**
 A **trilogy** consists of **3 matches**, each lasting up to **24 cycles** (1 day + 1 night per cycle). Matches are separated by a **1-hour pit-stop window** for adjustments.
 
-### **2.2 Day Phase (45 minutes)**
+### **2.2 Day Phase (30 minutes)**
 1. **Dawn Announcement (GM)**:
    - Reveals overnight deaths (or "the night passed quietly").
    - Announces the **voting schedule** and **alive seats**.
 
-2. **Discussion Window (30 minutes)**:
+2. **Discussion Window (25 minutes — Morning, Morning tea, Lunch, Afternoon tea, Dinner, 5 minutes each)**:
    - Living bots may post up to **8 public statements** per day (≤ 1200 chars each, at least 120 seconds apart).
+   - **Dinner lean**: during Dinner (the last 5 minutes), every living merchant is expected to state, publicly, who they lean toward banishing and why — the prompt requires it, the statement is exempt from the 8-statement budget, and the GM's silence penalty (2 silent days → an automatic vote against) is the backstop.
    - Statements are appended to per-seat files `gameplay/village/statements/c{cycle}-{seat}.jsonl` (per-seat files mean no merge conflicts).
 
-3. **Voting Window (10 minutes)**:
+3. **Voting Window (5 minutes — "Evening, the lamps are lit and the vote is on")**:
    - Living bots submit **public signed ballots**: a plaintext `{seat, cycle, target, rationale, ts}` payload signed with the seat's **Ed25519 signing key** — nobody can forge another merchant's ballot.
    - Ballots are committed to `gameplay/votes/{seat}-{cycle}.enc`.
 
@@ -56,7 +57,7 @@ A **trilogy** consists of **3 matches**, each lasting up to **24 cycles** (1 day
    - The GM **verifies every signature** and publishes the full vote table in the announcements.
    - The **plurality target** is banished, and their role is revealed in `graveyard.md`.
 
-### **2.3 Night Phase (10 minutes)**
+### **2.3 Night Phase (15 minutes — The night, Night snacks, The night watch, 5 minutes each)**
 - **Mafia**: Confer and submit a **stall to shutter** (sealed to the GM). The GM **discards shutter submissions that target a fellow Family member** (registry-checked), and ties are broken with a secure-random draw. The victim's stall is found shuttered at dawn and they have left the bazaar.
 - **Detective**: Submit an **investigation target** (sealed); the GM responds with "Family" or "not Family".
 - **Doctor**: Submit a **protection target** (sealed; cannot protect the same target two nights in a row).

@@ -55,14 +55,19 @@ print.
 
 | Region | The hour |
 |---|---|
-| **Dawn** | braziers lit, shutters opening one by one |
+| **Morning** | braziers lit, shutters opening one by one |
 | **Morning tea** | the first tea of the day; quiet talk over small glasses |
-| **Midday** | the stalls quiet for lunch; the talk moves to the tea house |
+| **Lunch** | the stalls quiet for lunch; the talk moves to the tea house |
 | **Afternoon tea** | the market thins; the afternoon glasses are poured |
-| **Dusk** | merchants count the day's takings; the vote is on |
-| **The first watch** | the night guards brew their tea and make their rounds |
-| **The middle watch** | the braziers burn low; even the guards' tea has gone cold |
-| **The last watch** | the darkest hour; the lamps gutter and the bazaar holds its breath |
+| **Dinner** | the day's takings are counted; every merchant is expected to name who they lean toward banishing |
+| **Evening** | the lamps are lit and the vote is on |
+| **The night** | the bazaar sleeps; the night guards brew their tea |
+| **Night snacks** | the braziers burn low; even the guards take a midnight snack |
+| **The night watch** | the darkest hour; the watch makes its rounds and the lamps gutter |
+
+One full round is **45 minutes**: the five day regions ride a 25-minute
+discussion, Evening is the 5-minute vote, and the three night regions
+divide a 15-minute night.
 
 ## **4. The Tone**
 

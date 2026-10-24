@@ -106,26 +106,30 @@ def get_living_seats() -> List[str]:
 # the arena clock, not new mechanics. Bots get the current region as
 # context and speak of tea naturally; the Herald states the time of
 # print. Fractions are of the phase's own duration.
+# One 45-minute round: Morning, Morning tea, Lunch, Afternoon tea,
+# Dinner (5 min each of a 25-min discussion) → Evening (the 5-min vote)
+# → The night, Night snacks, The night watch (5 min each of a 15-min night).
 DAY_REGIONS = [
-    (0.00, 0.20, "Dawn",
-     "the bazaar is waking — braziers lit, shutters opening one by one"),
+    (0.00, 0.20, "Morning",
+     "the braziers are lit and the shutters open one by one"),
     (0.20, 0.40, "Morning tea",
      "the first tea of the day; quiet talk over small glasses"),
-    (0.40, 0.60, "Midday",
+    (0.40, 0.60, "Lunch",
      "the stalls quiet for lunch; the talk moves to the tea house"),
     (0.60, 0.80, "Afternoon tea",
      "the market thins; the afternoon glasses are poured"),
-    (0.80, 1.01, "Dusk",
-     "merchants count the day's takings; the vote is coming"),
+    (0.80, 1.01, "Dinner",
+     "the day's takings are counted; every merchant is expected to name "
+     "who they lean toward banishing"),
 ]
 
 NIGHT_REGIONS = [
-    (0.00, 0.35, "The first watch",
-     "the night guards brew their tea and make their rounds"),
-    (0.35, 0.70, "The middle watch",
-     "the braziers burn low; even the guards' tea has gone cold"),
-    (0.70, 1.01, "The last watch",
-     "the darkest hour; the lamps gutter and the bazaar holds its breath"),
+    (0.00, 0.34, "The night",
+     "the bazaar sleeps; the night guards brew their tea"),
+    (0.34, 0.67, "Night snacks",
+     "the braziers burn low; even the guards take a midnight snack"),
+    (0.67, 1.01, "The night watch",
+     "the darkest hour; the watch makes its rounds and the lamps gutter"),
 ]
 
 
@@ -144,8 +148,8 @@ def day_region(state: dict):
     phase = state.get("phase")
 
     if phase in ("discussion", "voting"):
-        if phase == "voting":               # the vote rides the dusk
-            return "Dusk", "the lamps are lit and the vote is on"
+        if phase == "voting":               # the vote rides the evening
+            return "Evening", "the lamps are lit and the vote is on"
         dawn = _parse_ts(clock.get("dawn"))
         end = _parse_ts(clock.get("discussion_deadline"))
         if dawn and end and end > dawn:
@@ -163,7 +167,7 @@ def day_region(state: dict):
             # span (gm/run.py NIGHT_MINUTES, overridable for exotic tests).
             import os
             night_len = timedelta(
-                minutes=int(os.environ.get("BAZAAR_NIGHT_MINUTES", "10")))
+                minutes=int(os.environ.get("BAZAAR_NIGHT_MINUTES", "15")))
             elapsed = night_len - (end - now)
             frac = min(max(elapsed / night_len, 0.0), 0.99)
             for lo, hi, label, flavour in NIGHT_REGIONS:

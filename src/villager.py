@@ -69,7 +69,7 @@ NOTEBOOK_MAX_CHARS = 4000               # hard cap on stored notebook text
 # file per seat per cycle, never in the repo. Plaintext for now; the
 # dossier's night_channel_key is the hook for encrypting later (at which
 # point the channel could move into the arena repo).
-FAMILY_COUNCIL_GRACE_SECONDS = 90        # wait this long for slow cousins
+FAMILY_COUNCIL_GRACE_SECONDS = 120       # wait this long for slow cousins
 REASONING_TEMPERATURE = 0.3             # private thinking runs cooler than speech
 
 # ------------------------------------------------------------------ args ---
@@ -525,7 +525,12 @@ def parse_seat_id(text):
 
 # ------------------------------------------------------------- phase acts ---
 def do_discussion(state, cs, journal):
-    if cs["statements"] >= MAX_STATEMENTS_PER_DAY:
+    # Dinner is the village's reckoning: the last fifth of the day, when
+    # every merchant is expected to state, publicly, who they lean toward
+    # banishing. The dinner lean overrides the statement budget (once).
+    at_dinner = (day_region(state)[0] == "Dinner"
+                 and not cs.get("dinner_stated", False))
+    if not at_dinner and cs["statements"] >= MAX_STATEMENTS_PER_DAY:
         log(f"phase=discussion → statement budget used "
             f"({cs['statements']}/{MAX_STATEMENTS_PER_DAY}), idle")
         return
@@ -569,7 +574,10 @@ def do_discussion(state, cs, journal):
         f"them something. Address them by their name and seat number, exactly "
         f"as shown (e.g. 'Gandalf (5)'). The names are just labels — do "
         f"not treat any merchant as the character their name may evoke. Only "
-        f"open a new topic if the village is silent.",
+        f"open a new topic if the village is silent."
+        + ("\nIt is DINNER. This statement must state, publicly and clearly, "
+           "who you lean toward banishing tonight and why — name them. The "
+           "village is counting heads." if at_dinner else "")
     )[:STATEMENT_MAX_CHARS]
 
     sdir = "gameplay/village/statements"
@@ -587,8 +595,11 @@ def do_discussion(state, cs, journal):
 
     cs["statements"] += 1
     cs["last_statement_ts"] = time.time()
+    if at_dinner:
+        cs["dinner_stated"] = True
     save_journal(journal)
-    log(f"posted statement {cs['statements']}/{MAX_STATEMENTS_PER_DAY} for cycle {state['cycle']:03d}")
+    log(f"posted statement {cs['statements']}/{MAX_STATEMENTS_PER_DAY} for cycle {state['cycle']:03d}"
+        + (" (dinner lean)" if at_dinner else ""))
 
     # Stage 3 — remember it. What was said and why goes into the notebook so
     # the bot never contradicts itself on a later day.

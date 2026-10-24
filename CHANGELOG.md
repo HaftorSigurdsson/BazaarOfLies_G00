@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.6.0] - 2026-10-24
+### Changed
+- **The 45-minute round** — a new day rhythm, every window a multiple of the GM's 5-minute tick so phase deadlines always land on a tick: discussion **25 min** (`Morning`, `Morning tea`, `Lunch`, `Afternoon tea`, `Dinner` — 5 minutes each on the tea clock), voting **5 min** (`Evening — the lamps are lit and the vote is on`), night **15 min** (`The night`, `Night snacks`, `The night watch`). Was 30/10/10 (50-minute rounds).
+- **The Dinner lean**: during Dinner (the discussion's last 5 minutes), every living merchant's statement prompt requires them to state publicly who they lean toward banishing and why. The dinner statement is exempt from the 8-statement budget (once per cycle, journal-tracked); the GM's silence penalty remains the backstop.
+- **Family council grace loosened to 120 s** — the 15-minute night gives the candlelight council a whole watch to convene (pass A in *The night*, deliberation over *Night snacks*, the sealed shutter by *The night watch*).
+- Docs updated: the tea-clock table (`the_bazaar.md`), phase durations + the dinner rule (`rules.md`), council grace (`bot_architecture.md`).
+
 ## [2.5.0] - 2026-10-24
 ### Added
 - **The Family's candlelight council**: Mafiosi can now coordinate at night — a two-pass conclave held **outside the repo**, in `../.bazaar/family/c{CCC}-{seat}.json` (one writer per file, epoch-scoped, ghost-proof; invisible to the village by construction). First night poll: each Mafioso lodges a shutter proposal (target + one line why); later polls: the Family's proposals are read into the sealed-action prompt with instruction to converge on the majority (a split hands the choice to the GM's random tie-break). A 90-second grace keeps a stalled cousin from stalling the shutter; solo Mafiosi skip the council. Plaintext for now — the dossier's `night_channel_key` (dealt but previously unused) is the hook for encrypting it later, at which point the channel could move into the arena repo. `town-reset.py` and `setup/reset_match.sh` clear the channel between matches; documented in the bot architecture guide.
