@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "9c5ef90a",
+  "seat": "seat-03",
+  "target": "seat-08",
+  "rationale": "Morpheus (8) dodged Yoda (3)’s plain yes/no on Gandalf (1)’s roads twice—no copper there, only fog.",
+  "ts": "2026-10-24T19:00:51Z"
+ },
+ "sig": "d85BfXwaarEkHhlW977PeFhhxLcu4jU/400Ggj07Jsoe4S3nfT11HOGxPklCkz1A86T8yRbVP+JwVUIc336gBA=="
+}
