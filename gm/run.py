@@ -16,6 +16,7 @@ Contract with bots (villager.py):
     registry — a bot's self-declared role is never trusted.
 """
 import base64
+import glob
 import json
 import os
 import random
@@ -244,7 +245,17 @@ def advance_phase():
             log(f"phase=night → waiting until {deadline.isoformat()}")
             return
         log("phase=night → resolving night actions")
-        resolve_night_actions()
+        # Idempotency: a tick that crashed between resolving the night and
+        # ending the match must not resolve it again (double announcements,
+        # double results). Sealed dawn results for this cycle mean the
+        # night is already done — skip straight to the reckoning.
+        already = glob.glob(
+            f"gameplay/dossiers/seat-*-c{state['cycle']:03d}-result.enc")
+        if already:
+            log(f"night already resolved ({len(already)} dawn results "
+                f"sealed) — proceeding to the reckoning")
+        else:
+            resolve_night_actions()
         state = read_state()
         if check_win_conditions():
             end_match()
@@ -685,8 +696,9 @@ def write_truth_archive(state, registry, priv):
 
 
 def end_match():
+    priv = get_gm_private_key()
     state = read_state()
-    registry = load_role_registry(get_gm_private_key())
+    registry = load_role_registry(priv)
     seats = get_seats()
 
     with open(f"gameplay/village/match-{state["match"]:02d}-recap.md", "w") as f:
