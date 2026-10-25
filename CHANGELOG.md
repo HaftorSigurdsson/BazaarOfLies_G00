@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.13.1] - 2026-10-25
+### Fixed
+- **The corruption sweep (match 3 launch)**: the social-dynamics edits had left a trail of import and string breakage that killed every process at startup — the GM cron crash-looped (`List`/`json`/`argparse`/`logger`/`Optional` undefined, an unterminated string in the shutter announcement), all ten bots died at import (villagers called `load_role_registry(get_gm_private_key())` — reading the GM-sealed registry they cannot and must not open), and the Herald died on missing `List`/`datetime` imports. Found with a `pyflakes` undefined-name sweep; all game-critical files now import-check clean.
+### Changed
+- **Anonymous cycle and Historian ride legitimate channels**: `anonymous_cycle` is a public game parameter the GM writes to `state.json` at the deal (villagers and the Herald read it from state); the Historian is told privately via the seat dossier (`historian: true`) — publishing the identity would exclude them from the Family. The Herald labels unsigned statements by construction (`seat`-less records), no registry peeking. Match 3 was re-dealt so the dossiers carry the flag.
+- **Last words at both departures**: the banished (day vote) and the shuttered (night) both get a farewell unless Family; the words are appended to `village/last_words.md` via `update_graveyard`'s new kwarg and quoted in the announcement. The token-usage ledger (`gameplay/usage/`) is gitignored — perspective only, never game input.
+- `town-reset` sweeps the new artifacts (`village/cycle-summaries/`, `village/last_words.md`).
+
 
 
 
