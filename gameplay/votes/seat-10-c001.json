@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "482a98bf",
+  "seat": "seat-10",
+  "target": "seat-05",
+  "rationale": "Ripley coordinated eight voices to press Gandalf on the roster column while refusing to answer Gandalf's identical question to Morpheus. That silence is the ledger the bazaar asked for and did not receive.",
+  "ts": "2026-10-25T22:00:32Z"
+ },
+ "sig": "VFgYjdlDSAiMdLD7KBlGN7XPtsGNORRdG/Vm1+kZugJACdiB70Hx0vbXfEpY/EdD9aC44kfBcdOcRP0FModOBA=="
+}
