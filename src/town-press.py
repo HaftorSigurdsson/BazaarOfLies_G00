@@ -29,6 +29,29 @@ with docs/assets/images/bazaar-engraving.png as the static fallback —
 plus three deterministic filler boxes at the foot of the page: the
 weather & the market, PERSONALS classifieds, and "The Bazaar Whisper"
 humour column.
+
+REPAIRS (2026-10-25) — all in the parsing/layout layer, no API change:
+  1. body_line() now recognises standalone **BOLD** lines as section
+     heads, and the first surviving one as the front-page headline.
+     Previously they fell through to body paragraphs: the real headline
+     never reached the masthead, sections ran inline with the prose
+     (the "run-on blob"), and the fpdf2 engine printed literal
+     asterisks ("**EVENING EDITION – CYCLE 1**").
+  2. Machine-appended sections ("## The Tally", "## Editor's Note") can
+     no longer be promoted to the front-page headline — vol-23-c001
+     led its page with the banner headline "The Tally".
+  3. The dateline ("*Vol. 23 — Match 3, Cycle 1*") is dropped: the old
+     check only matched "*Match ...", so the "Vol." prefix let it leak
+     through as a stray ruled section head under the plate.
+  4. Short italic lines are decks (centred italic standfirst), not
+     ruled section heads; short italics ending in ":" are attributions
+     (e.g. "*From Hermione:*").
+  5. latex_escape() is now single-pass — the sequential replaces
+     corrupted braces introduced by \\textbackslash{}.
+  6. fpdf2 engine: body paragraphs are md_strip()'ed (no literal
+     asterisks), subheads are measured at their render size (the fit
+     check used to underestimate), and the foot filler starts at its
+     computed y instead of wherever the body cursor stopped.
 """
 import argparse
 import os
@@ -122,7 +145,6 @@ PLATE_RULES = [
                 r"|without a (?:funeral|departure)", re.I), "moon-and-stars.png"),
     (re.compile(r"banish", re.I), "scales-of-judgement.png"),
     (re.compile(r"ballot|\bvot(?:e|es|ing|ed)\b", re.I), "ballot-urn.png"),
-    (re.compile(r"banish", re.I), "tombstones-cypress.png"),
     (re.compile(r"graveyard|funeral|obituar", re.I), "tombstones-cypress.png"),
     (re.compile(r"carpet weaver|loom", re.I), "weavers-loom.png"),
     (re.compile(r"moneylender|ledger", re.I), "ledger-and-quill.png"),
@@ -269,15 +291,29 @@ def sanitize(text):
                 .replace("\u201d", "''"))
 
 
+# Sections that appear in the markdown by the Herald's own machinery (or
+# that duplicate the masthead). They are printed as ruled sections but
+# must never be promoted to the front-page headline — vol-23-c001 led
+# its page with the banner headline "The Tally".
+MACHINE_HEADS = re.compile(r"(the tally|editor'?s note)\b", re.I)
+# "**MORNING/EVENING/FINAL EDITION – CYCLE N**" kickers duplicate the
+# masthead dateline — drop them.
+KICKER = re.compile(r"(morning|evening|final)\s+edition\b", re.I)
+# The Herald's dateline line ("*Vol. 23 — Match 3, Cycle 1*"; older
+# editions wrote "*Match 3, Cycle 1*"). The masthead already carries
+# these numbers — drop either form.
+DATELINE = re.compile(r"\*(?:Vol(?:ume)?\.|Match\b)", re.I)
+
+
 def parse_edition(md_text, md_path):
     """Split an edition into masthead metadata and printable blocks."""
     name = os.path.basename(md_path)
     vol = None
-    m = re.match(r"herald-vol-(\d+)-c(\d+)-(morning|evening|final)\.md", name)
+    m = re.match(r"herald-vol-(\d+)-c(\d+)-(morning|evening|final).md", name)
     if m:
         vol, cycle, part = int(m.group(1)), m.group(2), m.group(3)
     else:
-        m = re.match(r"herald-c(\d+)-(morning|evening|final)\.md", name)
+        m = re.match(r"herald-c(\d+)-(morning|evening|final).md", name)
         if m:
             cycle, part = m.group(1), m.group(2)
         else:           # e.g. the docs sample: herald-sample-evening.md
@@ -293,7 +329,7 @@ def parse_edition(md_text, md_path):
     headline, blocks = None, []
 
     def body_line(s):
-        """One line of edition prose → headline / subhead / paragraph."""
+        """One line of edition prose → headline / subhead / deck / para."""
         nonlocal headline
         if s.startswith("#"):             # any heading depth (# … ######)
             m = re.match(r"#{1,6}\s*(.+)", s)
@@ -301,18 +337,35 @@ def parse_edition(md_text, md_path):
                 t = sanitize(m.group(1).strip().strip("*"))
                 if re.match(r"the herald\b", t, re.I):
                     return                 # the duplicate inner masthead
-                if headline is None:      # first section heading = headline
+                if MACHINE_HEADS.match(t):
+                    # press/Herald machinery: print, never the headline
+                    blocks.append(("subhead", t))
+                elif headline is None:    # first section heading = headline
                     headline = t
                 else:
                     blocks.append(("subhead", t))
             return
-        if re.fullmatch(r"\*[^*]+\*", s):   # *Match 1, Cycle 001* → dateline
-            if re.match(r"\*Match\b", s, re.I):
-                return
+        if re.fullmatch(r"\*{2}[^*]+\*{2}", s):
+            # A standalone **BOLD LINE** — the edition's banner headline
+            # and its section heads. Previously these fell through to
+            # body paragraphs and printed with literal asterisks.
+            t = sanitize(s.strip("*").strip())
+            if KICKER.match(t):
+                return                     # the masthead already says it
+            if headline is None:
+                headline = t
+            else:
+                blocks.append(("subhead", t))
+            return
+        if re.fullmatch(r"\*[^*]+\*", s):
+            if DATELINE.match(s):
+                return                     # masthead has the numbers
             text = sanitize(s.strip("*"))
-            if len(text) <= 60:             # short italic = section label
-                blocks.append(("subhead", text))
-            else:                           # long italic = stage direction
+            if text.endswith(":"):         # "*From Hermione:*" — attribution
+                blocks.append(("para", sanitize(s)))
+            elif len(text) <= 60:          # short italic = deck/standfirst
+                blocks.append(("deck", text))
+            else:                          # long italic = stage direction
                 blocks.append(("para", sanitize(s)))   # → \emph in LaTeX
             return
         if s == "---":
@@ -377,17 +430,25 @@ def parse_chart_rows(text):
     return header, bars
 
 
+# Single-pass escaping: the sequential replaces used before corrupted
+# braces introduced by \textbackslash{} ("{" → "\{" ran after the
+# backslash replacement had written "{...}" into the text).
+_LATEX_SPECIALS = {
+    "\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "#": r"\#",
+    "_": r"\_", "{": r"\{", "}": r"\}", "~": r"\textasciitilde{}",
+    "^": r"\textasciicircum{}",
+}
+
+
 def latex_escape(text):
-    return (text.replace("\\", r"\textbackslash{}")
-                .replace("&", r"\&").replace("%", r"\%")
-                .replace("#", r"\#").replace("_", r"\_")
-                .replace("{", r"\{").replace("}", r"\}")
-                .replace("~", r"\textasciitilde{}")
-                .replace("^", r"\textasciicircum{}"))
+    return re.sub(r"[\\&%#_{}~^]",
+                  lambda m: _LATEX_SPECIALS[m.group(0)], text)
 
 
 def latex_inline(text):
-    """Light markdown → LaTeX: **bold**, *italic*."""
+    r"""Light markdown → LaTeX: **bold**, *italic*. NB: in a re.sub
+    replacement template a single backslash starts an escape ("\t" is a
+    tab, "\e" is an error) — the commands need doubled backslashes."""
     text = latex_escape(text)
     text = re.sub(r"\*\*(.+?)\*\*", r"\\textbf{\1}", text)
     text = re.sub(r"\*(.+?)\*", r"\\emph{\1}", text)
@@ -402,13 +463,14 @@ def chart_tex(text):
     rows = []
     for label, n in bars:
         w = max(0.9, 4.5 * n / top)
-        rows.append("%s & \\rule{%.2fem}{1.2ex} & %s \\\\" %
-                    (latex_escape(sanitize(label)), w, n))
+        rows.append("%s & \\rule{%.2fem}{1.2ex} & %s \\\\"
+                    % (latex_escape(sanitize(label)), w, n))
     head = [latex_escape(sanitize(l)) for l in header]
     tex = ["\\begin{center}",
            "\\hrule height .6pt\\vspace{5pt}"]
     if head:
-        tex.append("{\\footnotesize\\scshape\\textbf{%s}}\\\\" % head[0])
+        tex.append("{\\footnotesize\\scshape\\textbf{%s}}\\\\"
+                   % head[0])
         for extra in head[1:]:
             tex.append("\\textit{\\footnotesize %s}\\\\[2pt]" % extra)
     tex.append("\\vspace{3pt}")
@@ -426,9 +488,12 @@ def build_tex(meta, date_str, size, linespread):
     for kind, text in meta["blocks"]:
         if kind == "subhead":
             body.append(r"\section*{%s}" % latex_escape(text))
+        elif kind == "deck":              # centred italic standfirst
+            body.append("\\begin{center}\\itshape %s\\end{center}\n"
+                        % latex_escape(text))
         elif kind == "chart":
             if meta["part"] not in ("evening", "final"):
-                continue     # the tally chart belongs to the evening and final papers
+                continue   # the tally chart belongs to the evening/final papers
             body.append(chart_tex(text))
         elif kind == "code":
             body.append("\\begin{quote}\\small\\ttfamily\\obeylines\n"
@@ -632,6 +697,14 @@ def fpdf_sanitize(text):
                 .encode("cp1252", errors="replace").decode("cp1252"))
 
 
+def md_strip(text):
+    """The fpdf2 engine cannot set inline **bold**/*italic* spans inside a
+    flowing cell — strip the markers instead of printing them (previously
+    paragraphs carried literal asterisks into the paper)."""
+    text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
+    return re.sub(r"\*(.+?)\*", r"\1", text)
+
+
 def _wrap_lines(pdf, w, text):
     lines, current = 0, ""
     for word in text.split():
@@ -726,7 +799,7 @@ def render_fpdf(meta, date_str, size):
 
     col, y = 0, col_top[0]
     for kind, text in meta["blocks"]:
-        if kind == "chart" and meta["part"] != "evening":
+        if kind == "chart" and meta["part"] not in ("evening", "final"):
             continue          # the tally chart belongs to the evening paper
         if kind == "chart":
             header, bars = parse_chart_rows(text)
@@ -734,7 +807,12 @@ def render_fpdf(meta, date_str, size):
         elif kind == "code":
             block_h = len(text.splitlines()) * 4.0 + 4.0
         else:
-            pdf.set_font("Times", "B" if kind == "subhead" else "", size)
+            # measure with the font the block will actually be set in:
+            # subheads render at size+1 (previously measured at size, so
+            # the fit check underestimated and blocks overflowed).
+            fstyle = "B" if kind == "subhead" else ("I" if kind == "deck" else "")
+            fsize = size + (1 if kind == "subhead" else 0)
+            pdf.set_font("Times", fstyle, fsize)
             block_h = (_wrap_lines(pdf, COL_W, text) * leading
                        + (3.0 if kind == "subhead" else 1.6))
         if y + block_h > body_bottom:
@@ -771,17 +849,28 @@ def render_fpdf(meta, date_str, size):
             pdf.set_font("Courier", "", size - 1)
             pdf.multi_cell(COL_W, 4, fpdf_sanitize(text), align="L")
             y = pdf.get_y() + 1.2
+        elif kind == "deck":               # centred italic standfirst
+            pdf.set_font("Times", "I", size)
+            pdf.multi_cell(COL_W, leading, fpdf_sanitize(text), align="C")
+            y = pdf.get_y() + 1.2
         elif kind == "subhead":
             pdf.set_font("Times", "B", size + 1)
-            pdf.multi_cell(COL_W, leading, text.upper(), align="L")
+            pdf.multi_cell(COL_W, leading, fpdf_sanitize(text.upper()),
+                           align="L")
             y = pdf.get_y() + 1.8
         else:
-            pdf.multi_cell(COL_W, leading, text, align="J")
+            pdf.set_font("Times", "", size)
+            pdf.multi_cell(COL_W, leading, fpdf_sanitize(md_strip(text)),
+                           align="J")
             y = pdf.get_y() + 1.2
 
     pdf.set_auto_page_break(False)
     if foot_rows:
         fy = BODY_BOTTOM - foot_h + 2.0
+        # the foot starts at its ruled line — previously it was drawn at
+        # wherever the body cursor happened to stop, leaving the filler
+        # boxes floating mid-page (or overlapping a short column).
+        pdf.set_y(fy)
         pdf.set_line_width(0.25)
         pdf.line(MARGIN, fy - 2.0, PAGE_W - MARGIN, fy - 2.0)
         for kind, text in foot_rows:
@@ -789,7 +878,8 @@ def render_fpdf(meta, date_str, size):
                 pdf.set_y(pdf.get_y() + 2.0)
                 continue
             pdf.set_xy(MARGIN, pdf.get_y() + (1.0 if kind == "I" else 0.5))
-            pdf.set_font("Times", "BI" if kind == "B" else "I", 9 if kind == "B" else 8.5)
+            pdf.set_font("Times", "BI" if kind == "B" else "I",
+                         9 if kind == "B" else 8.5)
             if kind == "B":
                 pdf.cell(0, 4, text, align="C")
                 pdf.set_y(pdf.get_y() + 4)
@@ -846,7 +936,7 @@ def compile_edition(md_path, out_path=None, quiet=False):
 def main():
     ap = argparse.ArgumentParser(
         description="Bazaar of Lies — compile a Herald edition to a "
-                    "one-page A4 newspaper-front-page PDF.")
+        "one-page A4 newspaper-front-page PDF.")
     ap.add_argument("edition", help="Path to herald-cXXX-{morning,evening}.md")
     ap.add_argument("-o", "--output", default=None,
                     help="Output PDF path (default: same stem, .pdf)")

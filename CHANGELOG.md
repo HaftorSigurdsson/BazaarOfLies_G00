@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.13.2] - 2026-10-25
+### Fixed
+- **The press, repaired** (`src/town-press.py`): standalone **BOLD** lines are now recognised as section heads (the first one becomes the front-page headline — previously they ran inline as a "run-on blob" and the fpdf2 engine printed literal asterisks); machine-appended sections ("The Tally", "Editor's Note") can no longer be promoted to the banner headline; the `*Vol. N — Match M, Cycle C*` dateline is dropped instead of leaking through as a stray ruled head; short italic lines render as decks/attributions, not section heads; `latex_escape` is single-pass (the sequential replaces corrupted braces); the fpdf2 fallback strips markdown and measures subheads at render size.
+- **LaTeX engine restored**: a misplaced brace in `\titleformat`'s after-code (`\titlerule` outside its group) broke every tectonic compile — the press had silently fallen back to fpdf2. All three live editions (vols. 22–24) re-pressed with the fine engine; one A4 page each, zero literal asterisks.
+
 ## [2.13.1] - 2026-10-25
 ### Fixed
 - **The corruption sweep (match 3 launch)**: the social-dynamics edits had left a trail of import and string breakage that killed every process at startup — the GM cron crash-looped (`List`/`json`/`argparse`/`logger`/`Optional` undefined, an unterminated string in the shutter announcement), all ten bots died at import (villagers called `load_role_registry(get_gm_private_key())` — reading the GM-sealed registry they cannot and must not open), and the Herald died on missing `List`/`datetime` imports. Found with a `pyflakes` undefined-name sweep; all game-critical files now import-check clean.
