@@ -205,7 +205,7 @@ MARKET_ITEMS = [
     "Pepper: firm. Saffron: smug. Camel feed: suspiciously cheap.",
     "Rugs are up, figs are down, opinions remain at an all-time high.",
     "Lantern oil steady; candle wax nervous ahead of the night shift.",
-    "Copper is trading at exactly what the Coppersmith says it is worth.",
+    "Copper is trading at exactly what the coppersmith says it is worth.",
     "Tea is up on rumors. The rumors are also up, mostly on tea.",
     "Perfume closed higher; nobody can say why, and everybody can smell it.",
     "Rope: knotty. Dates: pitted. Spices: spicy. Market report concludes.",

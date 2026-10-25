@@ -547,36 +547,39 @@ def check_win_conditions():
 # for the non-Family seats: every file in the night channel decrypts
 # under the family key, so a snoop holding the key sees ten council
 # voices and cannot tell which three are the Family. In-theme, family-
-# friendly vocabulary; targets are random living seats.
+# friendly vocabulary; the {merchant} slot is filled with the CURRENT
+# target's name at mint time — trades may rotate between matches, so
+# the pool never hardcodes them. The register matches the real
+# council's plain speech (the Plain Speech Act): decoys must never
+# stand out by style.
 DECOY_POOLS = {
     "talk": [
-        "The loom sits quiet; I propose we watch the lantern seller — "
-        "their questions burn too bright by half.",
+        "I propose we watch {merchant} — their questions today burned "
+        "brighter than their answers.",
         "A stall that never answers plain questions is a stall worth "
-        "watching; the tally page stays blank where receipts should sit.",
-        "The kettle sings loudest over empty cups; the quiet ones by the "
-        "east gate merit a longer look tonight.",
-        "Receipts, not echoes: the moneylender counts our words, and the "
-        "count does not favour the chatterers.",
-        "I say the spiced-date seller knows more than their ledger admits; "
+        "watching; {merchant} has dodged two today.",
+        "The quiet ones merit a longer look tonight; {merchant} has "
+        "said less than anyone.",
+        "{merchant} counts our words closely — watch whether the "
+        "count favours the chatterers.",
+        "I say {merchant} knows more than their ledger admits; "
         "silence at dinner has a price.",
-        "The mirror-merchant's chimes rang at dusk — third time this week "
-        "they dodge the plain yes or no.",
+        "{merchant} dodged the plain yes or no three times this week.",
     ],
     "declare": [
-        "I stand with my cousins of the tea: the weaver's thread runs "
-        "loosest, and I declare it plainly.",
-        "On my count the coppersmith's scales tilt crooked — I declare "
-        "for watching them, not for trusting them.",
-        "The bird merchant's cage door hangs open; I declare that we "
-        "watch the sky before we sleep.",
-        "Let the record show my lean: the potter's wheel has wobbled "
+        "I declare it plainly: {merchant}'s story today does not fit "
+        "yesterday's.",
+        "On my count: I declare for watching {merchant}, not for "
+        "trusting them.",
+        "I declare that we watch {merchant} before we sleep.",
+        "Let the record show my lean: {merchant}'s votes have wobbled "
         "since the second bell.",
     ],
     "assent": [
-        "The loom agrees — the thread is cut where we said it would be.",
-        "So it is woven; the watch closes its rounds and the lamps burn low.",
-        "The count stands; the bazaar sleeps a little easier tonight.",
+        "Agreed — the watch closes on {merchant} and the lamps burn low.",
+        "So it stands; the count holds and the bazaar sleeps easier "
+        "tonight.",
+        "The count stands; the day is decided.",
         "Agreed and sealed — the kettle cools, the day is decided.",
     ],
 }
@@ -586,11 +589,13 @@ def mint_decoys(family_key, seat, cycle, living, sr):
     """Three chat blobs for one non-Family seat — one per watch, sealed
     with the FAMILY key so every file in the channel decrypts alike."""
     target = sr.choice([s for s in living if s != seat])
+    target_name = display_name(target)
     decoys = []
     for watch, kind in ((1, "talk"), (2, "declare"), (3, "assent")):
         decoys.append(seal_chat(family_key, {
             "kind": kind, "watch": watch, "cycle": cycle, "seat": seat,
-            "text": sr.choice(DECOY_POOLS[kind]),
+            "text": sr.choice(DECOY_POOLS[kind]).format(
+                merchant=target_name),
             "target": target,
             "ts": datetime.now(timezone.utc).isoformat()}))
     return decoys

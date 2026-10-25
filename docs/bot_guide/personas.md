@@ -50,3 +50,16 @@ Merchants, artisans, keepers of records — one profession, one line.
 Identity only: what this merchant *is*, never how they should speak or
 act. If a sentence tells the bot to behave ("never answer directly",
 "answer in riddles"), it belongs in the doctrine — or nowhere at all.
+
+---
+
+## **5. Swapping trades between matches**
+The **name is permanent** (it is a label; it never influences the
+game), but the **trade may rotate** between matches: at the pit stop,
+edit the `persona` lines in `setup/seats.json` — every downstream
+consumer (announcements, the graveyard's persona column, the recap,
+bot prompts) reads the persona from there. The doctrine personalities
+(`../villagers/`) never mention trades, so they need no change; and the
+GM's night-chat decoys mint from the current roster, never from
+hardcoded trades. Keep the `"You are The <Trade>."` first sentence so
+`persona_name()` keeps parsing.
