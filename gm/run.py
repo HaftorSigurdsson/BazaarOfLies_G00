@@ -394,6 +394,7 @@ def deal_roles():
         with open(f"gameplay/deals/{seat}.enc", "w") as f:
             f.write(sealed)
 
+    save_decoy_ledger(set())          # fresh decoy ledger for the match
     save_role_registry(priv, assignment, mafia_key, anonymous_cycle, historian)
     log(f"dealt {len(living)} roles (dossiers sealed to seats, registry sealed to GM)")
 
@@ -666,46 +667,145 @@ def plain_speech_block():
         "exact quotes, votes, and observed actions, never on imagery.\n\n"
     )
 
+# ------------------------------------------------ night chat decoys ------
+# Plausible council-flavored lines for the decoy chat blobs the GM mints
+# for every non-Family seat. The register matches the real council's
+# plain speech (the Plain Speech Act): decoys must never read as
+# flowery exceptions. Talk lines are ASSEMBLED from opener x pivot pools
+# (10 x 10 = 100 surfaces, deterministically rotated) and declare/assent
+# draw from 10-line pools with a stride-7 rotation: no two seats share
+# a line within a cycle, and no line repeats for the same seat inside
+# ten cycles — a key-holding snoop correlating cycles cannot classify
+# decoys by an exact repeated line (the match-3 hole: the same template
+# in consecutive cycles, only the merchant slot swapped).
+_DECOY_OPENERS = [
+    "I propose we watch {merchant}:",
+    "Keep one eye on {merchant}:",
+    "The quiet ones merit a longer look tonight, and {merchant} leads them:",
+    "I say {merchant} knows more than their ledger admits:",
+    "Watch the hands, not the stall; {merchant} was busy when the vote needed names:",
+    "Note it for the record — {merchant}:",
+    "If {merchant} is plain, the bazaar is plain:",
+    "{merchant} asks after everyone and answers for no one:",
+    "{merchant} measured their wares twice and their words not once:",
+    "The lantern light fell on {merchant} twice at the count:",
+]
+
+_DECOY_PIVOTS = [
+    "their questions today burned brighter than their answers.",
+    "they have dodged a plain question twice.",
+    "their ledger grew tidy exactly when it should not.",
+    "their words agree with whoever spoke last.",
+    "their arithmetic at dinner did not match their morning talk.",
+    "silence at dinner has a price, and they are paying in small coins.",
+    "they were first to name a lean and last to give a reason.",
+    "the scale tilts oddly whenever their wares are counted.",
+    "they quote the Compact but have never walked it.",
+    "their story today does not fit the one from yesterday.",
+]
+
 DECOY_POOLS = {
-    "talk": [
-        f"I propose we watch {{merchant}} — their questions today burned brighter than their answers. {plain_speech_block()}",
-        f"A stall that never answers plain questions is a stall worth watching; {{merchant}} has dodged two today. {plain_speech_block()}",
-        f"The quiet ones merit a longer look tonight; {{merchant}} has said less than anyone. {plain_speech_block()}",
-        f"{{merchant}} counts our words closely — watch whether the count favours the chatterers. {plain_speech_block()}",
-        f"I say {{merchant}} knows more than their ledger admits; silence at dinner has a price. {plain_speech_block()}",
-        f"{{merchant}} dodged the plain yes or no three times this week. {plain_speech_block()}",
-    ],
     "declare": [
-        f"I declare it plainly: {{merchant}}'s story today does not fit yesterday's. {plain_speech_block()}",
-        f"On my count: I declare for watching {{merchant}}, not for trusting them. {plain_speech_block()}",
         "I declare that we watch {merchant} before we sleep.",
-        "Let the record show my lean: {merchant}'s votes have wobbled "
-        "since the second bell.",
+        "Let the record show my lean: {merchant}'s votes have wobbled since the second bell.",
+        "My declaration stands where it stood: {merchant} first, the rest can wait.",
+        "I declare a lean toward {merchant} and a reason with a date attached.",
+        "The count needs a name, so here is mine: {merchant}, for the ledger's sake.",
+        "Declared plainly and dated: {merchant} — let them answer in the morning.",
+        "My lean is {merchant}; my reason is already on the record.",
+        "I declare {merchant} — not from silence, but from the shape of their answers.",
+        "The declaration is {merchant}, and I will own it at the count.",
+        "So declared: watch {merchant}, weigh the ledger, and let the morning judge.",
+        "I declare {merchant} for the watch; their stall keeps odd hours.",
+        "On my oath as a trader: the lean is {merchant}, and the date is today.",
+        "{merchant} carries my declaration tonight; the ledger may check it.",
+        "The lean I declare is {merchant}, and I will stand behind it at the count.",
+        "Declared and dated: {merchant} — the arithmetic of their answers is wrong.",
     ],
     "assent": [
         "Agreed — the watch closes on {merchant} and the lamps burn low.",
-        "So it stands; the count holds and the bazaar sleeps easier "
-        "tonight.",
-        "The count stands; the day is decided.",
-        "Agreed and sealed — the kettle cools, the day is decided.",
+        "So it stands; the count holds, and {merchant} keeps the watch.",
+        "The count stands on {merchant}; the day is decided.",
+        "Agreed and sealed — {merchant} it is, and the kettle cools.",
+        "So we hold together; the lean carries on {merchant} and the ledger is written.",
+        "Agreed — and may the morning prove the count right about {merchant}.",
+        "The assent is given; the watch is set on {merchant} and the lamps are trimmed.",
+        "It stands as counted, {merchant} and no quibble from this stall.",
+        "Agreed; the choice is {merchant} and the tea is poured.",
+        "Sealed — the watch agrees on {merchant} and the bazaar keeps its counsel.",
+        "So it stands: {merchant} bears the watch, and I bear my share of it.",
+        "Agreed — the lamps dim on {merchant} and the count holds.",
+        "The count carries {merchant}; this stall stands behind it.",
+        "Sealed and dated: the watch falls to {merchant} tonight.",
+        "Agreed; {merchant} keeps the watch and the rest of us keep the count.",
     ],
 }
 
 
-def mint_decoys(family_key, seat, cycle, living, sr):
+def decoy_text(kind, seat_n, match, cycle, watch, target_name):
+    """One decoy line for a seat/watch, chosen by deterministic rotation.
+    The match number rides the rotation too: old matches' night files live
+    in git history, so a snoop correlating ACROSS matches must not find
+    the same line for the same cycle either."""
+    m = match or 0
+    if kind == "talk":
+        o = _DECOY_OPENERS[(m * 13 + cycle * 7 + seat_n + watch - 1) % len(_DECOY_OPENERS)]
+        p = _DECOY_PIVOTS[(m * 9 + cycle * 11 + seat_n * 3 + watch * 7) % len(_DECOY_PIVOTS)]
+        return o.format(merchant=target_name) + " " + p
+    pool = DECOY_POOLS[kind]
+    return pool[(m * 13 + cycle * 7 + seat_n + watch - 1) % len(pool)].format(
+        merchant=target_name)
+
+
+def mint_decoys(family_key, seat, match, cycle, living, sr, used=None):
     """Three chat blobs for one non-Family seat — one per watch, sealed
-    with the FAMILY key so every file in the channel decrypts alike."""
-    target = sr.choice([s for s in living if s != seat])
-    target_name = display_name(target)
+    with the FAMILY key so every file in the channel decrypts alike.
+    Lines come from decoy_text's rotation; the target merchant is the
+    random element (the register must stay plausible). `used` is the
+    match's decoy ledger: a line that has already been minted is redrawn
+    (new rotation index, then a new target) so no decoy line ever
+    repeats — repetition across cycles was the snoop's classification
+    attack."""
+    used = used if used is not None else set()
+    seat_n = int(seat.split("-")[-1])
     decoys = []
     for watch, kind in ((1, "talk"), (2, "declare"), (3, "assent")):
+        targets = [s for s in living if s != seat]
+        bump = 0
+        while True:
+            w = watch + bump
+            target = (sr.choice(targets) if bump == 0 else
+                      targets[(seat_n + cycle * 3 + bump * 5) % len(targets)])
+            line = decoy_text(kind, seat_n, match, cycle, w, display_name(target))
+            if line not in used or bump > 64:
+                break
+            bump += 1
+        used.add(line)
         decoys.append(seal_chat(family_key, {
             "kind": kind, "watch": watch, "cycle": cycle, "seat": seat,
-            "text": sr.choice(DECOY_POOLS[kind]).format(
-                merchant=target_name),
+            "text": line,
             "target": target,
             "ts": datetime.now(timezone.utc).isoformat()}))
     return decoys
+
+
+DECOY_LEDGER = "gm/decoys-used.json"     # GM-local (gitignored): every line
+                                         # already minted this match — a line
+                                         # is a decoy's fingerprint, so the
+                                         # same line may never appear twice.
+
+
+def load_decoy_ledger():
+    try:
+        with open(DECOY_LEDGER) as f:
+            return set(json.load(f))
+    except (OSError, json.JSONDecodeError):
+        return set()
+
+
+def save_decoy_ledger(used):
+    with open(DECOY_LEDGER, "w") as f:
+        json.dump(sorted(used), f, ensure_ascii=False)
 
 
 def publish_night_packets(state, priv):
@@ -713,21 +813,25 @@ def publish_night_packets(state, priv):
     presence and name. Non-Family seats receive their three decoy chat
     blobs (posted verbatim during the watches); the Family receive an
     acknowledgement. The Detective-leak and night-role-set leak both
-    die here: every seat has a packet, every night."""
+    die here: every seat has a packet, every night. No decoy line is
+    ever minted twice in a match (the ledger guards the rotation)."""
     payload = load_registry_payload(priv)
     family_key = payload.get("family_key")
     roles = payload["roles"]
     seats = get_seats()
+    used = load_decoy_ledger()
     for seat in state["alive"]:
         body = {"kind": "night_packet", "match": state["match"],
                 "cycle": state["cycle"], "seat": seat}
         if roles.get(seat) != "Mafia" and family_key:
-            body["chat"] = mint_decoys(family_key, seat, state["cycle"],
-                                      list(state["alive"]), SECURE_RANDOM)
+            body["chat"] = mint_decoys(family_key, seat, state["match"],
+                                       state["cycle"], list(state["alive"]),
+                                       SECURE_RANDOM, used)
         sealed = encrypt_for_seat(seats[seat]["public_key"], body)
         with open(f"gameplay/dossiers/{seat}-c{state['cycle']:03d}-night.enc",
                   "w") as f:
             f.write(sealed)
+    save_decoy_ledger(used)
     log(f"night packets sealed to all {len(state['alive'])} living seats")
 
 

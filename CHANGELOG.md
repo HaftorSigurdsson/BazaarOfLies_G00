@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.13.5] - 2026-10-25
+### Fixed
+- **The night channel, stress-tested and hardened** (ground truth via the GM registry: the two oversize files were decoys, not Family talk — the design held, but two latent holes were found and closed):
+  - **Byte-exact sealing** (`seal_chat`): the old char-based padding let UTF-8 multibyte punctuation wobble ciphertext length (1420 vs 1424) — a metadata channel that only stayed harmless by luck (the decoy templates carried em-dashes too). All blobs are now byte-identical whatever the content; oversize messages shrink their text field so the JSON envelope is never cut.
+  - **The decoy ledger** (`gm/decoys-used.json`, GM-local, gitignored): decoys drew from small pools whose exact lines repeated across cycles — a key-holding snoop correlating cycles could classify decoys by repetition, and whatever is not a decoy is the real council. Talk lines are now assembled from opener × pivot pools (100 surfaces), declare/assent pools enlarged to 15 with a merchant slot in every line, the rotation rides the match number, and the ledger redraws any line already minted: **no decoy line repeats within a match** (verified over two 12-cycle stress runs; 252 decoys each, zero repeats). Cross-match overlap is harmless: each match mints a fresh family key.
+
 ## [2.13.4] - 2026-10-25
 ### Changed
 - **The anti-echo clause** (villager prompts): match 3 traced a phrase coined once ("the Compact rewards the walker", Elsa, cycle 1) spreading to nine seats in minutes — quoting mandates are the vector, and the verbatim transcript the amplifier. Every prompt now forbids reusing a distinctive phrase another merchant used today and caps citation at ONE short fragment (under 15 words), demanding the case in the merchant's own words.

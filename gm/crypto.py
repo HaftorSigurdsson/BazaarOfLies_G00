@@ -109,13 +109,27 @@ CHAT_PAD_BYTES = 1024              # padded plaintext length for chat payloads
 
 
 def seal_chat(shared_key_b64: str, payload: Dict[str, Union[str, int, List, Dict]]) -> str:
-    """Seal a chat payload with the shared key, padded to a fixed size."""
+    """Seal a chat payload with the shared key, padded to a fixed size —
+    BYTES, not characters: the earlier char-based padding let UTF-8
+    multibyte punctuation (em-dashes, curly quotes) wobble the ciphertext
+    length, a metadata channel that stood out against the ASCII-minted
+    decoys (the 1420/1424 quantization of match 3). Every sealed blob is
+    now byte-identical in length whatever the content.
+    Oversize messages shrink their TEXT FIELD until the JSON fits — the
+    envelope is never cut, so the receiver can always parse the blob."""
     from nacl.secret import SecretBox
     key = base64.b64decode(shared_key_b64)
     box = SecretBox(key)
+    if isinstance(payload.get("text"), str):
+        trimmed = dict(payload)
+        while len(json.dumps(trimmed, ensure_ascii=False).encode()) > CHAT_PAD_BYTES - 1:
+            if not trimmed["text"]:
+                break
+            trimmed["text"] = trimmed["text"][:-1]
+        payload = trimmed
     text = json.dumps(payload, ensure_ascii=False)
-    text = text[:CHAT_PAD_BYTES - 1].ljust(CHAT_PAD_BYTES - 1)
-    ct = box.encrypt(text.encode())
+    raw = text.encode().ljust(CHAT_PAD_BYTES - 1, b" ")
+    ct = box.encrypt(raw)
     return base64.b64encode(ct).decode()
 
 

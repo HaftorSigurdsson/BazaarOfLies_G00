@@ -12,3 +12,6 @@ gameplay/village/statements/_assembled-*.jsonl
 
 # Token usage ledger (perspective only, never game input)
 gameplay/usage/
+
+# GM-local decoy ledger (lists decoy lines in plaintext — never committed)
+gm/decoys-used.json
