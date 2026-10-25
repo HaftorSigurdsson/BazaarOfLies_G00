@@ -77,6 +77,18 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **Documentation aligned with the current architecture** — a full pass over every page: the Game Master is documented as the **cron-driven local referee** (dedicated clone, crontab line, `flock`, `gm-cron.log`, `BAZAAR_MATCH_LIMIT` + the halted phase, pull-before-acting), with the GitHub Action and `town-clock.py` marked as the legacy cloud variant; `setup.md`'s order of operations gains the GM-clone step and its game-day/reset/troubleshooting flows describe the cron world; the tea clock's region names (Morning/Morning tea/Lunch/Afternoon tea/Dinner + Evening + the three night watches), the Dinner lean, the watch-staged Family council, the truth archive, the Elder Council, the manifest, and the honest token-spend note replace the stale text; the README and index describe the arena as it is. `mkdocs build --strict` passes.
 
+
+## [2.11.0] - 2026-10-25
+### Added
+- **The night, contained (Option C)**: the Family's candlelight council moves **into the repo**, and the whole night becomes metadata-proof:
+  - **Uniform chat traffic** — every living seat posts one sealed chat file per watch (`gameplay/night/chat/cCCC-wN-seat-XX.enc`): the Family seal real council talk (proposal → declaration → assent) with the shared `night_channel_key` from the dossier; everyone else posts **GM-minted decoys** — plausible council lines sealed with the same family key, delivered in a per-seat **night packet** at nightfall. Every file in the channel decrypts under the family key and is byte-identical in size, so filenames, counts, sizes, timing, and content all carry zero information about who the Family is.
+  - **Uniform night actions** — every seat submits exactly one sealed action at the last watch, villagers included (a sealed "asleep" payload): the night-role-set leak (five night-files = all mafia + doctor + detective, five cleared villagers) is closed.
+  - **Uniform dawn results** — every seat receives a result file; only the Detective's is real: the who-gets-results leak is closed.
+  - Every dossier now carries a `night_channel_key` (the Family share one; the registry keeps it for the truth archive); the registry payload gains `family_key`.
+  - At match end the whole council — real voices and decoys, labelled by the registry — is decrypted into **`match-XX-truth.md`**, and the Elder Council reads the conclave from there (the vault channel remains the legacy fallback for match 1).
+  - The vault family channel retires; `town-reset.py` sweeps the in-repo chat path; commit messages for night traffic are uniform and seatless.
+  - Verified offline: chat blobs byte-identical under content of any length; decoys authenticate under the family key at identical size; truth-archive lines parse.
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.

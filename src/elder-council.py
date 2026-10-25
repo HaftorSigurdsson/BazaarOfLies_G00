@@ -196,9 +196,32 @@ def load_detective_results(match_no, seats):
 
 
 def load_family_channel(match_no):
-    """The candlelight council: the vault's family channel, both formats
-    (legacy .json single proposals, then the .jsonl watch protocol)."""
+    """The Family's candlelight council. Current matches: the GM's truth
+    archive decrypts the in-repo chat channel (real voices and decoys
+    labelled by the registry). Legacy (match 1): the retired vault
+    channel, both formats."""
     msgs = []
+    truth = f"gameplay/village/match-{match_no:02d}-truth.md"
+    if os.path.exists(truth):
+        for line in open(truth):
+            m = re.match(r"- cycle (\d+) watch (\d+) (\S+ \(\d+\)) "
+                         r"\[(\w+), (\w+)\]: (.*)", line.strip())
+            if not m:
+                continue
+            seat = "seat-" + re.search(r"\((\d+)\)", m.group(3)).group(1).zfill(2)
+            msg = {"cycle": int(m.group(1)), "watch": int(m.group(2)),
+                   "seat": seat, "seat_label": m.group(3),
+                   "voice": m.group(4), "kind": m.group(5),
+                   "reason": m.group(6),
+                   "target": None}
+            tm = re.search(r" \u2192 (.+?)$", m.group(6) or "")
+            if tm:
+                msg["target"] = tm.group(1)
+                msg["reason"] = (m.group(6) or "").rsplit(" \u2192 ", 1)[0]
+            msgs.append(msg)
+        if msgs:
+            return msgs
+    # legacy vault channel (match 1 and earlier)
     for path in sorted(glob.glob(os.path.join(FAMILY_DIR, f"c*-seat-*.jsonl"))):
         for line in open(path):
             line = line.strip()
@@ -556,9 +579,13 @@ def main():
                               detective_results, family_msgs,
                               roles, seats)
     family_digest = "\n".join(
-        f"cycle {m.get('cycle')} {plain(display_name(m.get('seat')))} "
+        f"cycle {m.get('cycle')}"
+        + (f" watch {m.get('watch')}" if m.get("watch") else "")
+        + (f" [{m.get('voice')}]" if m.get("voice") else "")
+        + f" {m.get('seat_label') or plain(display_name(m.get('seat')))} "
         f"({m.get('kind', 'talk')}): "
-        f"{plain(display_name(m.get('target')))} — {m.get('reason', '')}"
+        + (f"{m.get('target')} — " if m.get("target") else "")
+        + f"{m.get('reason', '')}"
         for m in family_msgs)
     detective_note = (""
         if not detective_results else

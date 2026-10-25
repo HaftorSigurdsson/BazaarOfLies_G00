@@ -27,7 +27,7 @@ from collections import Counter
 from datetime import datetime, timezone, timedelta
 
 from crypto import (load_gm_private_key, decrypt_payload, encrypt_for_seat,
-                   verify_payload)
+                   verify_payload, seal_chat, open_chat)
 from utils import (read_state, write_state, update_announcements,
                    update_graveyard, get_seats, is_alive, persona_name,
                    display_name)
@@ -123,9 +123,9 @@ def commit_and_push(label, attempts=3):
 
 
 # ---------------------------------------------------------------- registry ---
-def save_role_registry(priv, assignment):
+def save_role_registry(priv, assignment, family_key):
     payload = {"ts": datetime.now(timezone.utc).isoformat(),
-               "roles": assignment}
+               "roles": assignment, "family_key": family_key}
     sealed = encrypt_for_seat(
         base64.b64encode(bytes(priv.public_key)).decode(), payload)
     with open(GM_ROLES_FILE, "w") as f:
@@ -136,6 +136,13 @@ def load_role_registry(priv):
     with open(GM_ROLES_FILE) as f:
         payload = decrypt_payload(priv, f.read().strip())
     return payload["roles"]
+
+
+def load_registry_payload(priv):
+    """The full registry payload — roles AND the family channel key
+    (needed by the night packets and the truth archive)."""
+    with open(GM_ROLES_FILE) as f:
+        return decrypt_payload(priv, f.read().strip())
 
 
 # ------------------------------------------------------------ state machine ---
@@ -220,6 +227,7 @@ def advance_phase():
             "The sun sets. The bazaar sleeps. Night actions begin!\n"
             f"**Night ends at:** {state['clock']['night_deadline']}"
         )
+        publish_night_packets(state, priv)
         commit_and_push(f"cycle {state['cycle']} tally done, night falls")
 
     elif phase == "night":
@@ -288,13 +296,16 @@ def deal_roles():
             "role": assignment[seat],
             "teammates": ([s for s in living if assignment[s] == "Mafia" and s != seat]
                           if assignment[seat] == "Mafia" else []),
-            "night_channel_key": mafia_key if assignment[seat] == "Mafia" else None,
+            # Every seat carries a channel key (uniform shape); the Family
+            # share one, the rest hold random unusable ones.
+            "night_channel_key": (mafia_key if assignment[seat] == "Mafia"
+                                  else base64.b64encode(os.urandom(32)).decode()),
         }
         sealed = encrypt_for_seat(seats[seat]["public_key"], dossier)
         with open(f"gameplay/deals/{seat}.enc", "w") as f:
             f.write(sealed)
 
-    save_role_registry(priv, assignment)
+    save_role_registry(priv, assignment, mafia_key)
     log(f"dealt {len(living)} roles (dossiers sealed to seats, registry sealed to GM)")
 
 
@@ -477,18 +488,21 @@ def resolve_night_actions():
         update_announcements("The night passed quietly.")
         log("no shutter (saved, or no Mafia action)")
 
-    # Detective results go to the DETECTIVE — never to the investigated seat.
-    for detective, target in investigates:
-        result = "Family" if registry.get(target) == "Mafia" else "not Family"
-        payload = {
-            "match": state["match"], "cycle": state["cycle"],
-            "kind": "investigation", "target": target, "result": result,
-        }
-        sealed = encrypt_for_seat(seats[detective]["public_key"], payload)
-        fn = f"gameplay/dossiers/{detective}-c{state['cycle']:03d}-result.enc"
-        with open(fn, "w") as f:
-            f.write(sealed)
-        log(f"investigation result sealed to {detective} about {target}")
+    # Results at dawn, uniform in presence: every living seat receives a
+    # result file; only the Detective's carries the investigation — the
+    # tree cannot reveal who receives results.
+    detective_target = investigates[-1] if investigates else None
+    if detective_target:
+        result = ("Family" if registry.get(detective_target[1]) == "Mafia"
+                  else "not Family")
+        log(f"investigation result sealed to {detective_target[0]} "
+            f"about {detective_target[1]}")
+    publish_quiet_results(state, priv,
+                         detective=(detective_target[0] if detective_target
+                                    else None),
+                         target=(detective_target[1] if detective_target
+                                 else None),
+                         result=(result if detective_target else None))
 
     write_state(state)
 
@@ -509,12 +523,107 @@ def check_win_conditions():
     return False
 
 
-def write_truth_archive(state, registry):
+# ------------------------------------------------ night chat decoys ------
+# Plausible council-flavored lines for the decoy chat blobs the GM mints
+# for the non-Family seats: every file in the night channel decrypts
+# under the family key, so a snoop holding the key sees ten council
+# voices and cannot tell which three are the Family. In-theme, family-
+# friendly vocabulary; targets are random living seats.
+DECOY_POOLS = {
+    "talk": [
+        "The loom sits quiet; I propose we watch the lantern seller — "
+        "their questions burn too bright by half.",
+        "A stall that never answers plain questions is a stall worth "
+        "watching; the tally page stays blank where receipts should sit.",
+        "The kettle sings loudest over empty cups; the quiet ones by the "
+        "east gate merit a longer look tonight.",
+        "Receipts, not echoes: the moneylender counts our words, and the "
+        "count does not favour the chatterers.",
+        "I say the spiced-date seller knows more than their ledger admits; "
+        "silence at dinner has a price.",
+        "The mirror-merchant's chimes rang at dusk — third time this week "
+        "they dodge the plain yes or no.",
+    ],
+    "declare": [
+        "I stand with my cousins of the tea: the weaver's thread runs "
+        "loosest, and I declare it plainly.",
+        "On my count the coppersmith's scales tilt crooked — I declare "
+        "for watching them, not for trusting them.",
+        "The bird merchant's cage door hangs open; I declare that we "
+        "watch the sky before we sleep.",
+        "Let the record show my lean: the potter's wheel has wobbled "
+        "since the second bell.",
+    ],
+    "assent": [
+        "The loom agrees — the thread is cut where we said it would be.",
+        "So it is woven; the watch closes its rounds and the lamps burn low.",
+        "The count stands; the bazaar sleeps a little easier tonight.",
+        "Agreed and sealed — the kettle cools, the day is decided.",
+    ],
+}
+
+
+def mint_decoys(family_key, seat, cycle, living, sr):
+    """Three chat blobs for one non-Family seat — one per watch, sealed
+    with the FAMILY key so every file in the channel decrypts alike."""
+    target = sr.choice([s for s in living if s != seat])
+    decoys = []
+    for watch, kind in ((1, "talk"), (2, "declare"), (3, "assent")):
+        decoys.append(seal_chat(family_key, {
+            "kind": kind, "watch": watch, "cycle": cycle, "seat": seat,
+            "text": sr.choice(DECOY_POOLS[kind]),
+            "target": target,
+            "ts": datetime.now(timezone.utc).isoformat()}))
+    return decoys
+
+
+def publish_night_packets(state, priv):
+    """At nightfall: one sealed packet per living seat, uniform in
+    presence and name. Non-Family seats receive their three decoy chat
+    blobs (posted verbatim during the watches); the Family receive an
+    acknowledgement. The Detective-leak and night-role-set leak both
+    die here: every seat has a packet, every night."""
+    payload = load_registry_payload(priv)
+    family_key = payload.get("family_key")
+    roles = payload["roles"]
+    seats = get_seats()
+    for seat in state["alive"]:
+        body = {"kind": "night_packet", "match": state["match"],
+                "cycle": state["cycle"], "seat": seat}
+        if roles.get(seat) != "Mafia" and family_key:
+            body["chat"] = mint_decoys(family_key, seat, state["cycle"],
+                                      list(state["alive"]), SECURE_RANDOM)
+        sealed = encrypt_for_seat(seats[seat]["public_key"], body)
+        with open(f"gameplay/dossiers/{seat}-c{state['cycle']:03d}-night.enc",
+                  "w") as f:
+            f.write(sealed)
+    log(f"night packets sealed to all {len(state['alive'])} living seats")
+
+
+def publish_quiet_results(state, priv, detective=None, target=None, result=None):
+    """At dawn: one result file per living seat. The Detective's carries
+    the investigation; everyone else's carries quiet — the tree cannot
+    reveal who receives results."""
+    seats = get_seats()
+    for seat in state["alive"]:
+        if detective and seat == detective:
+            body = {"match": state["match"], "cycle": state["cycle"],
+                    "kind": "investigation", "target": target,
+                    "result": result}
+        else:
+            body = {"kind": "quiet", "cycle": state["cycle"]}
+        sealed = encrypt_for_seat(seats[seat]["public_key"], body)
+        with open(f"gameplay/dossiers/{seat}-c{state['cycle']:03d}-result.enc",
+                  "w") as f:
+            f.write(sealed)
+    log(f"night results sealed to all {len(state['alive'])} living seats")
+
+
+def write_truth_archive(state, registry, priv):
     """The post-match truth file (gameplay/village/match-XX-truth.md):
     the role registry and every sealed night action, decrypted — the
     authoritative record for the Elder Council, written before the next
     deal overwrites gm/roles.enc."""
-    priv = get_gm_private_key()
     lines = ["# Truth Archive\n",
              f"**Match {state['match']}** — the full record, secrecy lifted.\n",
              "\n## Roles\n",
@@ -533,6 +642,35 @@ def write_truth_archive(state, registry):
             continue
         lines.append(f"- cycle {a.get('cycle')}: {display_name(a.get('seat'))} "
                      f"({a.get('role')}) targeted {display_name(a.get('target'))}")
+
+    # The Family's candlelight council, decrypted for the historians:
+    # every chat file opens under the family key (decoys included — the
+    # GM minted them with it); the registry labels which voices were real.
+    try:
+        payload = load_registry_payload(priv)
+        family_key = payload.get("family_key")
+        roles = payload["roles"]
+    except Exception:
+        family_key, roles = None, {}
+    if family_key:
+        lines.append("\n## The Family's candlelight council\n")
+        import glob as globmod
+        chat_files = sorted(globmod.glob("gameplay/night/chat/c*-w*-seat-*.enc"))
+        for fn in chat_files:
+            try:
+                with open(fn) as f:
+                    m = open_chat(family_key, f.read().strip())
+            except OSError:
+                continue
+            if not m:
+                continue
+            seat = m.get("seat")
+            voice = ("REAL" if roles.get(seat) == "Mafia" else "decoy")
+            lines.append(f"- cycle {m.get('cycle')} watch {m.get('watch')} "
+                         f"{display_name(seat)} [{voice}, {m.get('kind')}]: "
+                         f"{m.get('text', '')}"
+                         + (f" → {display_name(m.get('target'))}"
+                            if m.get("target") else ""))
     with open(f"gameplay/village/match-{state['match']:02d}-truth.md", "w") as f:
         f.write("\n".join(lines) + "\n")
     log(f"truth archive written for match {state['match']}")
@@ -554,7 +692,7 @@ def end_match():
     # The truth archive: secrecy is over. Preserve the authoritative record
     # before the next deal overwrites gm/roles.enc — the Elder Council
     # judges from this, not from prose paraphrase.
-    write_truth_archive(state, registry)
+    write_truth_archive(state, registry, priv)
 
     state["match"] += 1
     state["cycle"] = 0

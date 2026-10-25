@@ -45,6 +45,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ARTIFACT_DIRS = [
     "gameplay/votes",
     "gameplay/night",
+    "gameplay/night/chat",
     "gameplay/dossiers",
     "gameplay/deals",
     "gameplay/herald",

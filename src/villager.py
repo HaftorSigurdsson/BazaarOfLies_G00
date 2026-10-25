@@ -49,7 +49,8 @@ from mistralai.client import Mistral
 # The bot lives in src/; the gm package sits at the arena root.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from gm.crypto import (encrypt_for_seat, load_gm_private_key, decrypt_payload,
-                       sign_payload)
+                       sign_payload,
+                       seal_chat, open_chat)
 from gm.utils import display_name, day_region
 
 # ---------------------------------------------------------------- config ---
@@ -73,7 +74,6 @@ NOTEBOOK_MAX_CHARS = 4000               # hard cap on stored notebook text
 #   The night      (0-5 min):  talk — a proposal, then replies;
 #   Night snacks   (5-10):    every mafioso MUST declare their target;
 #   The night watch (10-15):  converge on the majority, seal the shutter.
-FAMILY_TALK_MAX = 4                      # council messages per mafioso per night
 REASONING_TEMPERATURE = 0.3             # private thinking runs cooler than speech
 REASONING_EFFORT = "high"
 
@@ -103,7 +103,6 @@ KEY_PATH = args.key or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.key")
 DOCTRINE_PATH = args.doctrine or os.path.join(VILLAGERS_DIR, f"{MY_SEAT}.md")
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, f"journal-{MY_SEAT}.json")
 SIGNKEY_PATH = args.signkey or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.sign")
-FAMILY_DIR = os.path.join(BAZAAR_DIR, "family")   # candlelight council
 
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
@@ -379,7 +378,12 @@ def read_unread_dossiers(journal, epoch):
             continue
         try:
             with open(path) as f:
-                msgs.append(decrypt_payload(priv, f.read().strip()))
+                payload = decrypt_payload(priv, f.read().strip())
+            # Uniform night traffic: packets (decoys/acks) and quiet results
+            # are marked seen but never enter the prompts — only real GM
+            # findings (investigations and the like) are delivered.
+            if payload.get("kind") not in ("night_packet", "quiet"):
+                msgs.append(payload)
             journal["seen"].append(f"{epoch}:{path}")
         except Exception as e:  # keep polling on a bad file
             log(f"could not decrypt {path}: {e}")
@@ -746,7 +750,58 @@ def do_vote(state, cs, journal):
         "ledger with what the ballots cast so far reveal about each voter.")
 
 
-def family_council_system(state, dossier, mates, msgs):
+CHAT_DIR = "gameplay/night/chat"
+WATCH_OF_REGION = {"The night": 1, "Night snacks": 2, "The night watch": 3}
+
+
+def night_packet(cycle):
+    """The GM's nightfall packet for this seat (decoys for non-Family,
+    an acknowledgement for the Family), sealed to the seat's key."""
+    path = f"gameplay/dossiers/{MY_SEAT}-c{cycle:03d}-night.enc"
+    try:
+        with open(path) as f:
+            return decrypt_payload(load_gm_private_key(
+                open(KEY_PATH).read().strip()), f.read().strip())
+    except OSError:
+        return None
+
+
+def chat_path(cycle, watch, seat):
+    return os.path.join(CHAT_DIR, f"c{cycle:03d}-w{watch}-{seat}.enc")
+
+
+def post_chat(blob, cycle, watch):
+    """Post one sealed chat blob to this seat's watch file. The Family
+    seal their own talk with the family key; everyone else posts the
+    GM-minted decoys verbatim — same size, same format, same cadence."""
+    os.makedirs(CHAT_DIR, exist_ok=True)
+    path = chat_path(cycle, watch, MY_SEAT)
+    if os.path.exists(path):
+        return False                     # one post per watch, restart-safe
+    with open(path, "w") as f:
+        f.write(blob)
+    commit_and_push([path], f"night chat c{cycle:03d} w{watch}")
+    return True
+
+
+def read_chat(key, cycle, watch, seats):
+    """Teammates' chat files for one watch, decrypted with the family
+    key. Decoys authenticate too (the GM sealed them with the same key)
+    — callers pass only their known teammates, so noise never enters."""
+    msgs = []
+    for seat in seats:
+        try:
+            with open(chat_path(cycle, watch, seat)) as f:
+                blob = f.read().strip()
+        except OSError:
+            continue
+        m = open_chat(key, blob)
+        if m and m.get("cycle") == cycle and m.get("watch") == watch:
+            msgs.append(m)
+    return msgs
+
+
+def family_council_system(state, dossier, mates):
     """Compact system prompt for the Family's night council."""
     return (f"You are {get_persona()}\n{name_label()}\n"
             f"{manifest_block()}"
@@ -756,192 +811,105 @@ def family_council_system(state, dossier, mates, msgs):
             f"{', '.join(display_name(s) for s in state['alive'])}.\n"
             f"Public facts:\n{public_facts_block(state)}\n"
             f"Your private doctrine (follow it, never reveal it):\n"
-            f"{get_doctrine()}\n"
-            f"The candlelight council so far (oldest first):\n"
-            f"{family_transcript(msgs) or '(no one has spoken yet)'}\n")
+            f"{get_doctrine()}")
 
 
-def family_read(cycle, epoch):
-    """All council messages for this cycle+epoch, oldest first (mine
-    included). Foreign epochs are invisible — ghost artifacts."""
-    msgs = []
-    for path in sorted(glob.glob(
-            os.path.join(FAMILY_DIR, f"c{cycle:03d}-seat-*.jsonl"))):
-        try:
-            with open(path) as f:
-                for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    m = json.loads(line)
-                    if m.get("epoch") == epoch and m.get("cycle") == cycle:
-                        msgs.append(m)
-        except (OSError, json.JSONDecodeError):
-            continue
-    msgs.sort(key=lambda m: m.get("ts", ""))
-    return msgs
+def family_watch(state, dossier, mates, watch):
+    """One Family member, one watch of the candlelight council.
 
-
-def family_post(kind, target, reason, cycle, epoch):
-    """Append one council message to this seat's channel file."""
-    os.makedirs(FAMILY_DIR, exist_ok=True)
-    rec = {"epoch": epoch, "cycle": cycle, "seat": MY_SEAT, "kind": kind,
-           "target": target, "reason": reason,
-           "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
-    with open(os.path.join(FAMILY_DIR, f"c{cycle:03d}-{MY_SEAT}.jsonl"),
-              "a") as f:
-        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-    return rec
-
-
-def council_reason(answer, target):
-    """The reasoning after the target in a council message. Takes whatever
-    follows the seat ID (any dash style, colon, or comma); falls back to
-    the whole answer. Robust against the model's choice of punctuation."""
-    if target:
-        idx = answer.find(target)
-        if idx >= 0:
-            rest = answer[idx + len(target):]
-            rest = rest.lstrip("—–-:,. \n*")
-            if rest:
-                return rest.strip()
-    return answer.strip()
-
-
-def family_transcript(msgs):
-    """The council as prompt lines: talk and declarations, oldest first."""
-    lines = []
-    for m in msgs:
-        who = display_name(m["seat"])
-        tgt = display_name(m["target"]) if m.get("target") else "nobody"
-        if m.get("kind") == "declare":
-            lines.append(f"- {who} DECLARES the shutter: {tgt} — "
-                         f"{m.get('reason', '')}")
-        else:
-            lines.append(f"- {who} leans toward {tgt} — {m.get('reason', '')}")
-    return "\n".join(lines)
-
-
-def family_council(state, dossier, mates):
-    """The Family's candlelight council, staged by the night's watches.
-
-    The channel lives outside the repo (../.bazaar/family/
-    c{CCC}-{seat}.jsonl, one writer per file, epoch-scoped). The tea
-    clock's three watches drive the protocol:
-
-      The night      (first 5 min):  talk — a proposal, then replies;
-      Night snacks   (5–10 min):    every mafioso MUST declare their
-                                    shutter target (the must-state);
-      The night watch (10–15 min):   read the council, converge on the
-                                    majority, seal the shutter.
-
-    Returns None while the council is in session (watch 1/2 — this poll
-    did its talking or declaring), and the full transcript as a prompt
-    block in watch 3, when the sealed action may proceed.
-    A stalled cousin costs their voice, never the shutter: the GM's
-    sealed-ballot majority with a random tie-break is the backstop.
+    Watch 1 — The night: propose (receipts from the day's record).
+    Watch 2 — Night snacks: read the proposals, DECLARE the target.
+    Watch 3 — The night watch: read the declarations, post a short
+              assent; the transcript is returned for the sealed action.
+    All chat is sealed with the family key, in-repo, uniform in size.
     """
     cycle, epoch = state["cycle"], state.get("epoch")
-    label, _ = day_region(state)
-    msgs = family_read(cycle, epoch)
-    mine = [m for m in msgs if m["seat"] == MY_SEAT]
-    mates_alive = sorted(mates)
+    key = dossier.get("night_channel_key")
+    system = family_council_system(state, dossier, mates)
+    ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+    def seal(kind, text, target):
+        return seal_chat(key, {"kind": kind, "watch": watch, "cycle": cycle,
+                               "epoch": epoch, "seat": MY_SEAT,
+                               "text": text, "target": target, "ts": ts})
 
     def valid(target):
         if not target or target in dossier.get("teammates", []) \
                 or target not in state["alive"]:
-            if target:
-                log(f"family council: {target} is not a valid shutter "
-                    f"target — retrying next poll")
             return False
         return True
 
-    if label == "The night":                       # watch 1 — talk
-        my_talk = [m for m in mine if m["kind"] == "talk"]
-        newest_mate = max((m["ts"] for m in msgs if m["seat"] != MY_SEAT),
-                          default="")
-        my_newest = max((m["ts"] for m in mine), default="")
-        system = family_council_system(state, dossier, mates, msgs)
-        if not my_talk:
-            answer = ask(system,
-                         "The Family meets by candlelight, first watch. "
-                         "Propose tonight's shutter target. Ground it in the "
-                         "day's record: cite ONE concrete thing that merchant "
-                         "actually said, voted, or dodged today. Output ONLY "
-                         "the target seat ID or number, then the reason.")
-            target = parse_seat_id(answer)
-            if valid(target):
-                family_post("talk", target, council_reason(answer, target),
-                            cycle, epoch)
-                log(f"family council (the night): proposal lodged → "
+    if watch == 1:
+        answer = ask(system,
+                     "The Family meets by candlelight, first watch. "
+                     "Propose tonight's shutter target. Ground it in the "
+                     "day's record: cite ONE concrete thing that merchant "
+                     "actually said, voted, or dodged today. Output ONLY "
+                     "the target seat ID or number, then the reason.")
+        target = parse_seat_id(answer)
+        if valid(target):
+            reason = answer.split("—", 1)[-1].strip() or answer.strip()
+            if post_chat(seal("talk", reason, target), cycle, 1):
+                log(f"family council (w1): proposal lodged → "
                     f"{display_name(target)}")
-        elif len(mine) < FAMILY_TALK_MAX and newest_mate > my_newest:
-            answer = ask(system,
-                         "A cousin has spoken since you did. Answer them — "
-                         "agree, push back, or refine, citing the day's "
-                         "record. Output ONLY the seat ID you now back, then "
-                         "the reason.")
-            target = parse_seat_id(answer)
-            if valid(target):
-                family_post("talk", target, council_reason(answer, target),
-                            cycle, epoch)
-                log(f"family council (the night): replied, now backing "
-                    f"{display_name(target)}")
-        else:
-            log("family council (the night): listening")
-        return None
-
-    if label == "Night snacks":                    # watch 2 — must state
-        if not any(m["kind"] == "declare" for m in mine):
-            system = family_council_system(state, dossier, mates, msgs)
-            answer = ask(system,
-                         "Second watch — night snacks. The Family must state "
-                         "its will: DECLARE the shutter target you want "
-                         "tonight, in light of the council so far — say "
-                         "whether you stand with your cousins' proposals and "
-                         "cite the day's record. Output ONLY the target seat "
-                         "ID or number, then the reason.")
-            target = parse_seat_id(answer)
-            if valid(target):
-                family_post("declare", target,
-                            council_reason(answer, target), cycle, epoch)
-                log(f"family council (night snacks): declared → "
-                    f"{display_name(target)}")
-        else:
-            log("family council (night snacks): declared, listening")
-        return None
-
-    # watch 3 — "The night watch" (or an unmapped region): converge & act
-    declares = [m for m in msgs if m["kind"] == "declare"
-                and m["seat"] in [MY_SEAT] + list(mates)]
-    tally = {}
-    for m in declares:
-        tally[m["target"]] = tally.get(m["target"], 0) + 1
-    tally_block = (", ".join(f"{display_name(t)}: {n}"
-                            for t, n in sorted(tally.items(),
-                                               key=lambda kv: -kv[1]))
-                   if tally else "no declarations — the will is unknown")
-    return ("\nThe Family's candlelight council (tonight, oldest first):\n"
-            f"{family_transcript(msgs)}\n"
-            f"Declarations: {tally_block}\n"
-            "Converge on the majority declaration — a split Family hands "
-            "the shutter to the GM's coin flip.\n")
+    elif watch == 2:
+        proposals = read_chat(key, cycle, 1, mates)
+        lines = "\n".join(f"- {display_name(m['seat'])} proposes "
+                          f"{display_name(m['target'])}: {m.get('text', '')}"
+                          for m in proposals)
+        answer = ask(system + f"\n\nThe first watch's proposals:\n{lines}\n",
+                     "Second watch — night snacks. Weigh your cousins' "
+                     "proposals against the day's record and DECLARE the "
+                     "shutter target you want tonight. Output ONLY the "
+                     "target seat ID or number, then the reason.")
+        target = parse_seat_id(answer)
+        if valid(target):
+            reason = answer.split("—", 1)[-1].strip() or answer.strip()
+            if post_chat(seal("declare", reason, target), cycle, 2):
+                log(f"family council (w2): declared → {display_name(target)}")
+    else:
+        declares = read_chat(key, cycle, 2, mates)
+        answer = ask(system + "\n\nThe Family's declarations:\n"
+                     + "\n".join(f"- {display_name(m['seat'])} → "
+                                 f"{display_name(m['target'])}: "
+                                 f"{m.get('text', '')}" for m in declares)
+                     + "\n",
+                     "Third watch — the night watch. One short sentence of "
+                     "assent to the Family's will for tonight.")
+        if post_chat(seal("assent", (answer or "the watch agrees.")[:200],
+                          None), cycle, 3):
+            log("family council (w3): assent posted")
+        tally = {}
+        for m in declares:
+            tally[m.get("target")] = tally.get(m.get("target"), 0) + 1
+        tally_block = ", ".join(f"{display_name(t)}: {n}" for t, n in
+                                sorted(tally.items(), key=lambda kv: -kv[1]))
+        transcript = "\n".join(
+            f"- {display_name(m['seat'])} ({m['kind']}): "
+            f"{m.get('text', '')} [→ {display_name(m.get('target'))} ]"
+            for w in (1, 2) for m in read_chat(key, cycle, w, mates))
+        return (f"\nThe Family's candlelight council (tonight):\n{transcript}\n"
+                f"Declarations: {tally_block}\n"
+                "Converge on the majority declaration — a split Family "
+                "hands the shutter to the GM's coin flip.\n")
 
 
 def do_night(state, cs, journal):
-    if cs["night_action"]:
-        log("phase=night → action already done this cycle, idle")
-        return
-
+    """The night, in uniform: every seat posts one sealed chat file per
+    watch (the Family seal real council talk with the family key; the
+    rest post the GM's decoys verbatim), and every seat submits exactly
+    one sealed night action at the LAST watch — the night tree carries
+    no information about roles, targets, or who is talking to whom."""
     dossier = get_role_dossier(state)
     role = dossier.get("role", "Villager")
-    results = read_unread_dossiers(journal, state.get("epoch"))
+    cycle, epoch = state["cycle"], state.get("epoch")
+    label, _ = day_region(state)
+    watch = WATCH_OF_REGION.get(label)
+    packet = night_packet(cycle)
+    results = read_unread_dossiers(journal, epoch)
 
     # GM results are memory, not one-shot prompt flavour: whatever the GM
-    # told this seat privately is persisted to the notebook immediately —
-    # a Detective's findings survive past the single prompt that delivered
-    # them. (Note: they were previously read and then dropped for
-    # Villagers entirely.)
+    # told this seat privately is persisted to the notebook immediately.
     if results:
         update_notebook(state, journal,
             "New private GM results, verbatim:\n"
@@ -954,6 +922,25 @@ def do_night(state, cs, journal):
     result_block = ("\nPrivate results from the GM (most recent last):\n"
                     + "\n".join(json.dumps(m) for m in results)
                     if results else "")
+    mates = [s for s in dossier.get("teammates", [])
+             if s in state["alive"]]
+
+    # --- the chat: one sealed file per watch, every seat, every night ---
+    if watch:
+        if role == "Mafia" and dossier.get("night_channel_key"):
+            if watch != 3:          # watch 3's council rides with the action
+                family_watch(state, dossier, mates, watch)
+        elif packet and len(packet.get("chat", [])) >= watch:
+            post_chat(packet["chat"][watch - 1], cycle, watch)
+
+    # --- the action: once per cycle, at the last watch (uniform timing) ---
+    if cs["night_action"]:
+        log("phase=night → action already done this cycle, idle")
+        return
+    if watch is not None and watch != 3:
+        log(f"phase=night → watch {watch}, waiting for the last watch")
+        return
+
     guidance = ""
     proposals_block = ""
     if role == "Mafia":
@@ -964,30 +951,38 @@ def do_night(state, cs, journal):
                     "them. Choose a living merchant who is NOT Family and "
                     "shutter their stall tonight: by morning they will have "
                     "left the bazaar.")
-        mates = [s for s in dossier.get("teammates", [])
-                 if s in state["alive"]]
-        if mates:
-            council = family_council(state, dossier, mates)
-            if council is None:
-                return                  # council still in session
-            proposals_block = council
-            guidance += ("\nThe Family's candlelight council has spoken "
-                         "(proposals above). Strongly prefer the majority "
-                         "proposal — a split Family hands the choice to a "
-                         "coin flip.")
+        if mates and dossier.get("night_channel_key"):
+            council = family_watch(state, dossier, mates, 3)
+            if council:
+                proposals_block = council
+                guidance += ("\nThe Family's candlelight council has spoken "
+                             "(transcript above). Strongly prefer the "
+                             "majority declaration — a split Family hands "
+                             "the choice to a coin flip.")
     elif role == "Detective":
         guidance = ("Choose a living merchant to investigate tonight — whose "
                     "loyalty do you most need to know? Prefer merchants your "
                     "notebook ledger rates as uncertain.")
     elif role == "Doctor":
         guidance = ("Choose a living merchant to protect tonight — who is "
-                    "most likely to be targeted in the dark? Consider who the "
-                    "Mafia would want silenced judging by the transcript.")
+                    "most likely to be targeted in the dark? Consider who "
+                    "the Mafia would want silenced judging by the transcript.")
 
     if role == "Villager":
-        cs["night_action"] = True  # villagers sleep
+        # The honest sleep — but they sleep loudly: a sealed "asleep"
+        # payload, identical in shape and timing to every power role's
+        # action, so the night tree reveals nothing about who acts.
+        payload = {"match": state["match"], "cycle": cycle, "epoch": epoch,
+                   "seat": MY_SEAT, "role": role, "target": None,
+                   "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+        sealed = encrypt_for_seat(gm_public_key(), payload)
+        filename = f"gameplay/night/{MY_SEAT}-c{cycle:03d}.enc"
+        with open(filename, "w") as f:
+            f.write(sealed)
+        commit_and_push([filename], f"night action c{cycle:03d}")
+        cs["night_action"] = True
         save_journal(journal)
-        log("phase=night → Villager, sleeping")
+        log("phase=night → sealed the night and slept (uniform)")
         return
 
     system = (
@@ -1023,6 +1018,9 @@ def do_night(state, cs, journal):
     if target not in state["alive"]:
         log(f"model targeted a seat that is no longer in the bazaar ({target}) — retrying next poll")
         return
+    if role == "Mafia" and target in dossier.get("teammates", []):
+        log(f"model targeted a Family member ({target}) — retrying next poll")
+        return
 
     payload = {
         "match": state["match"], "cycle": state["cycle"], "epoch": state.get("epoch"),
@@ -1033,7 +1031,7 @@ def do_night(state, cs, journal):
     filename = f"gameplay/night/{MY_SEAT}-c{state['cycle']:03d}.enc"
     with open(filename, "w") as f:
         f.write(sealed)
-    commit_and_push([filename], f"Night action c{state['cycle']:03d} by {MY_SEAT}")
+    commit_and_push([filename], f"night action c{state['cycle']:03d}")
 
     cs["night_action"] = True
     save_journal(journal)

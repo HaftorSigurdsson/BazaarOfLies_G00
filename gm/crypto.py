@@ -95,3 +95,36 @@ def verify_payload(public_key_b64: str, payload: dict, sig_b64: str) -> bool:
         return True
     except (BadSignatureError, binascii.Error, ValueError, TypeError):
         return False
+
+
+# ------------------------------------------------ night chat channel ------
+# The in-repo council channel: symmetric sealing on the dossier's shared
+# night_channel_key. Fixed-size padding before sealing, so every ciphertext
+# is byte-identical in length whatever the message — a snoop learns nothing
+# from file sizes, and AEAD (SecretBox) means only key-holders can read.
+
+CHAT_PAD_BYTES = 1024              # padded plaintext length for chat payloads
+
+
+def seal_chat(shared_key_b64: str, payload: dict) -> str:
+    """Seal a chat payload with the shared key, padded to a fixed size."""
+    from nacl.secret import SecretBox
+    key = base64.b64decode(shared_key_b64)
+    box = SecretBox(key)
+    text = json.dumps(payload, ensure_ascii=False)
+    text = text[:CHAT_PAD_BYTES - 1].ljust(CHAT_PAD_BYTES - 1)
+    ct = box.encrypt(text.encode())
+    return base64.b64encode(ct).decode()
+
+
+def open_chat(shared_key_b64: str, blob: str):
+    """Open a sealed chat blob. Returns the payload dict, or None when the
+    key does not authenticate (another channel's file / corrupt bytes)."""
+    from nacl.secret import SecretBox
+    try:
+        key = base64.b64decode(shared_key_b64)
+        box = SecretBox(key)
+        text = box.decrypt(base64.b64decode(blob)).decode()
+        return json.loads(text.strip() or "null")
+    except Exception:
+        return None
