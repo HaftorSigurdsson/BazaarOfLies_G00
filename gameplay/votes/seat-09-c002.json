@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 2,
+  "epoch": "165f13bd",
+  "seat": "seat-09",
+  "target": "seat-08",
+  "rationale": "Morpheus, your iron tongue claims the Family fears two seats yet names none, while your own stall whispers in yesterday's rust.",
+  "ts": "2026-10-25T13:45:27Z"
+ },
+ "sig": "YxMbH0WRsEipQ6tgmVQ2DWyWf610LpujdRFv9MumwsNFmg/YlwnP2c/LlCcZxS4t0yGfTlvn/PjJ2mg8zpybCw=="
+}
