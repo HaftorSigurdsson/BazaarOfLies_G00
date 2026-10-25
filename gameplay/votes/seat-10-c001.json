@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "30fdc33a",
+  "seat": "seat-10",
+  "target": "seat-07",
+  "rationale": "Her forecast contradicted Compact clause 5, she dodged nine demands for the clause she invoked, and then cast a contradictory vote test.",
+  "ts": "2026-10-25T22:50:32Z"
+ },
+ "sig": "Cg4CBpC5CDHIeDdJZKOBYKFaPUcoZfzOJ1duaHVn3D0fY0Wt/G2kESuZ5DUVL8KZ6rGvszCHqWFw1e3b6FiCCA=="
+}
