@@ -29,7 +29,7 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 ## **2. The Herald (`src/town-herald.py`)**
 An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice daily. The Herald is **facts-only**:
 
-- **Display names**: every seat has a public name label (`Gandalf`, from `setup/seats.json`). GM announcements, ballot tables, and the graveyard keep the seat ID for unambiguous record-keeping (`Gandalf (seat-01)`); **the Herald prints names alone** — like the Elder Council's judgments, seat numbers never appear in the paper. The names are arbitrary pop-culture labels: the characters they evoke never enter the game, and bots are explicitly instructed never to roleplay them. Machine files (ballots, dossiers, state, statement records) keep the bare seat ID.
+- **Display names**: every seat has a public name label (`Gandalf`, from `setup/seats.json`). **All prose — GM announcements, ballot tables, the graveyard, the Herald, the Council's judgments, and every merchant's speech — prints names alone**; seat numbers are bookkeeping and live only in machine files (ballots, dossiers, state, statement records) and the Council's appendices. The shared `gm.utils.seat_from_label` resolves a plain name back to a seat everywhere prose is parsed, and still reads the older `Gandalf (1)` labels of matches 1–2. The names are arbitrary pop-culture labels: the characters they evoke never enter the game, and bots are explicitly instructed never to roleplay them.
 
 - Sources are exclusively **public**: announcements, the graveyard, the current cycle's public statements, and the list of living seats.
 - It **never speculates** about the roles of living merchants.

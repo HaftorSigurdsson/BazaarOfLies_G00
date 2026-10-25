@@ -78,19 +78,38 @@ def get_seats() -> Dict[str, dict]:
 
 
 def display_name(seat: str) -> str:
-    """The seat's public display name: 'Gandalf (1)'.
+    """The merchant's public name label, alone: 'Gandalf'.
 
-    Names are arbitrary pop-culture labels for humans and bots to read —
-    the number in brackets is the seat number, the one true identity
-    ('seat-01' prints as 1, 'seat-10' as 10). Machine files (ballots,
-    dossiers, state, transcripts) always store the bare seat ID; only
-    prose layers display the name."""
+    Names are arbitrary labels — never the seat number in prose. Machine
+    files (ballots, dossiers, state, transcripts) always store the bare
+    seat ID ('seat-01'); only prose layers display the name. Seat numbers
+    are bookkeeping, never speech."""
     if not seat:          # e.g. an asleep night action has no target
         return "—"
     name = get_seats().get(seat, {}).get("name")
-    number = seat.split("-")[-1]
-    number = str(int(number)) if number.isdigit() else number
-    return f"{name} ({number})" if name else seat
+    return name or seat
+
+
+def seat_from_label(text: str) -> Optional[str]:
+    """Seat ID from any label form: 'seat-01', 'Gandalf (1)', '(10)', or a
+    plain merchant NAME ('Gandalf', '...as Gandalf said...'). Names are
+    unique across seats, so the first name found wins. Backward compatible
+    with the old 'Name (number)' labels of earlier matches. Returns None
+    when nothing resolves."""
+    if not text:
+        return None
+    m = re.search(r"seat-(\d{1,2})", text)
+    if m:
+        return f"seat-{int(m.group(1)):02d}"
+    m = re.search(r"\(([0-9]{1,2})\)", text)
+    if m:
+        return f"seat-{int(m.group(1)):02d}"
+    low = text.lower()
+    for sid, s in sorted(get_seats().items()):
+        name = (s.get("name") or "").lower()
+        if name and re.search(rf"\b{re.escape(name)}\b", low):
+            return sid
+    return None
 
 
 def is_alive(seat: str) -> bool:
@@ -112,26 +131,19 @@ def get_living_seats() -> List[str]:
 # Dinner (5 min each of a 25-min discussion) → Evening (the 5-min vote)
 # → The night, Night snacks, The night watch (5 min each of a 15-min night).
 DAY_REGIONS = [
-    (0.00, 0.20, "Morning",
-     "the braziers are lit and the shutters open one by one"),
-    (0.20, 0.40, "Morning tea",
-     "the first tea of the day; quiet talk over small glasses"),
-    (0.40, 0.60, "Lunch",
-     "the stalls quiet for lunch; the talk moves to the tea house"),
-    (0.60, 0.80, "Afternoon tea",
-     "the market thins; the afternoon glasses are poured"),
+    (0.00, 0.20, "Morning", "the shutters open one by one"),
+    (0.20, 0.40, "Morning tea", "the first pots of the day"),
+    (0.40, 0.60, "Lunch", "the stalls quiet for lunch"),
+    (0.60, 0.80, "Afternoon tea", "the afternoon glasses are poured"),
     (0.80, 1.01, "Dinner",
-     "the day's takings are counted; every merchant is expected to name "
-     "who they lean toward banishing"),
+     "the takings are counted; every merchant names who they lean "
+     "toward banishing"),
 ]
 
 NIGHT_REGIONS = [
-    (0.00, 0.34, "The night",
-     "the bazaar sleeps; the night guards brew their tea"),
-    (0.34, 0.67, "Night snacks",
-     "the braziers burn low; even the guards take a midnight snack"),
-    (0.67, 1.01, "The night watch",
-     "the darkest hour; the watch makes its rounds and the lamps gutter"),
+    (0.00, 0.34, "The night", "the bazaar sleeps"),
+    (0.34, 0.67, "Night snacks", "the braziers burn low"),
+    (0.67, 1.01, "The night watch", "the watch makes its rounds"),
 ]
 
 

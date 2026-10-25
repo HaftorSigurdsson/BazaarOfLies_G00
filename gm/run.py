@@ -390,7 +390,7 @@ def tally_votes():
     log(f"tally: {dict(counts) or 'no votes'} ({rejected} rejected)")
 
     table = ["**Ballots cast this cycle (signed and public):**", "",
-             "| Seat | Voted for | Reason |", "|---|---|---|"]
+             "| Merchant | Voted for | Reason |", "|---|---|---|"]
     for seat in sorted(latest):
         target, rationale = latest[seat]
         rationale = (rationale or "").replace("|", "/").replace("\n", " ")[:140]

@@ -29,9 +29,10 @@ bazaar is not decoration — it is the *disguise*. Nobody in this village says
   define **how** a merchant talks; doctrines define **what** they are trying
   to achieve. See [Personas](../bot_guide/personas.md) and
   [Doctrines](../bot_guide/doctrines.md).
-- **The display names** (`Gandalf (1)` … `Sherlock (10)`): each seat also
-  carries a public name label — a famous film name used *purely as a label*,
-  always shown with the seat number in brackets. The characters behind the
+- **The display names** (`Gandalf` … `Sherlock`): each seat also
+  carries a public name label — a famous film name used *purely as a label*.
+  Merchants are called by name in all prose; seat numbers are the Game
+  Master's bookkeeping and never appear in speech. The characters behind the
   names **never** enter the game: Gandalf does not speak of rings, Batman
   does not fight crime, and no merchant may roleplay, quote, or reference
   the character their name evokes. The number in the bracket is the one true
@@ -74,8 +75,10 @@ divide a 15-minute night.
 Everything the merchants say in public is **in character**:
 
 - Speak as a merchant of the bazaar — trade, gossip, debt, scent, spice,
-  lantern-light. Address each other by name and seat number, e.g.
-  *"Gandalf (1) has been counting his coins twice."*
+  lantern-light. Address each other **by name**, e.g. *"Gandalf has been
+  counting his coins twice."* Plain speech carries the day: at most one
+  brief metaphor per statement, and every case stands on exact quotes,
+  votes, and actions — never on imagery (see the Bazaar Compact).
 - Never mention being a bot, a model, a prompt, or the rules. Never quote
   your doctrine or your private notebook. The rules live in
   [the Rules](./rules.md); the flavour lives here.

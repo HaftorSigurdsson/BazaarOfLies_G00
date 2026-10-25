@@ -53,7 +53,7 @@ from mistralai.client import Mistral
 # gm/ sits at the arena root — the tea clock (day regions) lives there.
 _ARENA_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ARENA_ROOT)
-from gm.utils import day_region
+from gm.utils import day_region, seat_from_label
 
 # ---------------------------------------------------------------- config ---
 MODEL = "mistral-large-latest"
@@ -215,15 +215,6 @@ def display_name(seat):
     return name or seat
 
 
-def seat_from_label(text):
-    """Seat ID from any label form: 'seat-04', 'Gandalf (1)', '(10)'."""
-    m = re.search(r"seat-\d{2}", text)
-    if m:
-        return m.group(0)
-    m = re.search(r"\(([0-9]{1,2})\)", text)
-    return f"seat-{int(m.group(1)):02d}" if m else None
-
-
 def graveyard_roll():
     """Public obituaries: seat, merchant name, role revealed on departure, cause."""
     entries = []
@@ -232,8 +223,7 @@ def graveyard_roll():
     except OSError:
         return entries
     for line in text.splitlines():
-        if not line.startswith("|") or ("seat-" not in line
-                                        and not re.search(r"\(\d{1,2}\)", line)):
+        if not line.startswith("|") or "---" in line or "Banished By" in line:
             continue
         cells = [c.strip() for c in line.split("|")]
         seat = seat_from_label(line)
@@ -352,8 +342,9 @@ def vote_history():
         counts = {}
         for target in voters.values():
             counts[target] = counts.get(target, 0) + 1
-        banished = re.search(r"\*\*Banishment!\*\*.*?\((?:seat-)?(\d{1,2})\)", body)
-        result = (f"{display_name(f'seat-{int(banished.group(1)):02d}')} banished"
+        m = re.search(r"\*\*Banishment!\*\*\s*([A-Za-z]+)", body)
+        banished = seat_from_label(m.group(1)) if m else None
+        result = (f"{display_name(banished)} banished"
                   if banished else "no banishment (tie or no majority)")
         tally = ", ".join(
             f"{display_name(t) if t != 'abstain' else 'abstain'}: "
@@ -455,12 +446,13 @@ def tally_chart():
         counts[target] = counts.get(target, 0) + 1
     total = len(voters)
     abstains = counts.get("abstain", 0)
-    banished = re.search(r"\*\*Banishment!\*\*.*?\((?:seat-)?(\d{1,2})\)", body)
+    m = re.search(r"\*\*Banishment!\*\*\s*([A-Za-z]+)", body)
+    banished = seat_from_label(m.group(1)) if m else None
 
     lines = []
     headline = "THE DAILY TALLY"
     if banished:
-        headline += f" — {display_name(f'seat-{int(banished.group(1)):02d}')} BANISHED"
+        headline += f" — {display_name(banished)} BANISHED"
     lines.append(headline)
     lines.append(f"{total} ballot{'s' if total != 1 else ''} cast"
                  + (f", {abstains} abstention{'s' if abstains != 1 else ''}"

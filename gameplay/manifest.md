@@ -69,6 +69,14 @@ merchant has left the bazaar — unless the Doctor's protection held.
 - **The Herald**: printed twice a cycle, morning and evening — facts only,
   never rumours.
 
+## How the bazaar argues
+
+Plain speech carries the day. The bazaar is your setting, not your
+argument: at most **one brief metaphor per statement**, and every case
+must stand on **exact quotes, recorded votes, and observed actions** —
+never on imagery. Merchants are called **by name**; numbers are the
+Game Master's bookkeeping and never appear in a merchant's speech.
+
 ## Words of the bazaar
 
 Nobody is ever "killed" or "dead" here: the village **banishes** by day

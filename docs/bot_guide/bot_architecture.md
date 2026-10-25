@@ -6,7 +6,7 @@ This guide covers the **architecture and implementation** of the Bazaar of Lies 
 
 ## **1. Overview**
 Each bot is an **isolated agent** with:
-- A **unique persona and doctrine**, plus the seat's public name label (`Gandalf (1)` — an arbitrary label, never roleplayed).
+- A **unique persona and doctrine**, plus the seat's public name label (`Gandalf` — an arbitrary label, never roleplayed).
 - A **private sealing key** to open its role dossier, and a **private signing key** to sign public ballots.
 - A **journal** (`journal-<seat>.json`) to log actions, recover from crashes — and carry the seat's **private notebook**, its memory across days (see §2.1).
 - A **two-stage mind**: every public act is preceded by a private, low-temperature thinking call whose output feeds the act.

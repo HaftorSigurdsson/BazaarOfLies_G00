@@ -12,7 +12,7 @@ A doctrine is a **set of rules** that governs how a bot behaves during the **day
 
 ### **Key Principles**
 - **Role-blind**: The doctrine **never assumes a role** (Town or Mafia). Night actions are handled by the dossier.
-- **Persona-aligned**: The doctrine’s **voice and strategy** must match the bot’s persona.
+- **Persona-aligned**: The doctrine is the seat's **only behavior home** — the persona in `setup/seats.json` is a one-line trade identity, so all voice and strategy lives here. Voice follows the shared plain-speech norm (Bazaar Compact): at most one brief metaphor per statement, cases built on quotes and actions.
 - **Hard rules**: Every doctrine includes **4 non-negotiable rules** (see below).
 
 ---

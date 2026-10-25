@@ -77,10 +77,11 @@ def load_registry(match_no, gm_priv):
     roles = {}
     if os.path.exists(truth):
         for line in open(truth):
-            m = re.match(r"^\|\s*(\S+ \(\d+\))\s*\|\s*(\w+)\s*\|$", line)
+            m = re.match(r"^\|\s*(.+?)\s*\|\s*(\w+)\s*\|$", line)
             if m and m.group(2) in ("Mafia", "Doctor", "Detective", "Villager"):
-                seat = "seat-" + re.search(r"\((\d+)\)", m.group(1)).group(1).zfill(2)
-                roles[seat] = m.group(2)
+                seat = seat_of(m.group(1))
+                if seat:
+                    roles[seat] = m.group(2)
         if roles:
             return roles
     try:
@@ -108,8 +109,10 @@ def plain(label):
 
 
 def seat_of(label):
-    m = re.search(r"\((\d+)\)", label)
-    return f"seat-{int(m.group(1)):02d}" if m else None
+    """Seat ID from a ballot/graveyard label — the shared resolver accepts
+    plain names (current GM rows) and the older 'Name (number)' labels."""
+    from gm.utils import seat_from_label
+    return seat_from_label(str(label))
 
 
 def load_ballots(match_no):
@@ -129,7 +132,7 @@ def load_ballots(match_no):
         if in_table and cycle is not None:
             m = re.match(r"^\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|$", line)
             if m and not set(m.group(1)) <= {"-", " "} \
-                    and m.group(1).strip() != "Seat":
+                    and m.group(1).strip() not in ("Seat", "Merchant"):
                 ballots.setdefault(cycle, []).append(
                     {"seat": seat_of(m.group(1)), "voter": m.group(1),
                      "target": m.group(2), "reason": m.group(3)})
@@ -204,11 +207,13 @@ def load_family_channel(match_no):
     truth = f"gameplay/village/match-{match_no:02d}-truth.md"
     if os.path.exists(truth):
         for line in open(truth):
-            m = re.match(r"- cycle (\d+) watch (\d+) (\S+ \(\d+\)) "
+            m = re.match(r"- cycle (\d+) watch (\d+) (.+?) "
                          r"\[(\w+), (\w+)\]: (.*)", line.strip())
             if not m:
                 continue
-            seat = "seat-" + re.search(r"\((\d+)\)", m.group(3)).group(1).zfill(2)
+            seat = seat_of(m.group(3))
+            if not seat:
+                continue
             msg = {"cycle": int(m.group(1)), "watch": int(m.group(2)),
                    "seat": seat, "seat_label": m.group(3),
                    "voice": m.group(4), "kind": m.group(5),

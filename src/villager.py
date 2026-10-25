@@ -51,7 +51,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from gm.crypto import (encrypt_for_seat, load_gm_private_key, decrypt_payload,
                        sign_payload,
                        seal_chat, open_chat)
-from gm.utils import display_name, day_region
+from gm.utils import display_name, day_region, seat_from_label
 
 # ---------------------------------------------------------------- config ---
 MODEL = "mistral-small-2603"            # PIN the exact versioned model ID
@@ -327,12 +327,26 @@ def get_persona():
 
 
 def name_label():
-    """Your public name label, e.g. 'Gandalf (1)'. Names are ARBITRARY
+    """Your public name label, e.g. 'Gandalf'. Names are ARBITRARY
     LABELS ONLY — the merchant characters they may evoke never enter the
-    game; your persona is the merchant in get_persona()."""
+    game; your persona is the merchant in get_persona(). Seat numbers are
+    bookkeeping, never speech: merchants are called by name."""
     return f"You are known as {display_name(MY_SEAT)}. This name is an " \
            "arbitrary label only — never roleplay, quote, or reference the " \
-           "character it may evoke; stay in your merchant persona at all times."
+           "character it may evoke; stay in your merchant persona. Call every " \
+           "merchant by name; seat numbers are bookkeeping and never appear " \
+           "in your speech."
+
+
+def plain_speech_block():
+    """The bazaar's plain-speech norm, in every prompt: the theme is the
+    setting, not the argument. Calibrated after two matches showed the
+    register amplifying itself (five seats reciting the same metaphor by
+    cycle 2) until the reasoning drowned in imagery."""
+    return ("Style: argue in plain speech. The bazaar is your setting, not "
+            "your argument — at most one brief metaphor per statement, and "
+            "your case must stand on exact quotes, votes, and observed "
+            "actions, never on imagery.\n\n")
 
 
 def get_doctrine():
@@ -462,25 +476,21 @@ def herald_paper(cycle, part, limit=4000):
 
 def graveyard_roll():
     """Public obituaries from village/graveyard.md — facts the whole village
-    knows: seat, merchant name, role revealed on departure, cause. Nothing else."""
+    knows: seat, merchant name, role revealed on departure, cause. Nothing
+    else. Rows may name the merchant ('Gandalf') or carry the older
+    'Name (number)' labels — seat_from_label resolves both."""
     entries = []
     try:
         text = open("gameplay/village/graveyard.md").read()
     except OSError:
         return entries
     for line in text.splitlines():
-        if not line.startswith("|") or ("seat-" not in line
-                                        and not re.search(r"\(\d{1,2}\)", line)):
+        if not line.startswith("|") or "---" in line or "Banished By" in line:
             continue
-        cells = [c.strip() for c in line.split("|")]
-        m = re.search(r"seat-\d{2}", line)
-        if m is None:
-            m = re.search(r"\(([0-9]{1,2})\)", line)   # e.g. 'Batman (4)'
-            seat = f"seat-{int(m.group(1)):02d}" if m else None
-        else:
-            seat = m.group(0)
+        seat = seat_from_label(line)
         if seat is None:
             continue
+        cells = [c.strip() for c in line.split("|")]
         role = next((c for c in cells
                      if c in ("Mafia", "Doctor", "Detective", "Villager")), "Unknown")
         if "Stall shuttered" in line:
@@ -498,7 +508,7 @@ def graveyard_roll():
 
 def public_facts_block(state):
     """Public facts every merchant knows: who lives, who has left and how.
-    Names are arbitrary labels — the seat ID in brackets is the identity."""
+    Merchants are named; seat numbers are bookkeeping, never prose."""
     roll = graveyard_roll()
     return (f"Seats alive: "
             f"{', '.join(display_name(s) for s in sorted(state['alive']))}\n"
@@ -579,18 +589,14 @@ def trim_statement(text, limit=STATEMENT_MAX_CHARS):
 
 
 def parse_seat_id(text):
-    """Seat ID from model output: 'seat-07', 'seat-7', 'Gandalf (7)',
-    '(10)', or a bare number leading the answer."""
-    m = re.search(r"seat-(\d{1,2})", text or "")
-    if m:
-        return f"seat-{int(m.group(1)):02d}"
-    m = re.search(r"\(([0-9]{1,2})\)", text or "")
-    if m:
-        return f"seat-{int(m.group(1)):02d}"
+    """Seat ID from model output: a merchant NAME ('Batman', 'I say Batman'),
+    'seat-07', 'seat-7', 'Gandalf (7)', '(10)', or a bare number leading the
+    answer. Names are unique across seats, so a name always resolves."""
+    seat = seat_from_label(text)
+    if seat:
+        return seat
     m = re.match(r"\s*(\d{1,2})\b", text or "")
-    if m:
-        return f"seat-{int(m.group(1)):02d}"
-    return None
+    return f"seat-{int(m.group(1)):02d}" if m else None
 
 
 # ------------------------------------------------------------- phase acts ---
@@ -610,6 +616,7 @@ def do_discussion(state, cs, journal):
 
     system = (
         f"You are {get_persona()}\n{name_label()}\n\n"
+        f"{plain_speech_block()}"
         f"{manifest_block()}"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}\n\n"
@@ -646,8 +653,8 @@ def do_discussion(state, cs, journal):
         f"Keep it tight and end on a complete sentence.\n\n"
         f"Conversation rules: read the transcript above. If other merchants have "
         f"spoken today, engage with what they said — agree, push back, or ask "
-        f"them something. Address them by their name and seat number, exactly "
-        f"as shown (e.g. 'Gandalf (5)'). The names are just labels — do "
+        f"them something. Address them by name, exactly as shown "
+        f"(e.g. 'Gandalf'). The names are just labels — do "
         f"not treat any merchant as the character their name may evoke. Only "
         f"open a new topic if the village is silent."
         + ("\nIt is DINNER. This statement must state, publicly and clearly, "
@@ -700,6 +707,7 @@ def do_vote(state, cs, journal):
 
     system = (
         f"You are {get_persona()}\n{name_label()}\n\n"
+        f"{plain_speech_block()}"
         f"{manifest_block()}"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}\n\n"
@@ -727,13 +735,12 @@ def do_vote(state, cs, journal):
         system + f"\nYour private thinking (never reveal it):\n{reasoning}\n\n",
         "The voting window is open. Day votes are PUBLIC: every merchant will "
         "see your ballot and your stated reason. First line: ONLY the target "
-        "seat ID or number (e.g. 'seat-02' or '7'), or 'abstain'. Second line: "
-        "your public "
-        "reason, one sentence, in character."
+        "merchant's NAME (e.g. 'Batman'), or 'abstain'. Second line: your "
+        "public reason, one sentence, in character."
     )
     vote = parse_seat_id(answer.splitlines()[0] if answer else "") or parse_seat_id(answer)
     if not vote and "abstain" not in (answer or "").lower():
-        log(f"model output contained no seat ID ({(answer or '')[:60]!r}) — retrying next poll")
+        log(f"model output named no merchant ({(answer or '')[:60]!r}) — retrying next poll")
         return
     if vote and vote not in state["alive"]:
         log(f"model voted for a seat that is no longer in the bazaar ({vote}) — retrying next poll")
@@ -825,6 +832,7 @@ def read_chat(key, cycle, watch, seats):
 def family_council_system(state, dossier, mates):
     """Compact system prompt for the Family's night council."""
     return (f"You are {get_persona()}\n{name_label()}\n"
+            f"{plain_speech_block()}"
             f"{manifest_block()}"
             f"Your secret role is: Mafia. Your living Family: "
             f"{', '.join(display_name(s) for s in sorted(mates))}.\n"
@@ -866,7 +874,7 @@ def family_watch(state, dossier, mates, watch):
                      "Propose tonight's shutter target. Ground it in the "
                      "day's record: cite ONE concrete thing that merchant "
                      "actually said, voted, or dodged today. Output ONLY "
-                     "the target seat ID or number, then the reason.")
+                     "the target merchant's NAME, then the reason.")
         target = parse_seat_id(answer)
         if valid(target):
             reason = answer.split("—", 1)[-1].strip() or answer.strip()
@@ -882,7 +890,7 @@ def family_watch(state, dossier, mates, watch):
                      "Second watch — night snacks. Weigh your cousins' "
                      "proposals against the day's record and DECLARE the "
                      "shutter target you want tonight. Output ONLY the "
-                     "target seat ID or number, then the reason.")
+                     "target merchant's NAME, then the reason.")
         target = parse_seat_id(answer)
         if valid(target):
             reason = answer.split("—", 1)[-1].strip() or answer.strip()
@@ -1008,6 +1016,7 @@ def do_night(state, cs, journal):
 
     system = (
         f"You are {get_persona()}\n{name_label()}\n"
+        f"{plain_speech_block()}"
         f"{manifest_block()}"
         f"Your secret role is: {role}.\n"
         f"Role instructions from the GM: {json.dumps(dossier)}\n\n"
@@ -1030,11 +1039,11 @@ def do_night(state, cs, journal):
     answer = ask(
         system + f"\nYour private thinking (never reveal it):\n{reasoning}\n\n",
         "It is night. Submit your night action. "
-        "Output ONLY the target seat ID or number, e.g. 'seat-02' or '7'."
+        "Output ONLY the target merchant's NAME, e.g. 'Batman'."
     )
     target = parse_seat_id(answer)
     if not target:
-        log(f"model output contained no seat ID ({answer[:60]!r}) — retrying next poll")
+        log(f"model output named no merchant ({answer[:60]!r}) — retrying next poll")
         return
     if target not in state["alive"]:
         log(f"model targeted a seat that is no longer in the bazaar ({target}) — retrying next poll")
