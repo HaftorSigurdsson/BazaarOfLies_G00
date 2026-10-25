@@ -11,9 +11,16 @@ daily. The Herald is a FACTS-ONLY publication:
   - roles may only be restated from official obituaries (the GM reveals
     roles at death);
   - every edition carries a 'By the Numbers' section (machine-counted
-    public figures, including per-seat vote participation once the GM
-    publishes ballot tables) and, when those tables exist, a
-    'The Voting Record' section;
+    public figures; ballot participation appears in EVENING editions
+    only — the morning paper reports the news, the evening paper carries
+    the returns);
+  - the FIRST MORNING of a match carries a short introduction: who has
+    arrived and opened their stalls (public facts only, no news to
+    print yet);
+  - merchants appear by NAME ALONE — seat numbers never appear in the
+    paper;
+  - evening editions are the fuller paper: the word on the street with
+    brief verbatim quotes from the day's statements;
   - when public statements exist, a 'Letter to the Editor' section closes
     the paper: one statement quoted verbatim, attributed, uncommented.
 
@@ -53,7 +60,7 @@ MODEL = "mistral-large-latest"
 POLL_SECONDS = 30
 JITTER_SECONDS = 5
 PUSH_ATTEMPTS = 5
-EDITION_MAX_CHARS = 3600
+EDITION_MAX_CHARS = {"morning": 3600, "evening": 5200}   # fuller evenings
 ANNOUNCEMENT_HIGHLIGHTS = 6
 BALLOT_TABLES_MAX = 2
 
@@ -95,15 +102,27 @@ HERALD_SYSTEM = (
     "you are given. Never speculate about the role or allegiance of a living "
     "merchant. Never invent statements, departures, or events. Roles may "
     "only be restated from official obituaries. Attribute every statement "
-    "to its seat, using the exact name-and-number label given (e.g. "
-    "'Gandalf (1)'). Names are arbitrary labels — never treat a merchant "
+    "to its merchant by NAME ALONE, exactly as the label is given (e.g. "
+    "'Gandalf') — never print seat numbers in the paper. Names are "
+    "arbitrary labels — never treat a merchant "
     "as the character their name may evoke, and never reference any film. "
     "Keep it short and lively: a headline, then brief sections (the day's "
     "news, the departed, the word on the street, by the numbers). Include "
     "a short 'By the Numbers' section using the counted figures exactly as "
-    "given. Do NOT write a tally or voting-record section: the official "
-    "tally chart is appended after your text by the press — you may refer "
-    "to its result in one sentence, nothing more. "
+    "given. Do NOT write a tally or voting-record section. Ballots are "
+    "evening news: in MORNING editions, do not mention ballots, tallies, "
+    "or vote counts at all. In EVENING editions, the official tally chart "
+    "is appended after your text by the press — you may refer to its "
+    "result in one sentence, nothing more. "
+    "FIRST MORNING: if the digest marks this as the match's first morning, "
+    "there is no news yet — write a short introductory edition: welcome "
+    "the readers to the newly opened bazaar and introduce the merchants "
+    "who have arrived (names only, public facts). Do not invent events, "
+    "statements, or departures. "
+    "In EVENING editions, write a fuller paper: include a 'The Word on "
+    "the Street' section with brief verbatim quotes from two or three of "
+    "the day's statements (attributed by name, never edited, uncommented) "
+    "and a few lines on what the day's discussion turned on. "
     "If the digest contains statements, close with a 'Letter to the "
     "Editor' section: quote one of the statements verbatim, attributed "
     "to its seat, introduced by at most one neutral line — never edit the "
@@ -188,14 +207,11 @@ def seat_names():
 
 
 def display_name(seat):
-    """'Gandalf (1)' — name label with the seat NUMBER in brackets
-    ('seat-01' prints as 1, 'seat-10' as 10)."""
+    """The merchant's public name label, alone ('Gandalf') — like the
+    Elder Council, the Herald never prints seat numbers in its pages.
+    (Raw GM text still carries them; seat_from_label does the parsing.)"""
     name = seat_names().get(seat)
-    if not name:
-        return seat
-    number = seat.split("-")[-1]
-    number = str(int(number)) if number.isdigit() else number
-    return f"{name} ({number})"
+    return name or seat
 
 
 def seat_from_label(text):
@@ -390,8 +406,10 @@ def quiet_night_streak():
     return streak
 
 
-def by_the_numbers(state):
-    """Public, machine-counted figures for the 'By the Numbers' section."""
+def by_the_numbers(state, part):
+    """Public, machine-counted figures for the 'By the Numbers' section.
+    Ballot figures are evening news only — the morning paper reports the
+    news, the evening paper carries the returns."""
     lines = []
     alive = sorted(state.get("alive", []))
     roll = {e.split(" ")[0] for e in graveyard_roll()}   # unique departed
@@ -412,9 +430,10 @@ def by_the_numbers(state):
     streak = quiet_night_streak()
     if streak:
         lines.append(f"Quiet nights in a row: {streak}.")
-    participation = vote_participation()
-    if participation:
-        lines.append(participation)
+    if part == "evening":
+        participation = vote_participation()
+        if participation:
+            lines.append(participation)
     return lines
 
 
@@ -470,11 +489,17 @@ def facts_digest(state, part):
         if clock.get(label):
             digest.append(f"{label.replace('_', ' ')}: {clock[label]}")
     digest.append("By the numbers (public facts, counted by the Herald):\n"
-                  + "\n".join(by_the_numbers(state)))
-    tallies = vote_history()
-    if tallies:
-        digest.append("Recent ballot tallies (from the GM's public tables, "
-                      "newest first):\n" + "\n".join(tallies))
+                  + "\n".join(by_the_numbers(state, part)))
+    if part == "evening":
+        tallies = vote_history()
+        if tallies:
+            digest.append("Recent ballot tallies (from the GM's public tables, "
+                          "newest first):\n" + "\n".join(tallies))
+    if part == "morning" and int(state.get("cycle") or 0) == 1:
+        digest.insert(2, "FIRST MORNING OF THE MATCH: the bazaar has just "
+                        "opened. The merchants listed above have all arrived "
+                        "and opened their stalls. Introduce the bazaar and "
+                        "its merchants to your readers — public facts only.")
     return "\n".join(digest)
 
 
@@ -553,10 +578,11 @@ def print_edition(state, part, journal):
         digest += "\n\nYour own previous editions (public record of this match, "
         digest += "most recent first):\n" + previous
 
+    limit = EDITION_MAX_CHARS[part]
     edition = ask(f"Public facts digest:\n\n{digest}\n\n"
                   f"Write the Herald's {part} edition for cycle {cycle:03d} "
-                  f"as markdown (max {EDITION_MAX_CHARS} characters)."
-                  )[:EDITION_MAX_CHARS]
+                  f"as markdown (max {limit} characters)."
+                  )[:limit]
 
     # The official tally chart is computed, never model-written — like an
     # election returns graphic, exact to the ballot. Evening editions only:
@@ -567,8 +593,10 @@ def print_edition(state, part, journal):
         edition += "\n\n## The Tally\n\n```text\n" + chart + "\n```\n"
 
     with open(path, "w") as f:
+        # Inside the paper the numbers print small (Vol. 1, Cycle 1);
+        # only the FILENAME pads (vol-01, c001) for clean sorting.
         f.write(f"# The Herald — {'Morning' if part == 'morning' else 'Evening'} Edition\n\n"
-                f"*Vol. {vol} — Match {state['match']}, Cycle {cycle:03d}*\n\n"
+                f"*Vol. {vol} — Match {state['match']}, Cycle {cycle}*\n\n"
                 f"{edition}\n")
 
     # Press the human copy: a one-page A4 newspaper front page (best-effort —

@@ -95,6 +95,15 @@ All notable changes to this project will be documented in this file.
 - **Docs aligned with the contained night**: `rules.md`'s night phase describes the uniform chat/actions/packets/results and the decoy chorus; `encryption.md` documents the symmetric fixed-size chat channel (`seal_chat`/`open_chat`, the `night_channel_key`, decoys); the repo map gains `night/chat/`; `operations.md`'s vault note and `FUTURE.md`'s evidence table point at the in-repo channel and the truth archive. `mkdocs build --strict` passes.
 
 
+## [2.11.4] - 2026-10-25
+### Changed
+- **The Herald prints names alone** — `display_name` drops the seat-number brackets ("Gandalf", not "Gandalf (1)"), matching the Elder Council; raw GM text (announcements, ballot tables, graveyard) still carries the IDs and `seat_from_label` still parses them. System prompt updated to attribute statements by name only.
+- **Ballots are evening news**: the morning edition's By the Numbers and digest no longer carry vote participation or ballot tallies, and the model is told not to mention tallies in the morning (no more "the official tally can be seen below" under a chart that isn't there).
+- **The first morning of a match is an introductory edition**: the digest is marked FIRST MORNING OF THE MATCH — the paper welcomes the readers and introduces the merchants who have arrived (public facts only), instead of an empty front page with no news and no letter.
+- **Evening editions are the fuller paper**: length limit raised 3600 → 5200 characters, with an instructed "The Word on the Street" section — brief verbatim quotes from two or three of the day's statements and a few lines on what the discussion turned on.
+- **Numbers print small inside the paper**: the markdown header now reads *Vol. 1 — Match 1, Cycle 1* (only the filename pads: `herald-vol-01-c001-morning.md`), matching the PDF masthead's Vol. N — No. M.
+
+
 ## [2.11.3] - 2026-10-25
 ### Added
 - **`src/town-reset.py --keep-match`**: a mid-chain reset. The default reset restarts the match counter at 0, so the next deal is Match 1 again — overwriting the previous match's recap, judgment, and truth archive. `--keep-match` preserves the counter the GM already bumped at `end_match`, so the next GM tick deals the **next** match (Match 2 after Match 1) with a fresh epoch and clean artifacts, history intact. Documented in `docs/operations.md`.
