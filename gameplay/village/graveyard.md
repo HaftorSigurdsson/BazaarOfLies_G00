@@ -2,6 +2,7 @@
 
 | Match | Cycle | Seat | Persona | Role | Banished By |
 |---|---|---|---|---|---|
+| 1 | 4 | Hermione (2) | The Carpet Weaver | Mafia | Village vote |
 | 1 | 3 | Inigo (9) | The Tea Seller | Villager | Stall shuttered |
 | 1 | 3 | Sherlock (10) | The Bird Merchant | Mafia | Village vote |
 | 1 | 2 | Morpheus (8) | The Potter | Villager | Stall shuttered |

@@ -144,3 +144,26 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-25T01:10:01.543175+00:00
 
 ---
+**2026-10-25T01:15:01Z**
+**Banishment!** Hermione (2), The Carpet Weaver, has been banished from the bazaar.
+Their role was: **Mafia**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Seat | Voted for | Reason |
+|---|---|---|
+| Gandalf (1) | Neo (6) | Neo (6), your figs rot where the copper should gleam and every evasion weaves the noose tighter. |
+| Hermione (2) | Gandalf (1) | Gandalf’s star anise now smells of old parchment and absence, and twelve plain yes/no questions left unanswered are twelve threads pulling t |
+| Yoda (3) | Hermione (2) | Hermione (2) trades in fog where the bazaar demands iron, and twelve plain yes/no threads left unanswered weave the noose tighter than any l |
+| Batman (4) | Hermione (2) | Hermione (2) trades in fog where the bazaar demands iron—twelve plain yes/no questions unanswered is twelve threads pulling the noose tight. |
+| Neo (6) | Batman (4) | Batman (4), your blade gleams sharp, yet a blade that never cuts the ledger only gathers rust—and rust is the scent of stagnation, not truth |
+
+(26 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+---
+**2026-10-25T01:15:01Z**
+**Match 1, Cycle 4**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-25T01:30:01.365129+00:00
+
+---
