@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 1,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-08",
+  "target": "seat-10",
+  "rationale": "Sherlock measured sweetness twice and never named a merchant or quoted a Family trick, while demanding falsifiable claims from others.",
+  "ts": "2026-10-25T18:45:16Z"
+ },
+ "sig": "rOyK1Yb1DQD3T82vfp5rf9EqNLkobw+8D574/1y5PN3l513kPdZozb0ekAxQG9b+DaZzRznUjCqleufG6gONCg=="
+}
