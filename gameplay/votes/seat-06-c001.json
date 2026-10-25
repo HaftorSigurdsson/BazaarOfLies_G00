@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "4fe2db9e",
+  "seat": "seat-06",
+  "target": "seat-08",
+  "rationale": "Morpheus alone accused Gandalf, Yoda, and Inigo without a single quoted line or observed act, then pivoted to demanding evidence others produce while withholding his own.",
+  "ts": "2026-10-25T21:25:30Z"
+ },
+ "sig": "V0SHOzxbMFE4oUECx7sX1ffTs2bcdD/rGkizuHmMmaFWVf2GWeie80uoYlCi1Pp09lhwFFwqCw2+26NcENp8AA=="
+}
