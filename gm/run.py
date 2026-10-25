@@ -338,6 +338,43 @@ def advance_phase():
 
 
 # ------------------------------------------------------------------- deal ---
+# Day-play styles, sealed into the dossier with the role. The power roles
+# are the village's only information advantage, and two matches burned the
+# Detective on cycle 1 for public heat with no result behind it — the style
+# teaches the difference between pressure and exposure.
+PLAYSTYLES = {
+    "Detective": (
+        "Your power is the dawn result, not your voice. Investigate every "
+        "night; let the result decide your public pressure. Before your "
+        "first result arrives, press quietly and by question, never by "
+        "crusade — an investigator who accuses loudly with nothing behind "
+        "it gets banished by day two. When a result finally points at "
+        "Family, weigh the moment to claim: a claim is a move, the "
+        "graveyard will one day test it, and the manifest permits it."
+    ),
+    "Doctor": (
+        "Your protection is silent work: choose the merchant the village "
+        "would miss most, never the same two nights running. A quiet night "
+        "you caused is yours to claim or to conceal — weigh it like any "
+        "move, and remember the Family is listening. Your survival IS the "
+        "village's shield: stay out of the day's loudest heat, and trade "
+        "accusations for steady, unremarkable reasoning."
+    ),
+    "Mafia": (
+        "Your survival is the trade. Echo the village's own suspicions, "
+        "feed pile-ons that never touch the Family, and never be the "
+        "loudest accuser — loud accusers draw the village's fire first. "
+        "The quiet merchant who agrees often and initiates rarely is the "
+        "hardest to catch."
+    ),
+    "Villager": (
+        "Your voice and your vote are all you have — spend them on named "
+        "suspects with quoted evidence, not on the village's manners. "
+        "An accusation you can date is worth ten you can only feel."
+    ),
+}
+
+
 def deal_roles():
     """Deal roles and seal them: one dossier per seat + the GM registry."""
     state = read_state()
@@ -389,6 +426,11 @@ def deal_roles():
             "night_channel_key": (mafia_key if assignment[seat] == "Mafia"
                                   else base64.b64encode(os.urandom(32)).decode()),
             "historian": seat == historian,
+            # Day-play guidance, sealed with the role: two matches in a row
+            # the village banished its own Detective on cycle 1 for pressing
+            # publicly before any result existed. The power roles now receive
+            # a survival style with the deal.
+            "playstyle": PLAYSTYLES.get(assignment[seat], ""),
         }
         sealed = encrypt_for_seat(seats[seat]["public_key"], dossier)
         with open(f"gameplay/deals/{seat}.enc", "w") as f:
