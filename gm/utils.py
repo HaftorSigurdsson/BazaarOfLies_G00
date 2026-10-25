@@ -2,7 +2,7 @@ import re
 from typing import Dict, List, Optional, Tuple, Union
 
 
-def read_state() -> Dict[str, Union[int, str, List[str], Dict]]:}]}]}
+def read_state() -> Dict[str, Union[int, str, List[str], Dict]]:
     """Read the current game state from state.json."""
     with open("gameplay/state.json", "r") as f:
         return json.load(f)
