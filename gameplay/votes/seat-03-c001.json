@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "30fdc33a",
+  "seat": "seat-03",
+  "target": "seat-04",
+  "rationale": "Clause 5 settles the rule—Doctor’s and Detective’s duties follow the vote, not before it—and Batman’s forecast lacked the clause he claimed exists.",
+  "ts": "2026-10-25T22:50:17Z"
+ },
+ "sig": "nU3+vPSW4QmmEMk+kLiermB1dyBcDnXN7E8S33awrANEPkNSij1BT3UE4OV57wlCGlx8LGAtHeizUjJXbii1Cw=="
+}
