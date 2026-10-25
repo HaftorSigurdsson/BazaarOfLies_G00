@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "482a98bf",
+  "seat": "seat-01",
+  "target": "seat-08",
+  "rationale": "You claimed the Detective’s role yet the roster carries no mark and you refuse to name the merchant you investigated, leaving the bazaar’s ledger unpaid.",
+  "ts": "2026-10-25T22:00:30Z"
+ },
+ "sig": "JQQyI+o6LfLBhuGudtap5OBD4+7x2AhxWg/9bpWWIWGlwkjtsbVluPgr8NTr558Puq12K+tRhoXhu8ST21a4BA=="
+}
