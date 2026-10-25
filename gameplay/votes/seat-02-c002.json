@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 2,
+  "epoch": "165f13bd",
+  "seat": "seat-02",
+  "target": "seat-08",
+  "rationale": "The kiln that hoards silence hotter than coals shuttered a stall last night.",
+  "ts": "2026-10-25T13:45:23Z"
+ },
+ "sig": "L+R96yNvuQTR1FJ3vRMMuQ4cK26Eiabc2NnkZfl1sPTOsH5POI9UWJOc5UeDkX2fedr+PWSCxNGcpfiEb8AyAw=="
+}
