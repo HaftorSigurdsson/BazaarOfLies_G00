@@ -10,3 +10,9 @@ The bazaar awakens! Roles have been dealt.
 **Discussion ends at:** 2026-10-25T21:21:34.031817+00:00
 
 ---
+**2026-10-25T21:25:01Z**
+**Match 1, Cycle 1**
+The discussion ends. The bazaar votes!
+**Voting ends at:** 2026-10-25T21:30:01.006586+00:00
+
+---
