@@ -85,6 +85,8 @@ def display_name(seat: str) -> str:
     ('seat-01' prints as 1, 'seat-10' as 10). Machine files (ballots,
     dossiers, state, transcripts) always store the bare seat ID; only
     prose layers display the name."""
+    if not seat:          # e.g. an asleep night action has no target
+        return "—"
     name = get_seats().get(seat, {}).get("name")
     number = seat.split("-")[-1]
     number = str(int(number)) if number.isdigit() else number

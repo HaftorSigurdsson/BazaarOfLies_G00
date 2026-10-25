@@ -659,8 +659,12 @@ def write_truth_archive(state, registry, priv):
         except Exception as e:
             lines.append(f"- {fn}: unreadable ({e})")
             continue
+        role = a.get("role") or "no night role"
+        target = a.get("target")
         lines.append(f"- cycle {a.get('cycle')}: {display_name(a.get('seat'))} "
-                     f"({a.get('role')}) targeted {display_name(a.get('target'))}")
+                     f"({role}) "
+                     + (f"targeted {display_name(target)}" if target
+                        else "(asleep — no target)"))
 
     # The Family's candlelight council, decrypted for the historians:
     # every chat file opens under the family key (decoys included — the
