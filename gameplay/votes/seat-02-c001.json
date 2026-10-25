@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "4fe2db9e",
+  "seat": "seat-02",
+  "target": "seat-10",
+  "rationale": "Sherlock twice wrote Morpheus “refuses to quote the line that steered suspicion” yet Sherlock himself has not quoted a single merchant’s words or an observed act steering suspicion tonight.",
+  "ts": "2026-10-25T21:25:11Z"
+ },
+ "sig": "Ep2vWUqtgdzzc03ht4kHtGExDNiZCYHQJYmCjxkleqHMjSBzF+IJ6/7GBofyQ2Ew4RzegXLeiC3TySfFEBo8Dw=="
+}
