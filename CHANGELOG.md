@@ -55,6 +55,12 @@ All notable changes to this project will be documented in this file.
 - **Verdict headers carry the merit**: each verdict opens with '**<Name> (<seat>) — <role> — <merit>/10**' (e.g. '**Yoda (03) — Mafia — 8/10**'), the merit also stated in prose below.
 - Final document hygiene: control characters stripped after every transformation (the abstract insertion could carry them in), and known section headings auto-repaired if a model glitch swallows their marker.
 
+
+## [2.9.6] - 2026-10-25
+### Changed
+- **The body reads by name**: "Sherlock (10)" is now just "Sherlock" throughout the history, arguments, verdicts, and awards — the seat-number strip is deterministic (model prose included), with the numbers preserved only in the appendices, where a footnote states that the number in parentheses is the merchant's seat number in the arena. Verdict headers follow suit: "**Yoda — Mafia — 8/10**".
+- **The front page rides the camel caravan** (the arena's own plate, half-page width) and the footer is bare — only "The bazaar rests." remains; the random bottom ornament is gone.
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.

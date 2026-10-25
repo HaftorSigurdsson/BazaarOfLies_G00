@@ -101,6 +101,12 @@ def load_graveyard(match_no):
     return rows
 
 
+def plain(label):
+    """A merchant's name without the seat number — the body of the
+    judgment reads by name; the appendices carry the numbers."""
+    return re.sub(r"\s*\(\d+\)\s*$", "", str(label))
+
+
 def seat_of(label):
     m = re.search(r"\((\d+)\)", label)
     return f"seat-{int(m.group(1)):02d}" if m else None
@@ -220,7 +226,7 @@ def build_seat_record(seat, seats, roles, graveyard, ballots,
     name = f"{seats[seat]['name']} ({seat.split('-')[1]})"
     role = roles.get(seat, "Unknown")
     fate = next((g for g in graveyard if seat_of(g["seat_label"]) == seat), None)
-    rec = {"name": name, "role": role,
+    rec = {"name": name, "pname": plain(name), "role": role,
            "fate": (f"cycle {fate['cycle']}, {fate['by']} (revealed role: {fate['role']})"
                     if fate else "survived to the end"),
            "statements": statements.get(seat, []),
@@ -228,7 +234,8 @@ def build_seat_record(seat, seats, roles, graveyard, ballots,
     for cyc, rows in sorted(ballots.items()):
         for b in rows:
             if b["seat"] == seat:
-                rec["ballots"].append(f"cycle {cyc}: voted {b['target']} — {b['reason']}")
+                rec["ballots"].append(f"cycle {cyc}: voted "
+                                      f"{plain(b['target'])} — {b['reason']}")
     for a in night_actions:
         if a.get("seat") == seat:
             rec["night_actions"].append(
@@ -244,7 +251,7 @@ def build_seat_record(seat, seats, roles, graveyard, ballots,
 
 
 def render_record(rec):
-    lines = [f"Merchant: {rec['name']}",
+    lines = [f"Merchant: {rec['pname']}",
              f"True role: {rec['role']}",
              f"Fate: {rec['fate']}",
              f"Statements ({len(rec['statements'])}):"]
@@ -275,16 +282,18 @@ def build_timeline(graveyard, ballots, night_actions, detective_results,
                if "vote" in g["by"] else
                "the Family SHUTTERED their stall at night")
         deaths.setdefault(g["cycle"], []).append(
-            f"{how}: {g['seat_label']} — true role {g['role']}")
+            f"{how}: {plain(g['seat_label'])} — true role {g['role']}")
     nights = {}
     for a in night_actions:
         nights.setdefault(a.get("cycle"), []).append(
-            f"night action: {display_name(a.get('seat'))} "
-            f"({a.get('role')}) targeted {display_name(a.get('target'))}")
+            f"night action: {plain(display_name(a.get('seat')))} "
+            f"({a.get('role')}) targeted "
+            f"{plain(display_name(a.get('target')))}")
     for r in detective_results:
         nights.setdefault(r.get("cycle"), []).append(
             f"night action: the Detective investigated "
-            f"{display_name(r.get('target'))} — finding: {r.get('result')}")
+            f"{plain(display_name(r.get('target')))} — finding: "
+            f"{r.get('result')}")
     council = {}
     for m in family_msgs:
         council.setdefault(m.get("cycle"), []).append(m)
@@ -294,7 +303,7 @@ def build_timeline(graveyard, ballots, night_actions, detective_results,
         nights.setdefault(cyc, []).append(
             "night action: the Family's council talked "
             f"({len(msgs)} messages)"
-            + (f", declaring {', '.join(display_name(t) for t in declared)}"
+            + (f", declaring {', '.join(plain(display_name(t)) for t in declared)}"
                if declared else ""))
 
     lines = []
@@ -305,8 +314,8 @@ def build_timeline(graveyard, ballots, night_actions, detective_results,
             for b in ballots[cyc]:
                 tally[b["target"]] = tally.get(b["target"], 0) + 1
             parts.append("vote tally: " + ", ".join(
-                f"{t} = {n}" for t, n in sorted(tally.items(),
-                                               key=lambda kv: -kv[1])))
+                f"{plain(t)} = {n}" for t, n in sorted(tally.items(),
+                                                     key=lambda kv: -kv[1])))
         parts += deaths.get(cyc, [])
         parts += nights.get(cyc, [])
         if cyc in ballots and not deaths.get(cyc):
@@ -383,8 +392,8 @@ def final_judgment(match_no, case, timeline, family_digest,
         "strongest reasoning the bazaar produced, with quotes.\n"
         "## The Verdicts\n One compact paragraph per merchant, drawn from "
         "the drafts (keep the best quotes). Each verdict STARTS with a bold "
-        "header line in exactly this shape — '**<Name> (<seat>) — <role> — "
-        "<merit>/10**' — e.g. '**Yoda (03) — Mafia — 8/10**' — followed by "
+        "header line in exactly this shape — '**<Name> — <role> — "
+        "<merit>/10**' — e.g. '**Yoda — Mafia — 8/10**' — followed by "
         "the paragraph, which still mentions the merit in prose.\n"
         "## The Awards\n - Most Valuable Merchant (not necessarily the "
         "winner; a sacrifice may take it) — with justification.\n"
@@ -455,6 +464,9 @@ def appendix_record(match_no, seats, graveyard, ballots, statements,
              f"{len(family_msgs)} Family council messages, "
              f"{len(graveyard)} departures.",
              "",
+             "*(The number in parentheses is the merchant's seat "
+             "number in the arena.)*",
+             "",
              "**The ledger of departures**",
              "",
              "| Cycle | Merchant | Mechanism | True role |",
@@ -482,6 +494,9 @@ def appendix_ratings(seat_order, drafts, records):
         rows.append((merit if merit is not None else -1, seat, rec))
     rows.sort(key=lambda r: (-r[0], r[1]))
     lines = ["## Appendix B — The Ratings",
+             "",
+             "*(The number in parentheses is the merchant's seat "
+             "number in the arena.)*",
              "",
              "The verdicts' merit ratings, from finest thread to most frayed:",
              "",
@@ -541,8 +556,10 @@ def main():
                               detective_results, family_msgs,
                               roles, seats)
     family_digest = "\n".join(
-        f"cycle {m.get('cycle')} {m.get('seat')} ({m.get('kind', 'talk')}): "
-        f"{m.get('target')} — {m.get('reason', '')}" for m in family_msgs)
+        f"cycle {m.get('cycle')} {plain(display_name(m.get('seat')))} "
+        f"({m.get('kind', 'talk')}): "
+        f"{plain(display_name(m.get('target')))} — {m.get('reason', '')}"
+        for m in family_msgs)
     detective_note = (""
         if not detective_results else
         "The Detective's sealed results (never delivered to the bazaar):\n"
@@ -572,6 +589,8 @@ def main():
     judgment = re.sub(r"^```[a-z]*\s*\n", "", judgment.strip())
     judgment = re.sub(r"\n```\s*$", "", judgment.strip())
     judgment = re.sub(r"[\x00-\x08\x0b-\x1f]", "", judgment)  # model control chars
+    # The body reads by name; seat numbers live only in the appendices.
+    judgment = re.sub(r"\s*\(\d+\)", "", judgment)
 
     # The abstract rides in the md between markers: the press lifts it to
     # the front page and never typesets it in the body.

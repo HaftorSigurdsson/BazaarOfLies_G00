@@ -61,7 +61,7 @@ def latex_inline(text):
 
 
 PLATES_DIR = os.path.abspath("docs/assets/plates")
-ENGRAVING = os.path.abspath("docs/assets/images/bazaar-engraving.png")
+ENGRAVING = os.path.abspath("docs/assets/plates/camel-caravan.png")
 
 
 def front_page(md):
@@ -112,11 +112,8 @@ def front_page(md):
         tex += [r"\end{minipage}\end{center}",
                 r"\vspace{0.3cm}",
                 r"\rule{0.5\textwidth}{0.4pt}"]
-    tex += [r"\vfill"]
-    if ornament:
-        tex += [rf"\includegraphics[width=0.16\textwidth]{{{ornament}}}",
-                r"\vspace{0.4cm}"]
-    tex += [r"{\small\itshape The bazaar rests.\par}",
+    tex += [r"\vfill",
+            r"{\small\itshape The bazaar rests.\par}",
             r"\end{titlepage}", ""]
     return "\n\n".join(tex)
 
