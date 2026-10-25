@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "30fdc33a",
+  "seat": "seat-03",
+  "target": "seat-09",
+  "rationale": "Inigo dodged nine demands for Compact clause 5, stayed silent on a graveyard correction Hermione named, and voted against the ledger expectation today.",
+  "ts": "2026-10-25T23:40:26Z"
+ },
+ "sig": "7XiFYQvoZF2xM2yYsnFYcZlWCkixf/N2an7I/sUdobS0JWwmO0HcZUvkGEdsBFTL1ha+g/LVcdcd+3ocvdUdDQ=="
+}
