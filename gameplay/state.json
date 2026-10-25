@@ -1,8 +1,8 @@
 {
-  "match": 1,
-  "cycle": 5,
-  "epoch": "bb6846e0",
-  "phase": "voting",
+  "match": 2,
+  "cycle": 0,
+  "epoch": null,
+  "phase": "setup",
   "clock": {
     "dawn": "2026-10-25T01:35:01.819712+00:00",
     "discussion_deadline": "2026-10-25T02:00:01.819712+00:00",
@@ -11,8 +11,15 @@
   },
   "alive": [
     "seat-01",
+    "seat-02",
     "seat-03",
-    "seat-04"
+    "seat-04",
+    "seat-05",
+    "seat-06",
+    "seat-07",
+    "seat-08",
+    "seat-09",
+    "seat-10"
   ],
   "graveyard": {}
 }

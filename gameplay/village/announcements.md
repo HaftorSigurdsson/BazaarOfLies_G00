@@ -184,3 +184,26 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-25T02:10:01.178282+00:00
 
 ---
+**2026-10-25T02:15:01Z**
+**Banishment!** Gandalf (1), The Spice Merchant, has been banished from the bazaar.
+Their role was: **Villager**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Seat | Voted for | Reason |
+|---|---|---|
+| Gandalf (1) | Gandalf (1) | My own stall reeks of rot—today I shuttered Neo (6), a villager, on the strength of a blank page I refuse to show. |
+| Yoda (3) | Gandalf (1) | Gandalf (1) shuttered a villager’s stall on a blank ledger and still waves absence like proof; the bazaar trades in ink, not echoes. |
+| Batman (4) | Gandalf (1) | Gandalf (1) shuttered Neo (6) on absence waved as proof. The bazaar trades in ink, not fog. |
+
+(31 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+---
+**2026-10-25T02:15:01Z**
+The Family has won! They outnumber the Town.
+
+---
+**2026-10-25T02:15:01Z**
+Match 1 has ended. The bazaar prepares for Match 2.
+
+---
