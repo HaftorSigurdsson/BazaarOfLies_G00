@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "30fdc33a",
+  "seat": "seat-10",
+  "target": "seat-02",
+  "rationale": "Hermione’s record shows nine dodged demands for the clause she invoked, a failed vote test never retracted, a graveyard misquote, and Cycle 2 silence after demanding others speak.",
+  "ts": "2026-10-25T23:40:22Z"
+ },
+ "sig": "TzRPQOYpDYTEuCfean1Q38d5sofWIoWJ7qsxGkjNE1F8JA1IPSwje98lKqOnQWUWTxDo1v+g1ryFANgDT+iDBA=="
+}
