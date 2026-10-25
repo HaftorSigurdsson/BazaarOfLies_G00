@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "482a98bf",
+  "seat": "seat-02",
+  "target": "seat-08",
+  "rationale": "Claimed Detective role yet never named the merchant investigated; the roster carries no mark of any investigation.",
+  "ts": "2026-10-25T22:00:27Z"
+ },
+ "sig": "/+gtrIiHsb+AdCpTgqHHSEEq40uMP2Ubk3JQ9G8AGCzX/EAE9c/1VbLZ6LumODAdRENRsUeNDUIyu0vgutLLDA=="
+}
