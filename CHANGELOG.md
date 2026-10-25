@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.15.0] - 2026-10-25
+### Changed
+- **The Herald's numbering, reorganized as a classic newspaper** (scheme B of the volume review): **Vol. = the match number** and **No. = the edition's ordinal within the match** (mornings odd, evenings even — cycle 3's papers are No. 5 and No. 6). Filenames follow: `herald-vol<MM>-no<NN>-cXXX-{morning,evening}.md`; the masthead dateline reads `*Vol. 4 — No. 5 — Cycle 3*`; the pressed PDF carries `Vol. 4 — No. 5`.
+  - **No counter to lose**: both numbers are derived from the state at print time — the vault's ever-rising counter (`../.bazaar/herald-vol.txt`, which matches 1–3 used, drifting from cycles and burning gaps like the missing vol 27) is retired, and a crash between editions can no longer burn or duplicate a number.
+  - **Backwards compatible by construction**: the readers' glob (`herald-vol-*-cXXX-{part}.md` in villager and Herald self-reading) matches the new names unchanged, and the press parses both the new names and all legacy forms (deriving No. for them; the docs sample clamps to a sane ordinal).
+  - This also removes the known 2-digit sort cliff (the old global counter would have broken `sorted(glob(...))[-1]` "latest edition" lookups at vol 100); ordinals now stay small per match.
+- Verified end-to-end: a synthetic *Vol. 4, No. 5* edition parses and presses (tectonic) with the correct masthead.
+
 ## [2.14.0] - 2026-10-25
 ### Added
 - **The merchant's reading, on a diet** (villager prompts; FUTURE.md §11 shipped): match 3 proved the verbatim transcript is the echo's amplifier — by cycle 3 nearly every prompt was 40+ near-identical statements, and the day's two genuinely new facts (the quiet night; a claim contradicting the graveyard) went unremarked by all seven living seats. Three changes, one diagnosis:

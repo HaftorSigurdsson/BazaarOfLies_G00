@@ -112,7 +112,7 @@ bazaar-of-lies/
 │   │   ├── announcements.md         # GM proclamations + published vote tables
 │   │   ├── graveyard.md             # Departed merchants, revealed roles, scores
 │   │   └── match-00-recap.md        # End-of-match full reveal
-│   ├── herald/                      # The Herald's editions (herald-vol<VV>-cXXX-{morning,evening}.md)
+│   ├── herald/                      # The Herald's editions (herald-vol<MM>-no<NN>-cXXX-{morning,evening}.md)
 │   ├── library/                    # The human archive: every pressed PDF (editions + judgments)
 │   ├── deals/                       # Encrypted role dossiers (one per seat)
 │   ├── dossiers/                    # Encrypted GM→bot private traffic (e.g., Detective results)
@@ -133,7 +133,7 @@ bazaar-of-lies/
 | `gameplay/votes/{seat}-{cycle}.json` | Public signed ballots (plaintext payload + Ed25519 signature, epoch-scoped). |
 | `gameplay/night/{seat}-{cycle}.enc` | Sealed night actions — every living seat submits one per night (power roles real, villagers a sealed "asleep" payload). |
 | `gameplay/night/chat/c{cycle}-w{watch}-{seat}.enc` | The sealed watch-chat channel: the Family's council talk and everyone else's GM-minted decoys, fixed-size and indistinguishable. |
-| `gameplay/herald/herald-vol<VV>-cXXX-*.md` | The Herald's morning/evening editions (the volume rises forever; PDFs in `gameplay/library/`). |
+| `gameplay/herald/herald-vol<MM>-no<NN>-cXXX-*.md` | The Herald's morning/evening editions (Vol. = match, No. = edition within the match; PDFs in `gameplay/library/`). |
 
 ---
 

@@ -40,7 +40,8 @@ REPAIRS (2026-10-25) — all in the parsing/layout layer, no API change:
   2. Machine-appended sections ("## The Tally", "## Editor's Note") can
      no longer be promoted to the front-page headline — vol-23-c001
      led its page with the banner headline "The Tally".
-  3. The dateline ("*Vol. 23 — Match 3, Cycle 1*") is dropped: the old
+  3. The dateline ("*Vol. 4 — No. 5 — Cycle 3*" — older editions wrote
+     "*Vol. 23 — Match 3, Cycle 1*") is dropped: the old
      check only matched "*Match ...", so the "Vol." prefix let it leak
      through as a stray ruled section head under the plate.
   4. Short italic lines are decks (centred italic standfirst), not
@@ -309,17 +310,28 @@ def parse_edition(md_text, md_path):
     """Split an edition into masthead metadata and printable blocks."""
     name = os.path.basename(md_path)
     vol = None
-    m = re.match(r"herald-vol-(\d+)-c(\d+)-(morning|evening|final).md", name)
+    no = None
+    # The classic scheme (v2.15.0): vol = match, no = edition ordinal.
+    m = re.match(r"herald-vol-(\d+)-no-(\d+)-c(\d+)-(morning|evening|final).md", name)
     if m:
-        vol, cycle, part = int(m.group(1)), m.group(2), m.group(3)
+        vol, no, cycle, part = int(m.group(1)), int(m.group(2)), m.group(3), m.group(4)
     else:
-        m = re.match(r"herald-c(\d+)-(morning|evening|final).md", name)
+        m = re.match(r"herald-vol-(\d+)-c(\d+)-(morning|evening|final).md", name)
         if m:
-            cycle, part = m.group(1), m.group(2)
-        else:           # e.g. the docs sample: herald-sample-evening.md
-            part = "evening" if "evening" in name else "morning"
-            dm = re.search(r"Cycle\s+(\d+)", md_text)
-            cycle = dm.group(1) if dm else "000"
+            vol, cycle, part = int(m.group(1)), m.group(2), m.group(3)
+        else:
+            m = re.match(r"herald-c(\d+)-(morning|evening|final).md", name)
+            if m:
+                cycle, part = m.group(1), m.group(2)
+            else:           # e.g. the docs sample: herald-sample-evening.md
+                part = "evening" if "evening" in name else "morning"
+                dm = re.search(r"Cycle\s+(\d+)", md_text)
+                cycle = dm.group(1) if dm else "000"
+    if no is None:
+        # Legacy names carried no edition ordinal — derive it the same way
+        # the Herald now does: mornings odd, evenings even within the match
+        # (cycle 000, the docs sample, clamps to No. 1).
+        no = max(1, 2 * int(cycle) - (0 if part == "evening" else 1))
 
     match_no = "1"
     mm = re.search(r"Match\s+(\d+)", md_text)
@@ -405,6 +417,7 @@ def parse_edition(md_text, md_path):
         body_line(s)
     return {
         "vol": vol or int(match_no),
+        "no": no,
         "match": match_no,
         "cycle": cycle,
         "part": part,
@@ -584,7 +597,7 @@ def build_tex(meta, date_str, size, linespread):
 \begin{{center}}
 {{\fontsize{{33}}{{37}}\selectfont\bfseries THE BAZAAR HERALD\par}}
 \doubleRule
-{{\small\itshape Vol. {vol} --- No. {cycle} \quad|\quad {edition} Edition
+{{\small\itshape Vol. {vol} --- No. {no} \quad|\quad {edition} Edition
   \quad|\quad {date} \quad|\quad Price: one spiced date\par}}
 \vspace{{1pt}}
 {{\footnotesize\itshape {motto}\par}}
@@ -614,6 +627,7 @@ def build_tex(meta, date_str, size, linespread):
            match=latex_escape(meta["match"]),
            cycle=latex_escape(str(int(meta["cycle"]))),
            vol=latex_escape(str(meta["vol"])),
+           no=latex_escape(str(meta["no"])),
            edition=latex_escape(meta["part"].capitalize()),
            date=latex_escape(date_str),
            headline=latex_escape(meta["headline"]),
@@ -741,7 +755,7 @@ def render_fpdf(meta, date_str, size):
     pdf.set_y(pdf.get_y() + 2.0)
 
     pdf.set_font("Times", "I", 9.5)
-    dateline = (f"Vol. {meta['vol']} \u2014 No. {int(meta['cycle'])}"
+    dateline = (f"Vol. {meta['vol']} \u2014 No. {meta['no']}"
                 f"   |   {meta['part'].capitalize()} Edition"
                 f"   |   {date_str}   |   Price: one spiced date")
     pdf.cell(0, 5, fpdf_sanitize(dateline), align="C")

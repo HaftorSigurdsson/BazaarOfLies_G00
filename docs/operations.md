@@ -56,13 +56,13 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 ### **Editions**
 | Edition | Trigger | Villagers read it | Output |
 |---|---|---|---|
-| Morning | Phase becomes `discussion` | Over tea, when they wake — included in the discussion prompt | `gameplay/herald/herald-vol<VV>-cXXX-morning.md` |
-| Evening | Phase becomes `night` | By lamplight, before they sleep — included in the night prompt | `gameplay/herald/herald-vol<VV>-cXXX-evening.md` |
+| Morning | Phase becomes `discussion` | Over tea, when they wake — included in the discussion prompt | `gameplay/herald/herald-vol<MM>-no<NN>-cXXX-morning.md` |
+| Evening | Phase becomes `night` | By lamplight, before they sleep — included in the night prompt | `gameplay/herald/herald-vol<MM>-no<NN>-cXXX-evening.md` |
 
 Each edition is journal-guarded against double printing, and the villagers' own reading is the plain markdown (facts-only, public repo content).
 
 ### **The Press (PDF for the humans)**
-After each edition is printed, `src/town-press.py` compiles it into a **one-page A4 PDF styled as an old newspaper front page**, shelved in **`gameplay/library/`** as `herald-vol<VV>-cXXX-{morning,evening}.pdf` — the current match's human reading copies (the library is emptied by each reset; copy PDFs out to keep them). The markdown stays beside the bots; the volume rises forever (kept in the vault at `../.bazaar/herald-vol.txt`, surviving resets), and the masthead carries **Vol. N — No. M** with the true volume.
+After each edition is printed, `src/town-press.py` compiles it into a **one-page A4 PDF styled as an old newspaper front page**, shelved in **`gameplay/library/`** as `herald-vol<MM>-no<NN>-cXXX-{morning,evening}.pdf` — the current match's human reading copies (the library is emptied by each reset; copy PDFs out to keep them). The markdown stays beside the bots. Since v2.15.0 the paper carries the classic newspaper scheme: **Vol. = the match number** (Vol. 4 = Match 4) and **No. = the edition's ordinal within the match** (mornings odd, evenings even — cycle 3's papers are No. 5 and No. 6), both derived from the state with no counter to lose. (Matches 1–3 were numbered by an ever-rising vault counter, `../.bazaar/herald-vol.txt`, now retired.)
 
 - **LaTeX engine** (`tectonic` or `pdflatex`, checked in that order) produces the fine edition in the style of the classic newspaper template: Times-like type with hyphenation and microtype, a double-rule masthead and dateline, a bold headline, a **woodcut-style engraving plate** at the head of the first column, a **drop cap** on the opening paragraph, thin-ruled centred section heads, and two balanced columns with a hairline rule between them. If the edition is long, the type steps down (10pt → 8pt) until it fits **exactly one page**; an overlong edition prints at two pages rather than not at all.
 - **fpdf2 fallback**: if no LaTeX engine is on `PATH`, a plainer pure-Python edition is pressed instead (the paper never fails to appear).

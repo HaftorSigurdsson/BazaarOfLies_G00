@@ -36,7 +36,7 @@ Editions (one writer per file, journal-guarded against double printing):
   - morning edition — printed once when phase becomes 'discussion'
   - evening edition — printed once when phase becomes 'night'
 
-Output: gameplay/herald/herald-vol<VV>-c<CCC>-{morning,evening}.md (the volume rises forever, kept in the vault); the PDF twins land in gameplay/library/ for the humans.
+Output: gameplay/herald/herald-vol<MM>-no<NN>-c<CCC>-{morning,evening}.md — the classic newspaper scheme (v2.15.0): the VOLUME is the match (Vol. 4 = Match 4) and the No. is the edition's ordinal within the match (No. 1 = cycle 1 morning, No. 4 = cycle 2 evening), both derived from the state — no vault counter to lose. The PDF twins land in gameplay/library/ for the humans.
 
 Run from any clone of the arena repo with push access, in its own window:
 
@@ -105,19 +105,14 @@ if args.verbose:
 # src/town-herald.py -> REPO_ROOT is the parent of src/ (the clone root).
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BAZAAR_DIR = os.path.join(os.path.dirname(REPO_ROOT), ".bazaar")
-VOL_FILE = os.path.join(BAZAAR_DIR, "herald-vol.txt")
 
 
-def next_volume():
-    """The Herald's volume rises forever — across matches and resets.
-    The counter lives in the vault, next to the journal."""
-    try:
-        vol = int(open(VOL_FILE).read().strip()) + 1
-    except (OSError, ValueError):
-        vol = 1
-    with open(VOL_FILE, "w") as f:
-        f.write(str(vol))
-    return vol
+def edition_number(cycle, part):
+    """The edition's No. within the match's volume — the classic newspaper
+    scheme: mornings are odd, evenings even (cycle 1 = No. 1 & 2, cycle 2 =
+    No. 3 & 4, ...). Derived from the state, so nothing is stored and a
+    crash between editions can never burn or duplicate a number."""
+    return 2 * int(cycle) - (0 if part == "evening" else 1)
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, "herald-journal.json")
 
 client = Mistral(api_key=os.environ.get("MISTRAL_API_KEY"))
@@ -824,8 +819,12 @@ def print_edition(state, part, journal):
         mark_edition(journal, epoch, cycle, part)
         save_journal(journal)
         return
-    vol = next_volume()
-    path = f"{herald_dir}/herald-vol-{vol:02d}-c{cycle:03d}-{part}.md"
+    # The classic newspaper scheme: the volume IS the match, the No. is the
+    # edition's ordinal within it — both derived, nothing stored to drift,
+    # burn, or get lost with the vault.
+    vol = state["match"]
+    no = edition_number(cycle, part)
+    path = f"{herald_dir}/herald-vol-{vol:02d}-no-{no:02d}-c{cycle:03d}-{part}.md"
 
     digest = facts_digest(state, part)
     ann = announcements_since(journal)
@@ -880,10 +879,10 @@ def print_edition(state, part, journal):
     edition += "\n\n---\n\n" + generate_editors_note(state, part)
     
     with open(path, "w") as f:
-        # Inside the paper the numbers print small (Vol. 1, Cycle 1);
-        # only the FILENAME pads (vol-01, c001) for clean sorting.
+        # Inside the paper the numbers print small (Vol. 4, No. 5);
+        # only the FILENAME pads (vol-04, no-05, c003) for clean sorting.
         f.write(f"# The Herald — {'Morning' if part == 'morning' else 'Evening'} Edition\n\n"
-                f"*Vol. {vol} — Match {state['match']}, Cycle {cycle}*\n\n"
+                f"*Vol. {vol} — No. {no} — Cycle {cycle}*\n\n"
                 f"{edition}\n")
 
     # Press the human copy: a one-page A4 newspaper front page (best-effort —
