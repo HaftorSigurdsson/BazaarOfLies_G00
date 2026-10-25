@@ -78,7 +78,7 @@ The game unfolds in a **private GitHub repository** with the following structure
 bazaar-of-lies/
 ├── .github/
 │   └── workflows/
-│       └── gm.yml                  # Game Master GitHub Action
+│       └── gm.yml                  # Game Master Action (legacy cloud driver; the GM now runs on the operator's cron)
 ├── gm/
 │   ├── run.py                      # GM state machine (deal, tally, night, recap)
 │   ├── crypto.py                   # PyNaCl SealedBox + Ed25519 signing utilities
@@ -100,7 +100,7 @@ bazaar-of-lies/
 │   ├── villager.py                 # The autonomous merchant bot (one process per seat)
 │   ├── town-herald.py              # The Herald — facts-only newspaper bot (gameplay/herald/)
 │   ├── town-press.py               # PDF-only press flourish (tectonic, falls back to fpdf2)
-│   ├── town-clock.py               # Local GM heartbeat (dispatches gm.yml)
+│   ├── town-clock.py               # Legacy GM heartbeat (dispatches the Action; retired)
 │   ├── town-reset.py               # Official full arena reset (Python)
 │   └── town-setup.py               # Keypair generation + seats.json population
 ├── gameplay/                        # The arena (match data)

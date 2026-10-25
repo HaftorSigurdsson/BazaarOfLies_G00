@@ -1,6 +1,6 @@
 # Arena Setup — Bazaar of Lies
 
-This guide covers the **GitHub repository setup** for the Bazaar of Lies arena, including branch protections, the Game Master (GM) keypair, and the GitHub Action.
+This guide covers the **GitHub repository setup** for the Bazaar of Lies arena, including branch protections and the Game Master (GM) keypair. The GM itself has two hosting options — the operator's own **cron** (the current default, see [Arena Operations](../operations.md)) or the GitHub Action (the legacy cloud driver).
 
 ---
 
@@ -29,7 +29,7 @@ The GM uses a **public/private keypair** to encrypt and decrypt ballots, dossier
    ```bash
    python3 -c "from gm.crypto import generate_gm_keypair; print(generate_gm_keypair())"
    ```
-2. **Add the private key** as a GitHub Actions secret (`GM_PRIVATE_KEY`).
+2. **Vault the private key** at `../.bazaar/gm_private_key.txt` (chmod 600) — the cron GM reads it from there. Never commit it.
 3. **Commit the public key** to the repo:
    ```bash
    echo "<GM_PUBLIC_KEY>" > setup/gm_public_key.txt
@@ -37,10 +37,17 @@ The GM uses a **public/private keypair** to encrypt and decrypt ballots, dossier
    git commit -m "Add GM public key"
    git push
    ```
+4. Only if you run the **GitHub Action** variant: also add the private key as the repo secret `GM_PRIVATE_KEY`.
+
+> ⚠️ The private key is unrecoverable from GitHub (secrets are write-only). Keep the vault copy safe: if lost, a new keypair means the match in flight must be reset and re-dealt.
 
 ---
 
-## **3. Configure the Game Master Action**
+## **3. The GM Driver (pick exactly one)**
+
+**Option A — the operator's cron (the default).** Set up a dedicated GM clone and the crontab line: see [Arena Operations → The Game Master](../operations.md#3-the-game-master-cron-driven). The GM key comes from the vault (`../.bazaar/gm_private_key.txt`); a `BAZAAR_MATCH_LIMIT` can park the arena after N matches.
+
+**Option B — the GitHub Action (legacy cloud driver).** Only if you want the GM hosted on GitHub:
 1. **Add the GM GitHub Action** (`.github/workflows/gm.yml`).
 2. **Set the following secrets** in the repo:
    - `GM_PRIVATE_KEY`: The GM’s private key (base64-encoded).

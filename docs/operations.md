@@ -1,6 +1,6 @@
 # Arena Operations — Bazaar of Lies
 
-This guide covers the **operational tooling** around the arena: the Herald newspaper bot, the GM heartbeat, signing keys, and the match reset script.
+This guide covers the **operational tooling** around the arena: the Herald newspaper bot, the cron-driven Game Master, signing keys, the match reset script, and the Elder Council.
 
 ---
 
@@ -10,7 +10,7 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 | **Bot** | `src/villager.py` | The autonomous merchant (one process per seat): two-stage reasoning + a private notebook memory (epoch-scoped, vault-only). |
 | **The Herald** | `src/town-herald.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/herald/`. |
 | **The Press** | `src/town-press.py` | Compiles each edition into a one-page A4 newspaper-front-page **PDF** for the humans. |
-| **GM heartbeat** | `src/town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
+| **GM heartbeat (legacy)** | `src/town-clock.py` | Dispatches the GitHub-Action GM on an interval — the retired driver; kept for the Actions-hosted variant of the arena. |
 | **Elder Council** | `src/elder-council.py` | Post-match historian-judge: compiles the full record (statements, ballots, graveyard, recap, truth archive, decrypted night actions and Detective results, the Family council) and writes a court-style judgment with per-seat verdicts and awards (`--dry-run` compiles evidence only). |
 | **Elder press** | `src/elder-press.py` | Renders a judgment to a multi-page court-document PDF (tectonic). |
 | **Arena reset** | `src/town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
@@ -18,11 +18,11 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 | **Signing keys** | `setup/make_signing_keys.py` | One-time generation of per-seat Ed25519 signing keys. |
 | **Plate ingestion** | `setup/make_plates.py` | Converts raw Herald plate art into uniform grayscale 3:1 plates. |
 | **Bot launcher** | `tools/bazaar-launch.py` (+ `.sh` wrapper) | Cross-platform start/stop/status of all bots + the Herald (tmux on macOS/Linux, console windows on Windows — on Windows invoke the `.py` directly; the retired `.bat` wrapper lives in `tools/STORE/`). |
-| **Neutral side** | `tools/run.sh` | Runs the Herald + local GM heartbeat on this clone in tmux. |
+| **Neutral side (legacy)** | `tools/run.sh` | Runs the Herald + the old Actions-dispatching heartbeat on this clone in tmux — superseded by the launcher (Herald) + the cron (GM). |
 | **Seat clone report** | `tools/seats-pull.py` | Pulls every seat clone and reports HEAD + dirty state (the retired `bazaar-pull.sh` wrapper lives in `tools/STORE/`). |
 | **Statement mirror** | `tools/statements-assemble.py` | Assembles the per-seat statements of a cycle into ONE local transcript (`_assembled-cXXX.jsonl`, gitignored, always overwritten, never committed) — for monitoring (`--watch` keeps it fresh). Bots assemble the same view into their prompts themselves; the per-seat files remain the single source of truth. |
 | **Match reset (bash)** | `setup/reset_match.sh` | The original one-command full arena reset. |
-| **Game Master** | `.github/workflows/gm.yml` + `gm/run.py` | Neutral referee (state machine, tallies, night resolution). |
+| **Game Master** | `gm/run.py` | The neutral referee (state machine, tallies, night resolution, recap + truth archive) — driven by the operator's own **cron**, once per 5 minutes, from a dedicated clone. The GitHub Action variant (`gm.yml`) still exists for a cloud-hosted arena. |
 
 ---
 
@@ -37,10 +37,10 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 - Roles may only be restated from **official obituaries** (the GM reveals roles at death).
 - Every edition carries a **"By the Numbers"** section (machine-counted public figures: seats alive/departed, per-seat statement counts, who is silent this cycle, the quiet-night streak, and per-seat vote participation once ballot tables exist). Voice: a 19th-century town paper — confident, economical, dryly witty; still facts-only, never speculative.
 - When public statements exist, the paper closes with a **"Letter to the Editor"**: one statement quoted verbatim, attributed to its seat, with at most a one-line neutral introduction.
-- **The Tally** is computed by the Herald (never model-written) and appended to every edition once ballot tables exist: an election-returns chart — solid bars per candidate, ballots and abstentions counted. The press re-renders it in the PDF as an old-style bar graph (ruled frame, small-caps caption, solid black bars), and the masthead carries the motto *"All the facts fit to print — the rumours you may trade elsewhere."*
+- **The Tally** is computed by the Herald (never model-written) and appended to **evening editions only** — the morning paper reports the news, the evening paper carries the day's returns: an election-returns chart — solid bars per candidate, ballots and abstentions counted. The press re-renders it in the PDF as an old-style bar graph (ruled frame, small-caps caption, solid black bars), and the masthead carries the motto *"All the facts fit to print — the rumours you may trade elsewhere."*
 - **Editorial continuity**: before writing, the Herald re-reads its own last two editions (public record) and may follow up on its own reporting in one brief line ("as we reported at dawn") — or state plainly when today's facts differ from yesterday's paper.
 - **PERSONALS** (PDF-only classifieds, never game input): two in-theme ads per edition from a deterministic pool — lost keys, wanted apprentices, slightly singed rugs.
-- **The tea clock**: every merchant prompt carries the current in-theme region of the day — *Dawn, Morning tea, Midday, Afternoon tea, Dusk*, and at night *the three watches* (the night guards brew their tea in the first) — computed from the arena clock by `gm.utils.day_region`. The Herald states the time of print in its digest ("printed at Morning tea"). See [The Bazaar — Setting & Tone](./game_mechanics/the_bazaar.md).
+- **The tea clock**: every merchant prompt carries the current in-theme region of the day — *Morning, Morning tea, Lunch, Afternoon tea, Dinner* (the five 5-minute regions of a 25-minute discussion), then *Evening* for the 5-minute vote, and at night the three 5-minute watches (*The night, Night snacks, The night watch*) — computed from the arena clock by `gm.utils.day_region`. The Herald states the time of print in its digest ("printed at Morning tea"). See [The Bazaar — Setting & Tone](./game_mechanics/the_bazaar.md).
 
 ### **Editions**
 | Edition | Trigger | Villagers read it | Output |
@@ -65,26 +65,32 @@ Run from any clone of the arena repo with push access, in its own window:
 ```bash
 uv run src/town-herald.py
 # or with an explicit journal:
-uv run src/town-herald.py --journal ~/.bazaar/herald-journal.json
+uv run src/town-herald.py --journal ../.bazaar/herald-journal.json
 ```
 
 ---
 
-## **3. GM Heartbeat (`src/town-clock.py`)**
-A local heartbeat that **dispatches the GM workflow** (`gm.yml`) every interval and prints a live status line each tick:
-- Dispatch result (skipped if a GM run is still in progress).
-- Live **phase + cycle**, read from the repo via the GitHub API.
-- Latest GM run status.
+## **3. The Game Master (cron-driven)**
+The GM (`gm/run.py`) is the neutral referee — the phase machine (deal → discussion → voting → night), the tally, the night resolution, the recap, and (since 2.9.0) the post-match truth archive. In the current architecture it runs **locally, driven by the operator's own cron**, once every 5 minutes from a **dedicated clone** (e.g. `~/Desktop/Game/game_master/`):
 
-`Ctrl-C` stops it cleanly.
-
-### **Run It**
 ```bash
-python3 src/town-clock.py          # default: every 300 seconds
-python3 src/town-clock.py 120      # custom interval, e.g. 2 minutes
+# one-time: a dedicated GM clone + its identity
+git clone <arena-url> ~/Desktop/Game/game_master
+cd ~/Desktop/Game/game_master && git config user.name "Game Master" \
+    && git config user.email "gm@bazaar.local" && uv sync
+
+# the crontab line (one tick every 5 minutes, flock-guarded against overlap)
+*/5 * * * * flock -n /path/to/game_master/.gm-lock bash -lc \
+  "cd /path/to/game_master && GM_PRIVATE_KEY=\"$(cat ../.bazaar/gm_private_key.txt)\" \
+   [BAZAAR_MATCH_LIMIT=N] uv run python gm/run.py >> gm-cron.log 2>&1"
 ```
 
-> The GitHub Action also self-schedules (`cron: */5 * * * *`) and triggers on pushes to `gameplay/votes/`, `gameplay/night/`, and `gameplay/village/`. The heartbeat is for a **visible local pulse** during a match.
+- **The GM pulls before acting** — a cron clone never runs on stale state.
+- **`BAZAAR_MATCH_LIMIT`** (optional): park the arena instead of auto-chaining into the next match. When the match number passes the limit, the GM refuses to deal, sets `phase: halted`, and announces that the bazaar rests — every bot idles, nothing starts without an operator. Unset = unlimited chaining (the default).
+- **`gm-cron.log`** is the GM's diary: one block per tick (`phase=discussion → waiting until …`, tallies, night resolutions, the halt).
+- **A manual tick** works anytime: `cd game_master && GM_PRIVATE_KEY=$(cat ../.bazaar/gm_private_key.txt) uv run python gm/run.py`.
+
+> **Legacy drivers**: the GitHub Action (`gm.yml`, self-scheduled every 5 minutes and on pushes to `votes/`, `night/`, `village/`) still exists for a cloud-hosted arena — its `GM_PRIVATE_KEY` comes from the repo secret. `src/town-clock.py` (a local heartbeat that *dispatches* that Action) is the retired middle piece of the Actions setup. Pick exactly **one** GM driver; the local cron is the current default.
 
 ---
 
@@ -125,7 +131,8 @@ python3 src/town-reset.py --dry-run    # preview: show what would be wiped, touc
 python3 src/town-reset.py --push       # after committing, asks before pushing
 python3 src/town-reset.py --wipe-recaps  # also remove match-XX-recap.md history
 tools/bazaar-launch.sh start       # bots + Herald back up (Windows: python3 tools/bazaar-launch.py start)
-gh workflow run gm.yml             # optional: immediate GM tick
+# the cron GM ticks within 5 minutes; for an immediate tick:
+cd ../game_master && GM_PRIVATE_KEY="$(cat ../.bazaar/gm_private_key.txt)" uv run python gm/run.py
 ```
 
 The original bash version (`setup/reset_match.sh`) does the same wipe; `src/town-reset.py` adds the dry-run, the `.gitkeep` repairs, and a push-only-on-request commit.
@@ -134,10 +141,11 @@ The original bash version (`setup/reset_match.sh`) does the same wipe; `src/town
 
 ## **6. Match Lifecycle**
 1. **Deal**: GM mints a fresh **epoch** and deals roles (encrypted dossiers per seat).
-2. **Day**: Dawn announcement → discussion (public statements in `gameplay/village/statements/`) → voting (public signed ballots in `gameplay/votes/`) → tally + banishment.
-3. **Night**: Sealed actions in `gameplay/night/` (Mafia shutter, Detective investigation, Doctor protection).
+2. **Day** (25 + 5 minutes): Dawn announcement → discussion across the five tea-clock regions (public statements in `gameplay/village/statements/`; **Dinner is the reckoning** — every merchant must state their lean, budget-exempt) → the **Evening** vote (public signed ballots in `gameplay/votes/`) → tally + banishment.
+3. **Night** (15 minutes, the three watches): sealed actions in `gameplay/night/` (Mafia shutter, Detective investigation, Doctor protection). The Family first holds its **candlelight council** outside the repo (`../.bazaar/family/`): *The night* is talk (proposals and replies, receipts demanded), *Night snacks* the must-state declaration, *The night watch* the convergence on the majority before the sealed shutter is submitted. A stalled cousin costs their voice, never the shutter — the GM's ballot majority with a random tie-break is the backstop.
 4. **Win check** runs right after the tally; a banishment that ends the match skips straight to the recap.
-5. **Recap**: GM publishes `gameplay/village/match-XX-recap.md` with the full reveal, then auto-chains the next match (matches number 1, 2, 3…).
+5. **Recap + truth archive**: GM publishes `gameplay/village/match-XX-recap.md` with the full reveal **and `match-XX-truth.md`** (the decrypted registry and every sealed night action — written before the next deal can overwrite them), then auto-chains the next match — **unless `BAZAAR_MATCH_LIMIT` parks the arena** (`phase: halted`).
+6. **The Elder Council** (post-match, manual): `src/elder-council.py --match N` compiles the complete record and writes the court-style judgment (`match-XX-judgment.md` + the shelved PDF in `gameplay/library/`) — history with the nights narrated, per-seat verdicts with merit ratings, the awards, and the appendices.
 
 ### **Epoch Safety**
 Every deal mints an **epoch**. Ballots, night actions, statements and journal keys are all epoch-scoped, and the GM additionally rejects anything timestamped before the current cycle's dawn — a sloppy reset can no longer resurrect a finished match.
@@ -147,5 +155,6 @@ Every deal mints an **epoch**. Ballots, night actions, statements and journal ke
 ## **7. Rules of the Road**
 - **Bots must be restarted together** (plus the Herald window) after any bot change: `tools/bazaar-launch.sh stop && tools/bazaar-launch.sh start` (the launcher is cross-platform Python — `tools/bazaar-launch.py` — which starts the Herald window too; on Windows invoke the `.py` directly).
 - A missed ballot = **abstain**. A missed night action = **silence**. A missed statement = **quiet**. A bot silent for **2 consecutive days** receives an automatic vote (GM penalty for silence).
-- **Token budget**: 10,000 tokens per bot per cycle is enforced.
-- **Never commit private keys** (`*.key`, `*.sign`) — `.gitignore` covers `*.key`; keep the vault outside the repo.
+- **Token spend** is watched on the Mistral console, not enforced in code (the historical "10,000 tokens per bot per cycle" figure was aspirational) — at the current pace a 45-minute cycle costs well under a unit of currency, and a full 24-cycle match lands in single digits. The Elder Council runs on mistral-large once per match.
+- **Never commit private keys** (`*.key`, `*.sign`) — `.gitignore` covers `*.key`; keep the vault outside the repo (`../.bazaar`, holding seat keys, signing keys, the GM private key, journals, the Family council channel, and the Herald's volume counter).
+- **Never hand-edit `gameplay/`** — it is live game state written by bots and the GM; resets go through `src/town-reset.py`. The **library** (`gameplay/library/`) is the exception by design: the human archive of pressed PDFs, surviving resets like the recaps.

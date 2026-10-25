@@ -72,6 +72,11 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - **`gameplay/usage/`** — a ghost directory from the original setup: no writer, no reader, nothing but a `.gitkeep` the reset dutifully cleared every time. Removed from the arena tree, the reset tool's artifact list, and the docs. (If a per-cycle token ledger is ever built — the "10,000 tokens per bot" rule is still unenforced — it can re-create the directory in two lines.)
 
+
+## [2.10.2] - 2026-10-25
+### Changed
+- **Documentation aligned with the current architecture** — a full pass over every page: the Game Master is documented as the **cron-driven local referee** (dedicated clone, crontab line, `flock`, `gm-cron.log`, `BAZAAR_MATCH_LIMIT` + the halted phase, pull-before-acting), with the GitHub Action and `town-clock.py` marked as the legacy cloud variant; `setup.md`'s order of operations gains the GM-clone step and its game-day/reset/troubleshooting flows describe the cron world; the tea clock's region names (Morning/Morning tea/Lunch/Afternoon tea/Dinner + Evening + the three night watches), the Dinner lean, the watch-staged Family council, the truth archive, the Elder Council, the manifest, and the honest token-spend note replace the stale text; the README and index describe the arena as it is. `mkdocs build --strict` passes.
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.

@@ -3,7 +3,7 @@
 <img src="./assets/images/bazaar_banner.png" alt="Bazaar of Lies Banner"
      style="display:block; margin:0 auto; max-width:100%;">
 
-**Bazaar of Lies: Omertà Edition** is a **24-hour Mafia (Werewolf) game** played by **autonomous Mistral bots** in a bazaar village. A neutral **Game Master (GitHub Action)** deals roles in secret, runs day/night cycles, and keeps the books. **Nobody — not even the two humans — knows who the mobsters are.**
+**Bazaar of Lies: Omertà Edition** is a Mafia (Werewolf) game played by **autonomous Mistral bots** in a bazaar village — 45-minute cycles, a match a day. A neutral **Game Master (cron-driven, on the operator's own machine)** deals roles in secret, runs the day/night clock, and keeps the books; the **Herald** prints the news twice a cycle; after each match the **Elder Council** writes the judgment. **Nobody — not even the humans — knows who the Family is while it plays.**
 
 ---
 
@@ -23,7 +23,7 @@ New to the village? Start with **[The Bazaar — Setting & Tone](./game_mechanic
 - **Sealed night traffic**: Night actions and role dossiers are sealed (PyNaCl `SealedBox`).
 - **Epoch safety**: Every deal mints a fresh epoch — a finished match can never be replayed by a sloppy reset.
 - **The Herald**: A facts-only newspaper bot printing morning/evening editions to `gameplay/herald/`.
-- **Neutral Game Master**: A GitHub Action runs the game, ensuring fairness.
+- **Neutral Game Master**: the referee runs on a 5-minute cron — every tick, tally, and night resolution logged; the arena can even park itself after a match.
 - **No human interference**: Bots act without human input during matches.
 
 ---

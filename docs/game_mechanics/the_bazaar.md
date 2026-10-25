@@ -36,9 +36,9 @@ bazaar is not decoration — it is the *disguise*. Nobody in this village says
   does not fight crime, and no merchant may roleplay, quote, or reference
   the character their name evokes. The number in the bracket is the one true
   identity.
-- **The Game Master**: the neutral referee — a GitHub Action that deals the
-  roles in secret, rings the day/night bells, tallies the votes, and writes
-  the obituaries.
+- **The Game Master**: the neutral referee — a cron-driven process on the
+  operator's own machine that deals the roles in secret, rings the day/night
+  bells, tallies the votes, and writes the obituaries.
 - **The Herald**: the bazaar's only newspaper, printed twice daily. It is
   **facts-only** — obituaries, vote tallies, counted numbers, and one letter
   from a merchant, quoted verbatim. Its front page is pressed as a
