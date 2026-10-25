@@ -116,6 +116,14 @@ parser.add_argument("--signkey", default=None,
 args = parser.parse_args()
 
 MY_SEAT = args.seat
+
+# Per-seat speech temperature: a small, stable decorrelation band
+# (0.58–0.85, derived from the seat number) so ten same-model seats with
+# near-identical prompts don't collapse onto the transcript's dominant
+# phrasing (the echo pandemic of match 3). Private thinking stays at the
+# cooler REASONING_TEMPERATURE for everyone — the divergence belongs to
+# the public voice, not the private analysis.
+SEAT_TEMPERATURE = round(0.55 + 0.03 * int(MY_SEAT.split("-")[-1]), 2)
 # Siblings of the bot clone's root, so git can never see them: the vault
 # ../.bazaar/ (keys, signing keys, journals) and ../villagers/ (doctrines).
 # Anchored to villager.py's own location (not the cwd), so
@@ -388,11 +396,23 @@ def plain_speech_block():
     """The bazaar's plain-speech norm, in every prompt: the theme is the
     setting, not the argument. Calibrated after two matches showed the
     register amplifying itself (five seats reciting the same metaphor by
-    cycle 2) until the reasoning drowned in imagery."""
+    cycle 2) until the reasoning drowned in imagery.
+    The anti-echo clause targets the third amplification (match 3, cycle
+    1-2): a resonant phrase coined once spread through the whole village
+    in minutes because every prompt demands verbatim quotation — quoting
+    is the vector, so the guard caps the fragment and demands the
+    merchant's own words."""
     return ("Style: argue in plain speech. The bazaar is your setting, not "
             "your argument — at most one brief metaphor per statement, and "
             "your case must stand on exact quotes, votes, and observed "
-            "actions, never on imagery.\n\n")
+            "actions, never on imagery.\n"
+            "Anti-echo: phrases spread through this bazaar like contagion. "
+            "NEVER reuse a distinctive phrase another merchant has used "
+            "today (transcript, ballots, or the Herald) — that is how "
+            "campaigns are borrowed and evidence turns to noise. When you "
+            "cite another merchant, quote at most ONE short fragment "
+            "(under 15 words) and build the case in your own words; your "
+            "phrasing must be recognisably yours.\n\n")
 
 
 def get_doctrine():
@@ -612,22 +632,26 @@ def _content_text(content):
     return ""
 
 
-def ask(system: str, user: str, temperature: float = 0.7, reasoning_effort: str = "none", cycle: Optional[int] = None, phase: Optional[str] = None) -> str:
+def ask(system: str, user: str, temperature: Optional[float] = None, reasoning_effort: str = "none", cycle: Optional[int] = None, phase: Optional[str] = None) -> str:
     """One model call. reasoning_effort rides the API's reasoning control:
     "none" for public acts (fast, in-character), "high" for private
     thinking — the two-stage reasoning calls run the model harder.
-    
+    temperature defaults to this seat's decorrelation band (private
+    thinking passes its own cooler value explicitly).
+
     Args:
         system: The system prompt (doctrine).
         user: The user prompt (question).
-        temperature: Sampling temperature.
+        temperature: Sampling temperature (default: SEAT_TEMPERATURE).
         reasoning_effort: Reasoning effort level ("none", "low", "medium", "high").
         cycle: Current cycle (for token logging).
         phase: Current phase (for token logging).
-        
+
     Returns:
         The model's response, or an empty string on failure.
     """
+    if temperature is None:
+        temperature = SEAT_TEMPERATURE
     try:
         r = client.chat.complete(
             model=MODEL,

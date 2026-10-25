@@ -419,6 +419,49 @@ instead of a note scribbled every ten minutes.
 
 ---
 
+## 11. Transcript hygiene — starving the echo at the source (designed, not built)
+
+Match 3 gave the cleanest evidence yet: a phrase coined once
+("the Compact rewards the walker", Elsa, cycle 1, 18:31) spread to nine
+seats within minutes and structured the entire next day. The shipped
+mitigations (the anti-echo clause + per-seat temperature band,
+v2.13.4) raise the cost of copying; this design removes the fuel — the
+verbatim transcript that every bot re-reads before every statement.
+
+### The design: a recency window with a cheap-model digest
+
+- **Verbatim window**: only the **K most recent statements** (K ≈ 5–6)
+  enter the transcript verbatim. Recency carries the conversational
+  thread; everything older is context.
+- **The older day, digested**: statements that roll out of the window
+  are summarized **per merchant** by a *cheap* model
+  (`mistral-small-latest` or the Nemo-class — pennies against the main
+  model): "keep the claim, the names, and the dates; drop the
+  phrasing." One to two lines each. The transcript then reads
+  *Earlier today (digest): …* then *Most recent (verbatim): …*.
+- **Per-bot, vault-local summaries** — the crucial choice: the digest is
+  computed by each bot into `../.bazaar/digests/` (epoch+cycle+seat
+  keyed, write-once, read-every-poll). A *shared* in-repo digest would
+  itself become the next shared verbatim anchor — the exact thing we
+  are removing. Ten cheap-model digests also decorrelate naturally.
+- **Cost**: ~8 summaries per bot per cycle, written once as statements
+  age out of the window; a cheap model at a few hundred tokens each —
+  noise against the discussion calls themselves.
+
+### Risks and open questions
+
+- **Evidentiary loss**: the quoting culture is load-bearing (receipts
+  against confabulation). Should the digest preserve ONE verbatim
+  fragment per merchant per statement, so citations stay possible?
+- **Tuning K**: too small starves context (early accusations vanish);
+  too large keeps the pandemic alive. Start at 5, watch a match.
+- The **Herald keeps verbatim** (it quotes for a living) — hygiene is
+  for the merchants only.
+- Does the **Family council** transcript need the same hygiene, or is
+  three-voices-small immune?
+
+---
+
 *Built and shipped since this file was written: the Elder Council
 (Phases 0–4, trialed on match 1), the truth archive, the contained night
 (in-repo council, GM decoys, uniform night traffic), the library, the

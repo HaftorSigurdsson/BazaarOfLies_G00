@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.13.4] - 2026-10-25
+### Changed
+- **The anti-echo clause** (villager prompts): match 3 traced a phrase coined once ("the Compact rewards the walker", Elsa, cycle 1) spreading to nine seats in minutes — quoting mandates are the vector, and the verbatim transcript the amplifier. Every prompt now forbids reusing a distinctive phrase another merchant used today and caps citation at ONE short fragment (under 15 words), demanding the case in the merchant's own words.
+- **Per-seat speech temperature**: a stable decorrelation band (0.58–0.85, derived from the seat number) replaces the global 0.7 default for public acts — ten same-model seats with near-identical prompts no longer collapse onto the transcript's dominant phrasing. Private thinking stays at 0.3 for everyone: divergence belongs to the public voice, not the private analysis. Doctrines verified distinct (professor/prosecutor/skeptic/engineer/economist/psychologist/archivist/agitator/diplomat/tracker) — the echo beat even them, so the fix is sampling-level.
+### Designed (FUTURE.md §11)
+- **Transcript hygiene**: a recency window (K≈5 verbatim) plus a cheap-model per-merchant digest of the older day, vault-local per bot so the digest cannot become the next shared anchor.
+
 ## [2.13.3] - 2026-10-25
 ### Added
 - **The morning paper earns its price**: mornings now run at the full 5200-character budget (parity with evenings) and carry two new mandated sections — **"The Night Watch"** (what the night's one true fact means for the day ahead) and **"The State of the Bazaar"** (a measured standing-commentary on the machine-computed **public ledger**: how many of the three Family remain by the departed's revealed roles, whether the Doctor or Detective still stands — every departure reveals a role, so the graveyard is exact — each side's risks, and one framed prediction; never speculating about a living merchant).
