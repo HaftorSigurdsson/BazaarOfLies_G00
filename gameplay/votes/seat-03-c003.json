@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 3,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-03",
+  "target": "seat-01",
+  "rationale": "Eleven calls for \"Family tricks\" sit beside your ledger of cardamom and scent—no merchant named, no sentence quoted, no date cited.",
+  "ts": "2026-10-25T20:35:28Z"
+ },
+ "sig": "iJfwPN+P13PAMBvzhuHNJyzYwZ+gnL38lxSEmNUpFqrw68zG9yzUIGyiXHpl0Ncjc5cYw73TYjkTAlpnol7fCw=="
+}
