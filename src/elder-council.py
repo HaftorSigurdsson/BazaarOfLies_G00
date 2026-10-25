@@ -373,11 +373,19 @@ def final_judgment(match_no, case, timeline, family_digest,
         "# The Judgment of the Council of Elders — <THE CASE NAME GIVEN BELOW>\n"
         "A dateline line: the match number and its dates.\n"
         "A formal preamble (the Council convenes, the match reviewed).\n"
-        "## The History\n One bullet per cycle — each line exactly '- **Cycle N**: ...' carrying the cycle's tally and departures. No prose paragraphs in this section.\n"
+        "## The History\n One bullet per cycle, each with indented sub-bullets "
+        "— exactly this shape:\n"
+        "- **Cycle N**:\n  - Vote tally: ...\n  - Night action: ...\n"
+        "  - Departures: ...\n"
+        "End with '- **Conclusion**: ...' restating the computed conclusion. "
+        "No prose paragraphs in this section.\n"
         "## The Main Arguments\n The best cases made on each side — the "
         "strongest reasoning the bazaar produced, with quotes.\n"
         "## The Verdicts\n One compact paragraph per merchant, drawn from "
-        "the drafts (keep the best quotes).\n"
+        "the drafts (keep the best quotes). Each verdict STARTS with a bold "
+        "header line in exactly this shape — '**<Name> (<seat>) — <role> — "
+        "<merit>/10**' — e.g. '**Yoda (03) — Mafia — 8/10**' — followed by "
+        "the paragraph, which still mentions the merit in prose.\n"
         "## The Awards\n - Most Valuable Merchant (not necessarily the "
         "winner; a sacrifice may take it) — with justification.\n"
         "- The Golden Sacrifice: valor without victory.\n"
@@ -576,6 +584,14 @@ def main():
            + appendix_record(args.match, seats, graveyard, ballots, statements,
                              night_actions, family_msgs) + "\n\n---\n\n"
            + appendix_ratings(seat_order, drafts, records) + "\n")
+
+    # Final hygiene: control chars out of the whole document (the abstract
+    # insertion can carry them in), and known section names repaired if a
+    # model glitch swallowed their heading marker.
+    doc = re.sub(r"[\x00-\x08\x0b-\x1f]", "", doc)
+    for section in ("The History", "The Main Arguments", "The Verdicts",
+                    "The Awards", "The Closing"):
+        doc = re.sub(rf"(?m)^{section}\s*$", f"## {section}", doc)
 
     out = f"gameplay/village/match-{args.match:02d}-judgment.md"
     with open(out, "w") as f:

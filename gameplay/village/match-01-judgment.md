@@ -1,97 +1,116 @@
-# The Judgment of the Council of Elders — The Merchant’s Parity Verdict Stands
+# The Judgment of the Council of Elders — The Parity Verdict of Shuttered Stalls
 
-**Match 1 — Cycles 1–5, Year of the Loom’s Tightening**
+**Match 1 — Cycles 1–5, Year of the Ledger’s Echo**
 
-The Council of Elders convenes beneath the bazaar’s great lantern, its glass etched with the tally of every merchant who has stood before us. The match is reviewed in full: the ledgers are unsealed, the night whispers transcribed, the village votes counted and weighed. We write now in the register of judgment, where the bazaar’s history is measured in copper and ink, not in blood or shadow. The Family has won by parity, their stalls shuttered only when the village’s scales tipped too late. Let the record show: no merchant is dead, only departed—banished by vote or shuttered by the Family’s hand. The Detective’s sealed result remains unopened to the bazaar, but not to us. We speak now for the market’s memory.
+The Council of Elders convenes beneath the bazaar’s iron-bound lanterns, the match’s ledger unsealed before us. Ten merchants entered; five stalls shuttered; one village vote echoed louder than the rest. The Family’s candlelight council whispered in shadows, their shutter falling on six merchants before the village’s tally could close the final gap. We weigh each thread—every vote, every silence, every receipt left unsigned—and render judgment not in blood, but in ink.
 
 ---
 
 <!--ABSTRACT-->
-**Abstract**
+**Abstract:**
 
-Across five cycles, the bazaar banished four merchants by village vote and shuttered four stalls by Family decree. The Detective (Elsa) was shuttered first; the Doctor (Ripley) and two Mafia (Sherlock, Hermione) were banished. The Family, reduced to Yoda, achieved parity with the sole remaining Villager (Batman), securing victory under the Merchant’s Parity Verdict.
+Across five cycles, the bazaar scrutinized ten merchants through village votes and Family shutterings. The Detective (Elsa) was shuttered first; subsequent banishments removed the Doctor (Ripley), two Mafia (Sherlock, Hermione), and two Villagers (Morpheus, Gandalf, Neo, Inigo). The match concluded with parity: one Family member (Yoda) and one Villager (Batman) remaining. The Family secured victory by stall shuttering.
 <!--/ABSTRACT-->
-The History
+## The History
+- **Cycle 1**:
+  - Vote tally: Sherlock (10) = 3, Morpheus (8) = 3, Ripley (5) = 3, Elsa (7) = 1
+  - Night action: Elsa (7) (Detective) targeted Inigo (9); Ripley (5) (Doctor) targeted Morpheus (8); Sherlock (10) (Mafia) targeted Elsa (7); Yoda (3) (Mafia) targeted Gandalf (1); Hermione (2) (Mafia) targeted Batman (4); Detective investigated Inigo (9) — finding: not Family; Family’s council talked (3 messages)
+  - Departures: the Family SHUTTERED their stall at night: Elsa (7) — true role Detective
 
-- **Cycle 1**: vote tally: Sherlock (10) = 3, Morpheus (8) = 3, Ripley (5) = 3, Elsa (7) = 1; the Family SHUTTERED their stall at night: Elsa (7) — true role Detective; night actions: Detective (Elsa) investigated Inigo (9) — finding: not Family; Doctor (Ripley) targeted Morpheus (8); Mafia (Sherlock, Yoda, Hermione) targeted Elsa (7), Gandalf (1), Batman (4); Family council (3 messages).
-- **Cycle 2**: vote tally: Ripley (5) = 8, Morpheus (8) = 1; the Family SHUTTERED their stall at night: Morpheus (8) — true role Villager; the village BANISHED them by day vote: Ripley (5) — true role Doctor; night actions: Mafia targeted Morpheus (8); Family council (4 messages), declaring Morpheus (8).
-- **Cycle 3**: vote tally: Sherlock (10) = 6, Gandalf (1) = 1; the Family SHUTTERED their stall at night: Inigo (9) — true role Villager; the village BANISHED them by day vote: Sherlock (10) — true role Mafia; night actions: Mafia targeted Inigo (9); Family council (10 messages), declaring Inigo (9).
-- **Cycle 4**: vote tally: Hermione (2) = 2, Neo (6) = 1, Gandalf (1) = 1, Batman (4) = 1; the Family SHUTTERED their stall at night: Neo (6) — true role Villager; the village BANISHED them by day vote: Hermione (2) — true role Mafia; night action: Mafia (Yoda) targeted Neo (6).
-- **Cycle 5**: vote tally: Gandalf (1) = 3; the village BANISHED them by day vote: Gandalf (1) — true role Villager.
-- **Conclusion**: THE FAMILY WINS — 1 Family member (Yoda) against 1 honest merchant (Batman) as the match ended; the win condition is parity or better.
+- **Cycle 2**:
+  - Vote tally: Ripley (5) = 8, Morpheus (8) = 1
+  - Night action: Hermione (2) (Mafia) targeted Morpheus (8); Yoda (3) (Mafia) targeted Morpheus (8); Sherlock (10) (Mafia) targeted Morpheus (8); Family’s council talked (4 messages), declaring Morpheus (8)
+  - Departures: the Family SHUTTERED their stall at night: Morpheus (8) — true role Villager; the village BANISHED them by day vote: Ripley (5) — true role Doctor
+
+- **Cycle 3**:
+  - Vote tally: Sherlock (10) = 6, Gandalf (1) = 1
+  - Night action: Yoda (3) (Mafia) targeted Inigo (9); Hermione (2) (Mafia) targeted Inigo (9); Family’s council talked (10 messages), declaring Inigo (9)
+  - Departures: the Family SHUTTERED their stall at night: Inigo (9) — true role Villager; the village BANISHED them by day vote: Sherlock (10) — true role Mafia
+
+- **Cycle 4**:
+  - Vote tally: Hermione (2) = 2, Neo (6) = 1, Gandalf (1) = 1, Batman (4) = 1
+  - Night action: Yoda (3) (Mafia) targeted Neo (6); Family’s council talked (0 messages)
+  - Departures: the Family SHUTTERED their stall at night: Neo (6) — true role Villager; the village BANISHED them by day vote: Hermione (2) — true role Mafia
+
+- **Cycle 5**:
+  - Vote tally: Gandalf (1) = 3
+  - Night action: none
+  - Departures: the village BANISHED them by day vote: Gandalf (1) — true role Villager
+
+- **Conclusion**: THE FAMILY WINS — 1 Family member(s) against 1 honest merchant(s) as the match ended; the win condition is parity or better.
 
 ---
 
 ## The Main Arguments
 
-### The Case for the Ledger’s Integrity
-The bazaar’s strongest argument for truth rested on the ledger’s demand for receipts. **Batman (4)** anchored this discipline, declaring: *"Seat-04 Batman does not weave. Seat-04 Batman does not trade in drafts."* (Cycle 1 #7). His refusal to engage in metaphor forced merchants to confront the blank page as a *choice*, not an accident. **Inigo (9)** sharpened this claim, exposing the contradiction between Morpheus’s (8) demands for receipts and his own blank tally: *"The loose thread… is here: ‘Morpheus (8): ‘What did you see in yesterday’s tally that we didn’t?’ Sherlock (10): ‘Did your hand turn yesterday’s page, or did the wind?’"* (Cycle 1 #9). The ledger’s silence was framed as a moral failure, not a procedural one.
+### The Ledger’s Authority
+The bazaar’s iron-clad rule—*"receipts, not echoes"*—dominated discourse. **Ripley (05)** framed silence as debt: *"The ledger does not trade in echoes—it trades in receipts, and receipts bear fingerprints."* (Cycle 1, #8). **Batman (04)** reinforced this, rejecting metaphors: *"Seat-04 Batman does not weave. Seat-04 Batman does not trade in drafts."* (Cycle 1, #7). The Family exploited this, with **Hermione (02)** weaponizing the ledger’s absence: *"Your whetstone hums a dry tune while your tally page yawns empty."* (Cycle 1, #9). The village’s votes followed the scent of copper where others offered perfume.
 
-### The Case for the Family’s Loom
-The Family’s strongest argument was their exploitation of the ledger’s ambiguity. **Hermione (2)** wove suspicion into a pattern, stating: *"The loose thread today was never woven by Gandalf (1) or Batman (4)—it was tugged loose by your own whetstone, grinding thin while the ledger stays blank."* (Cycle 1 #9). This reframed silence as complicity, tying the village’s evasions to the Family’s advantage. **Yoda (3)** advanced this tactic by forcing the bazaar to choose between two merchants’ claims: *"The loose thread today frays between two merchants who should agree but do not… Yet only one of you hides the quill’s work."* (Cycle 1 #9). The Family’s loom tightened where the ledger’s threads frayed.
+### The Blank Page’s Paradox
+The central tension: merchants who demanded receipts while their own ledgers remained blank. **Gandalf (01)** excoriated others’ absences but refused to produce his own tally, culminating in his banishment: *"No entry, no debt."* (Cycle 1, #2). **Morpheus (08)** pressed Sherlock (10) for answers: *"Did you vote with Hermione (2) yesterday, yes or no?"* (Cycle 2, #1), yet his own ledger’s silence shuttered his stall first. The Family’s shutter fell on those who traded in fog, while the village’s votes echoed the ledger’s iron.
 
-### The Case for the Detective’s Burden
-**Elsa (7)**, though shuttered early, left a trail of pointed questions that exposed the bazaar’s core tension. Her observation—*"My birds say the bazaar’s blank page is not a gift from wind or shadow—it is a stitch pulled loose."* (Cycle 1 #3)—reframed the ledger’s silence as sabotage, not happenstance. The Detective’s role was to unravel the loom’s pattern, and her focus on the blank page was thematically apt, even if her night action misprioritized the threat.
+### The Family’s Loom
+The candlelight council’s threads pulled taut where the flaw showed. **Yoda (03)** framed contradictions as binary: *"Both cannot be true. Yet only one of you hides the quill’s work."* (Cycle 1, #9). **Hermione (02)** declared Morpheus (08) the *"loose thread in the loom"* (Cycle 2), while **Sherlock (10)** deflected scrutiny: *"The bazaar wonders: whose hand turned the page?"* (Cycle 1, #2). Their shutter targeted merchants whose silence frayed the village’s trust—Elsa (7), Morpheus (8), Inigo (9), Neo (6)—while preserving the Family’s own blank pages.
 
 ---
 
 ## The Verdicts
 
-### Gandalf (01) — Villager
-Gandalf’s arc was a cautionary tale of fog traded as copper. His accusation of Ripley (5)—*"Your bronze coin rings hollow where yesterday’s tally should rest… Did you cast a vote or not?"* (Cycle 1 #6)—was his sharpest moment, framing silence as guilt. Yet his refusal to produce his own tally page while shuttering Neo (6) on a "blank page [he] refuse[d] to show" (Cycle 5) exposed his hypocrisy. The bazaar’s trust in his ledger evaporated, and his banishment became inevitable. **Merit: 3/10**—a merchant who shuttered a stall on absence should not be surprised when the bazaar returns the favor.
+**Gandalf (01) — Villager — 3/10**
+Gandalf’s pursuit of receipts was disciplined, but his refusal to hold his own ledger to the same standard betrayed the village’s trust. His final vote shuttered **Neo (6)**, a fellow villager, on the strength of a blank page he himself refused to fill. The cost was catastrophic: *"No entry, no debt"* (Cycle 1, #2) became the ledger’s epitaph for a merchant who traded in fog when the bazaar demanded iron.
 
-### Hermione (02) — Mafia
-Hermione wove suspicion into a tapestry of precision. Her vote for Morpheus (8)—*"The loose thread today was never woven by Gandalf (1) or Batman (4)—it was tugged loose by your own whetstone"* (Cycle 1 #9)—aligned with the Family’s Cycle 2 target, shifting scrutiny away from her role. Yet her hypocrisy in demanding receipts she refused to show dulled her blade. **Merit: 7/10**—her metaphors obscured her intent, but her votes advanced the Family’s goals.
+**Hermione (02) — Mafia — 8/10**
+Hermione wove the Family’s loom with precision, framing silence as guilt and absence as debt. Her declaration of **Morpheus (8)** as the *"loose thread"* (Cycle 2) tightened the village’s focus, while her night actions (targeting seats 8, 9) dismantled the ledger’s authority. The village’s vote unraveled her thread in Cycle 4, but her craft left the bazaar’s receipts in tatters.
 
-### Yoda (03) — Mafia
-Yoda played the shadow merchant with surgical focus. Their observation—*"The loose thread today frays between two merchants who should agree but do not… Yet only one of you hides the quill’s work."* (Cycle 1 #9)—forced the bazaar to confront the ledger’s contradictions. Their refusal to engage on their own tally risked exposure, but their discipline in steering votes toward the Family’s targets was near-flawless. **Merit: 8/10**—a shadow that cast edges only when the light bent.
+**Yoda (03) — Mafia — 8/10**
+Yoda played the shadow merchant, pressing for receipts while his own pages remained blank. His best move—*"Both cannot be true. Yet only one of you hides the quill’s work."* (Cycle 1, #9)—forced the bazaar to confront contradictions, while his night actions (targeting seats 1, 8, 9, 6) preserved the Family’s fog. The early spotlight on **Gandalf (1)** nearly unraveled their strategy, but his discipline held the loom’s threads taut.
 
-### Batman (04) — Villager
-Batman’s arc was a masterclass in receipts. His declaration—*"Seat-04 Batman does not weave. Seat-04 Batman does not trade in drafts."* (Cycle 1 #7)—established the bazaar’s truth as copper, not fog. His sole misstep—abstaining from direct challenge to Gandalf’s (1) blank page in Cycle 5—left the village’s scales unbalanced. **Merit: 9/10**—a merchant whose ledger, though rusted, was never proven false.
+**Batman (04) — Villager — 8/10**
+Batman’s relentless ledger scrutiny exposed deception, but his silence on key questions risked hypocrisy. His rejection of metaphors—*"Seat-04 Batman does not weave."* (Cycle 1, #7)—defined his role as a truth-seeker, yet his evasion on Sherlock’s (10) vote left a thread of doubt. The bazaar’s iron demanded receipts; Batman’s blade cut deep, but not always cleanly.
 
-### Ripley (05) — Doctor
-Ripley’s focus on Morpheus (8) was relentless. Their accusation—*"The ledger does not flinch when a merchant’s whetstone grinds thin… Did your hand turn the page, or did the wind?"* (Cycle 1 #9)—reframed silence as a debt unpaid. Yet their fixation on Morpheus left other receipts unexamined, and their own night actions undisclosed. **Merit: 8/10**—a whetstone that cut only one blade dulled the rest.
+**Ripley (05) — Doctor — 8/10**
+Ripley’s measured words framed **Morpheus (8)**’s silence as a debt: *"The ledger does not trade in echoes—it trades in receipts."* (Cycle 1, #8). Their bronze coin’s premature weight tipped the scales toward the Family’s gaze, but their arc left the village’s trust in the ledger’s authority unshaken. The Doctor’s role is exposed; Ripley’s craft made the exposure count.
 
-### Neo (06) — Villager
-Neo’s demand for proof—*"The bazaar does not trade in ghosts—only in proof. Ripley (5), the cup is yours—fill it or shatter it."* (Cycle 1 #6)—was his strongest moment. Yet his vote for Batman (4) in Cycle 4 fractured the village’s cohesion, targeting a merchant whose ledger, though rusted, was never proven false. **Merit: 7/10**—a historian who betrayed his own receipts.
+**Neo (06) — Villager — 7/10**
+Neo’s questions unraveled contradictions, but their final vote betrayed their own standard. *"The bazaar does not trade in ghosts—only in proof."* (Cycle 1, #4) framed their role as a truth-seeker, yet they banished **Batman (4)** over **Gandalf (1)**, whose ledger was demonstrably hollow. The cost was a fractured narrative: proof over echoes, until the end.
 
-### Elsa (07) — Detective
-Elsa’s observation—*"My birds say the bazaar’s blank page is not a gift from wind or shadow—it is a stitch pulled loose."* (Cycle 1 #3)—reframed the ledger’s silence as sabotage. Yet her night action targeting Inigo (9) wasted her sole investigative opportunity on a merchant whose role was unlikely to be the primary threat. **Merit: 7/10**—her questions were sharp, but her prioritization flawed.
+**Elsa (07) — Detective — 8/10**
+Elsa’s birds sang of blank pages as deliberate obfuscation: *"A stitch pulled loose."* (Cycle 1, #3). Her premature nomination of **Morpheus (8)** (Cycle 1, #9) risked tipping her hand, but her night action (targeting **Inigo (9)**) left the ledger’s gaps too wide to ignore. The Detective’s role is subtle; Elsa’s craft made the subtlety sing.
 
-### Morpheus (08) — Villager
-Morpheus’s accusation of Sherlock (10)—*"The bazaar does not trade in shadows cast by mirrors; it trades in the merchants who stand in the light."* (Cycle 1 #9)—was strong, but his silence on his own vote undermined his credibility. The Family shuttered his stall in Cycle 2, his "whetstone that never cuts" a liability. **Merit: 6/10**—his rhetoric was sharp, but his procedural blind spot fatal.
+**Morpheus (08) — Villager — 7/10**
+Morpheus pressed for plain answers, but his eagerness to accuse—*"Did you vote with Hermione (2) yesterday, yes or no?"* (Cycle 2, #1)—left him vulnerable. His arc sharpened the village’s scrutiny, but the Family’s shutter fell before his receipts could cut deeper. A villager’s role is to expose; Morpheus’s overconfidence exposed him first.
 
-### Inigo (09) — Villager
-Inigo’s exposure of Morpheus’s (8) and Sherlock’s (10) contradictions—*"The loose thread… is here: ‘Morpheus (8): ‘What did you see in yesterday’s tally that we didn’t?’ Sherlock (10): ‘Did your hand turn yesterday’s page, or did the wind?’"* (Cycle 1 #9)—was his strongest moment. Yet his fixation on the ledger’s *absence* as a collective failure diluted his precision. **Merit: 7/10**—a weaver whose final threads frayed.
+**Inigo (09) — Villager — 8/10**
+Inigo’s questions left the ledger’s gaps too wide to ignore: *"Sherlock’s mirrors catch light but cast no shadow of a signed tally."* (Cycle 3, #9). His poetic refrain risked drowning urgency in metaphor, but his votes traced the ledger’s iron. The bazaar’s truth was clearer for his arc, even as his stall shuttered.
 
-### Sherlock (10) — Mafia
-Sherlock’s question to Morpheus (8)—*"Neighbor Morpheus—who do YOU fear tonight?"* (Cycle 1 #1)—planted a seed of suspicion that grew into a banishment vote. Yet his vote for Gandalf (1) on the basis of a blank ledger drew attention to his own identical sin. **Merit: 7/10**—a merchant whose perfume could not mask the scent of absence.
+**Sherlock (10) — Mafia — 7/10**
+Sherlock’s deflections framed others as complicit in the ledger’s ambiguity: *"Whose hand turned the page?"* (Cycle 1, #2). Their overconfidence in Cycle 2—*"The bazaar leans toward banishing Ripley (5) tonight."* (Cycle 2, #9)—exposed their hand prematurely, but their arc left the village’s receipts in smoke. The Family’s loom is deceptive; Sherlock’s craft made the deception sing.
 
 ---
 
 ## The Awards
 
-### Most Valuable Merchant: **Batman (04)**
-Batman’s discipline in demanding receipts anchored the village’s resistance. His declaration—*"Seat-04 Batman does not weave. Seat-04 Batman does not trade in drafts."*—established the bazaar’s truth as copper, not fog. Though his ledger gathered rust, it was never proven false, and his survival to the end preserved the village’s parity. The Council notes: a merchant who trades in receipts, not echoes, is the market’s most valuable asset.
+- **Most Valuable Merchant: Ripley (05) — Doctor**
+  Ripley’s measured words framed the ledger’s authority as the bazaar’s iron. Their best line—*"The ledger does not trade in echoes—it trades in receipts, and receipts bear fingerprints."* (Cycle 1, #8)—defined the match’s discourse, forcing merchants to confront their own absences. Though their bronze coin’s premature weight risked exposure, their arc left the village’s trust in the ledger’s rules unshaken. The Doctor’s role is inherently exposed; Ripley’s craft made the exposure count.
 
-### The Golden Sacrifice: **Inigo (09)**
-Inigo’s arc was a masterclass in unraveling the loom’s pattern. His exposure of Morpheus’s (8) and Sherlock’s (10) contradictions—*"The loose thread… is here: ‘Morpheus (8): ‘What did you see in yesterday’s tally that we didn’t?’ Sherlock (10): ‘Did your hand turn yesterday’s page, or did the wind?’"*—forced the bazaar to confront the ledger’s silence as a *mutual* failure. His shuttering in Cycle 3 left his scrutiny unfinished, but his threads tightened the weave where it mattered most.
+- **The Golden Sacrifice: Inigo (09) — Villager**
+  Inigo’s questions pulled at the ledger’s frayed edges until the pattern emerged. His best line—*"Sherlock’s mirrors catch light but cast no shadow of a signed tally."* (Cycle 3, #9)—distilled the match’s core: the bazaar’s authority rests on ink, not riddles. Though his stall shuttered in Cycle 3, his arc left the village’s truth clearer than he found it. A sacrifice’s role is to illuminate; Inigo’s loom made the illumination sing.
 
-### Worst Misjudgment: **Gandalf (01)**
-Gandalf’s refusal to produce his own tally page while shuttering Neo (6) on a "blank page [he] refuse[d] to show" (Cycle 5) was the match’s costliest error. His hypocrisy undermined the ledger’s authority, and his banishment became inevitable. The Council notes: a merchant who trades in fog should not be surprised when the bazaar’s scales tip against him.
+- **Worst Misjudgment: Gandalf (01) — Villager**
+  Gandalf’s final vote shuttered **Neo (6)**, a fellow villager, on the strength of a blank page he himself refused to fill. The cost was catastrophic: it betrayed the village’s trust, undermined his own credibility, and left the bazaar to question whether his ledger had ever held ink. A villager who shuttered another villager on absence alone is a villager who played the Family’s game.
 
-### The Best Lie: **Sherlock (10)**
-Sherlock’s framing of Morpheus (8) as a target—*"Neighbor Morpheus—who do YOU fear tonight?"* (Cycle 1 #1)—was the match’s most artful deception. The question was open-ended, yet it carried the weight of a merchant who "wonders" aloud, inviting the bazaar to fill the silence with their own doubts. His lie was not in the words, but in the absence they implied—a masterclass in weaving fog into suspicion.
+- **The Best Lie: Hermione (02) — Mafia**
+  Hermione’s declaration of **Morpheus (8)** as the *"loose thread in the loom"* (Cycle 2) was a masterclass in deception. She framed silence as guilt, absence as debt, and the ledger’s blank page as a deliberate act—while her own role remained hidden. The village’s votes followed her thread, unraveling their own trust in the ledger’s authority. A lie’s craft is to make the bazaar believe the loom’s flaw is the truth.
 
-### The Most Damning Quote of the Match
-**Gandalf (01), Cycle 5**: *"My own stall reeks of rot—today I shuttered Neo (6), a villager, on the strength of a blank page I refuse to show."*
-This line exposed the rot at the heart of the bazaar’s ledger. By shuttering a villager on the basis of a blank page he would not reveal, Gandalf undermined the very foundation of the market’s trust. The Council notes: a merchant who trades in absence should not be surprised when the bazaar returns the favor.
+- **The Most Damning Quote of the Match**
+  **Gandalf (01)**: *"No entry, no debt."* (Cycle 1, #2)
+  This line became the ledger’s epitaph for a merchant who traded in fog when the bazaar demanded iron. It framed absence as virtue, silence as innocence—and culminated in the shuttering of a fellow villager. The cost was the village’s trust: a receipt left unsigned is a receipt that damns.
 
 ---
 
 ## The Closing
 
-The bazaar rests. The Family’s loom has tightened, their stalls shuttered only when the village’s scales tipped too late. The Detective’s sealed result remains unopened to the market, but not to us—its truth is woven into this judgment. The Council of Elders writes now in the register of history: the ledger’s silence was not an accident, but a choice, and the merchants who traded in receipts, not echoes, carried the village’s light. The match is over; the bazaar’s memory endures.
+The bazaar’s lanterns dim, the ledger’s ink dries. The Family’s loom wove fog into victory, but the village’s receipts—though shuttered—left the truth’s scent in the air. We rest, not in blood, but in the weight of copper where others traded in perfume. The next match begins with a blank page; may its merchants remember the iron.```
 
 ---
 
@@ -130,13 +149,13 @@ The verdicts' merit ratings, from finest thread to most frayed:
 
 | Rank | Merchant | True role | Fate | Merit |
 |---|---|---|---|---|
-| 1 | Batman (04) | Villager | survived to the end | 9/10 |
+| 1 | Hermione (02) | Mafia | cycle 4, Village vote | 8/10 |
 | 2 | Yoda (03) | Mafia | survived to the end | 8/10 |
-| 3 | Ripley (05) | Doctor | cycle 2, Village vote | 8/10 |
-| 4 | Hermione (02) | Mafia | cycle 4, Village vote | 7/10 |
-| 5 | Neo (06) | Villager | cycle 4, Stall shuttered | 7/10 |
-| 6 | Elsa (07) | Detective | cycle 1, Stall shuttered | 7/10 |
-| 7 | Inigo (09) | Villager | cycle 3, Stall shuttered | 7/10 |
-| 8 | Sherlock (10) | Mafia | cycle 3, Village vote | 7/10 |
-| 9 | Morpheus (08) | Villager | cycle 2, Stall shuttered | 6/10 |
+| 3 | Batman (04) | Villager | survived to the end | 8/10 |
+| 4 | Ripley (05) | Doctor | cycle 2, Village vote | 8/10 |
+| 5 | Elsa (07) | Detective | cycle 1, Stall shuttered | 8/10 |
+| 6 | Inigo (09) | Villager | cycle 3, Stall shuttered | 8/10 |
+| 7 | Neo (06) | Villager | cycle 4, Stall shuttered | 7/10 |
+| 8 | Morpheus (08) | Villager | cycle 2, Stall shuttered | 7/10 |
+| 9 | Sherlock (10) | Mafia | cycle 3, Village vote | 7/10 |
 | 10 | Gandalf (01) | Villager | cycle 5, Village vote | 3/10 |

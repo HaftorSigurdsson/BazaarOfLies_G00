@@ -142,11 +142,19 @@ def _table_tex(rows):
 
 def md_to_tex(md):
     md = re.sub(r"[\x00-\x08\x0b-\x1f]", "", md)   # control chars break TeX
-    out, in_quote, in_item = [], False, False
+    out, in_quote = [], False
+    list_depth = 0
     table = []
     md = re.sub(r"<!--ABSTRACT-->.*?<!--/ABSTRACT-->",
                 "", md, flags=re.S)
     first_title = True
+
+    def close_lists():
+        nonlocal list_depth
+        while list_depth:
+            out.append(r"\end{itemize}")
+            list_depth -= 1
+
     for raw in md.splitlines():
         s = raw.strip()
         if s.startswith("|"):
@@ -158,9 +166,8 @@ def md_to_tex(md):
         if in_quote and not s.startswith(">"):
             out.append(r"\end{quote}")
             in_quote = False
-        if in_item and not s.startswith("- "):
-            out.append(r"\end{itemize}")
-            in_item = False
+        if s and not s.startswith("- ") and list_depth:
+            close_lists()          # content lines end lists; blanks do not
         if not s:
             continue
         if s.startswith("# "):                      # the front page owns it
@@ -182,9 +189,15 @@ def md_to_tex(md):
                 in_quote = True
             out.append(latex_inline(s.lstrip("> ").strip()) + r" \\[2pt]")
         elif s.startswith("- "):
-            if not in_item:
+            indent = len(raw) - len(raw.lstrip())
+            level = min(indent // 2, list_depth)       # nesting steps by one
+            target = level + 1                         # itemizes to be open
+            while list_depth < target:
                 out.append(r"\begin{itemize}")
-                in_item = True
+                list_depth += 1
+            while list_depth > target:
+                out.append(r"\end{itemize}")
+                list_depth -= 1
             out.append(r"\item " + latex_inline(s[2:]))
         elif set(s) <= {"-"}:                        # a --- rule
             out.append(r"\noindent\rule{\textwidth}{0.4pt}")
@@ -192,10 +205,9 @@ def md_to_tex(md):
             out.append(latex_inline(s))
     if table:
         out.append(_table_tex(table))
+    close_lists()
     if in_quote:
         out.append(r"\end{quote}")
-    if in_item:
-        out.append(r"\end{itemize}")
     return "\n\n".join(out) + "\n"
 
 

@@ -48,6 +48,13 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Model output is sanitized for control characters (a stray `\x02` from the large model broke the TeX compile); both the Council and the press strip them.
 
+
+## [2.9.5] - 2026-10-25
+### Changed
+- **The History is now nested bullets**: each cycle is a bullet with indented sub-bullets — Vote tally, Night action (sealed actions, the Detective's findings, the Family council), Departures — closing with the computed Conclusion. The press renders arbitrary list nesting (fixed a lonely-\item bug: blank lines inside lists no longer close them).
+- **Verdict headers carry the merit**: each verdict opens with '**<Name> (<seat>) — <role> — <merit>/10**' (e.g. '**Yoda (03) — Mafia — 8/10**'), the merit also stated in prose below.
+- Final document hygiene: control characters stripped after every transformation (the abstract insertion could carry them in), and known section headings auto-repaired if a model glitch swallows their marker.
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.
