@@ -509,6 +509,35 @@ def check_win_conditions():
     return False
 
 
+def write_truth_archive(state, registry):
+    """The post-match truth file (gameplay/village/match-XX-truth.md):
+    the role registry and every sealed night action, decrypted — the
+    authoritative record for the Elder Council, written before the next
+    deal overwrites gm/roles.enc."""
+    priv = get_gm_private_key()
+    lines = ["# Truth Archive\n",
+             f"**Match {state['match']}** — the full record, secrecy lifted.\n",
+             "\n## Roles\n",
+             "| Seat | Role |", "|---|---|"]
+    for seat in sorted(registry):
+        lines.append(f"| {display_name(seat)} | {registry.get(seat, 'Unknown')} |")
+    lines.append("\n## Night actions (sealed at the time, open now)\n")
+    for fn in sorted(os.listdir("gameplay/night")):
+        if not fn.endswith(".enc"):
+            continue
+        try:
+            with open(f"gameplay/night/{fn}") as f:
+                a = decrypt_payload(priv, f.read().strip())
+        except Exception as e:
+            lines.append(f"- {fn}: unreadable ({e})")
+            continue
+        lines.append(f"- cycle {a.get('cycle')}: {display_name(a.get('seat'))} "
+                     f"({a.get('role')}) targeted {display_name(a.get('target'))}")
+    with open(f"gameplay/village/match-{state['match']:02d}-truth.md", "w") as f:
+        f.write("\n".join(lines) + "\n")
+    log(f"truth archive written for match {state['match']}")
+
+
 def end_match():
     state = read_state()
     registry = load_role_registry(get_gm_private_key())
@@ -521,6 +550,11 @@ def end_match():
             stable = "North" if int(seat.split("-")[1]) <= 5 else "South"
             f.write(f"| {display_name(seat)} | {seats[seat]['persona']} | "
                     f"{registry.get(seat, 'Unknown')} | {stable} |\n")
+
+    # The truth archive: secrecy is over. Preserve the authoritative record
+    # before the next deal overwrites gm/roles.enc — the Elder Council
+    # judges from this, not from prose paraphrase.
+    write_truth_archive(state, registry)
 
     state["match"] += 1
     state["cycle"] = 0

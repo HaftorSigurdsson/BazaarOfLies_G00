@@ -11,6 +11,8 @@ This guide covers the **operational tooling** around the arena: the Herald newsp
 | **The Herald** | `src/town-herald.py` | Facts-only newspaper bot; prints morning/evening editions to `gameplay/herald/`. |
 | **The Press** | `src/town-press.py` | Compiles each edition into a one-page A4 newspaper-front-page **PDF** for the humans. |
 | **GM heartbeat** | `src/town-clock.py` | Locally dispatches the GM workflow on an interval and prints live status. |
+| **Elder Council** | `src/elder-council.py` | Post-match historian-judge: compiles the full record (statements, ballots, graveyard, recap, truth archive, decrypted night actions and Detective results, the Family council) and writes a court-style judgment with per-seat verdicts and awards (`--dry-run` compiles evidence only). |
+| **Elder press** | `src/elder-press.py` | Renders a judgment to a multi-page court-document PDF (tectonic). |
 | **Arena reset** | `src/town-reset.py` | One-command full arena reset in Python (artifacts + boards + state template + journals + `.gitkeep` repairs). |
 | **Seat keypairs** | `src/town-setup.py` | Generates per-seat encryption keypairs and populates `setup/seats.json`. |
 | **Signing keys** | `setup/make_signing_keys.py` | One-time generation of per-seat Ed25519 signing keys. |

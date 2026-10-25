@@ -1,8 +1,10 @@
 # FUTURE.md — the Elder Council
 
-*Status: designed 2026-10-25, not yet built. This is the plan we agreed to
-resume. The live arena (match in progress) is untouched by everything in
-this file — the Council runs strictly after a match has been won.*
+*Status: BUILT 2026-10-25 — Phases 0–4 complete and trialed on match 1
+(`src/elder-council.py` + `src/elder-press.py`; judgment at
+`gameplay/village/match-01-judgment.{md,pdf}`). Phase 5 (the trilogy
+scores ledger and final ranking) remains future work, as does The Early
+Bell below.*
 
 ---
 
