@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 1,
+  "epoch": "165f13bd",
+  "seat": "seat-07",
+  "target": "seat-10",
+  "rationale": "Sherlock (10), your lantern swings close to Elsa (7) while the bazaar’s tongs grow cold—you measured every shadow but never the hand that cast it.",
+  "ts": "2026-10-25T12:45:26Z"
+ },
+ "sig": "Mmt5hlR9vwTUfrdeN5XUf93qghHdPSWl2btu3UFZu5ljCf2Q+zOWhyIutr7KQTpdKT1JvmOE3McQO8EwiPQTCw=="
+}
