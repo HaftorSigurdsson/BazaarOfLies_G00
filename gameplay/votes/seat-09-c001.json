@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "30fdc33a",
+  "seat": "seat-09",
+  "target": "seat-09",
+  "rationale": "One merchant dodged nine plain demands for the clause he invoked, then voted for another whose test failed her own forecast.",
+  "ts": "2026-10-25T22:50:15Z"
+ },
+ "sig": "2wd1WlqN6r4vKWcJayrTQ6fG0aHhOD0lsa59e39l3SwnNpARqp7odzVdqaG6UPtulWOR8LQ7TUZWsQYToXguCA=="
+}
