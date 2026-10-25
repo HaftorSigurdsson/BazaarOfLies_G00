@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "30fdc33a",
+  "seat": "seat-02",
+  "target": "seat-01",
+  "rationale": "The graveyard names Elsa and Batman as Villagers by plain text; arithmetic cannot amend that record.",
+  "ts": "2026-10-25T23:40:29Z"
+ },
+ "sig": "Ef80yiTbQBSWAuSat7DG6Uh9xOHNWMNfsllyzvimx0g2XYBaxwHsbR69OEEtqj9m9aQY+PnADJyHwOVw7R+RAQ=="
+}
