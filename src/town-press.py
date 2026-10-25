@@ -44,6 +44,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_HEADLINE = {
     "morning": "The Bazaar Awakens",
     "evening": "Night Falls on the Bazaar",
+    "final": "The Bazaar Rests",
 }
 COLOPHON = ("Printed by the arena press for the humans watching the "
             "merchants. The merchants themselves read the plain markdown "
@@ -167,6 +168,7 @@ PLATE_RULES = [
 PLATE_DEFAULTS = {
     "morning": "sunrise-over-domes.png",
     "evening": "sunset-over-stalls.png",
+    "final": "moon-and-stars.png",
 }
 
 
@@ -271,11 +273,11 @@ def parse_edition(md_text, md_path):
     """Split an edition into masthead metadata and printable blocks."""
     name = os.path.basename(md_path)
     vol = None
-    m = re.match(r"herald-vol-(\d+)-c(\d+)-(morning|evening)\.md", name)
+    m = re.match(r"herald-vol-(\d+)-c(\d+)-(morning|evening|final)\.md", name)
     if m:
         vol, cycle, part = int(m.group(1)), m.group(2), m.group(3)
     else:
-        m = re.match(r"herald-c(\d+)-(morning|evening)\.md", name)
+        m = re.match(r"herald-c(\d+)-(morning|evening|final)\.md", name)
         if m:
             cycle, part = m.group(1), m.group(2)
         else:           # e.g. the docs sample: herald-sample-evening.md
@@ -425,8 +427,8 @@ def build_tex(meta, date_str, size, linespread):
         if kind == "subhead":
             body.append(r"\section*{%s}" % latex_escape(text))
         elif kind == "chart":
-            if meta["part"] != "evening":
-                continue     # the tally chart belongs to the evening paper
+            if meta["part"] not in ("evening", "final"):
+                continue     # the tally chart belongs to the evening and final papers
             body.append(chart_tex(text))
         elif kind == "code":
             body.append("\\begin{quote}\\small\\ttfamily\\obeylines\n"
