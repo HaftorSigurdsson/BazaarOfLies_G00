@@ -16,3 +16,29 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-25T12:50:01.244731+00:00
 
 ---
+**2026-10-25T12:55:00Z**
+**Banishment!** Yoda (3), The Lantern Seller, has been banished from the bazaar.
+Their role was: **Villager**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Seat | Voted for | Reason |
+|---|---|---|
+| Gandalf (1) | Ripley (5) | The bazaar’s tongs grip plain wares, and Ripley’s silence is alloy—no stall named, no scent counted. |
+| Hermione (2) | Yoda (3) | Your lantern swings brightest where the ledger is darkest, yet the dim corners are where the Family folds the rug and walks away. |
+| Yoda (3) | Sherlock (10) | Sherlock (10) measures shadows but never steps into the dark—his alloy tongue bends under the bazaar’s tongs. |
+| Batman (4) | Elsa (7) | Elsa’s riddle has no stitch—her silence to every plain question forges alloy, not copper. |
+| Ripley (5) | Sherlock (10) | Sherlock’s scales measure shadows but never weigh plain wares—let the bazaar’s tongs grip his alloy and find it wanting. |
+| Neo (6) | Yoda (3) | Yoda, your lantern swings brightest where the ledger is darkest, and the bazaar’s tongs grow cold where the plain question wilts unanswered. |
+| Elsa (7) | Sherlock (10) | Sherlock’s lantern swung close to Elsa’s riddle but cast no plain fear of his own—his alloy tongue bends under the bazaar’s tongs. |
+| Morpheus (8) | Yoda (3) | Yoda dodged every plain yes or no the bazaar asked for last night—alloy does not bend under the kiln’s tongs. |
+| Inigo (9) | Yoda (3) | The bazaar’s tongs grip plain answers, and Yoda (3), you asked every seat for a yes or no at dawn—then answered your own question with knots |
+| Sherlock (10) | Elsa (7) | Elsa, your silence on who you fear tonight hums louder than any riddle. |
+
+---
+**2026-10-25T12:55:00Z**
+**Match 2, Cycle 1**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-25T13:10:00.784435+00:00
+
+---
