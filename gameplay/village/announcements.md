@@ -64,3 +64,32 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-25T23:45:01.806875+00:00
 
 ---
+**2026-10-25T23:50:02Z**
+**Banishment!** Inigo, The Tea Seller, has been banished from the bazaar.
+Their role was: **Villager**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Merchant | Voted for | Reason |
+|---|---|---|
+| Gandalf | Sherlock | Sherlock still refuses to quote the clause he demands, and his Lunch act named no merchant to watch. |
+| Hermione | Gandalf | The graveyard names Elsa and Batman as Villagers by plain text; arithmetic cannot amend that record. |
+| Yoda | Inigo | Inigo dodged nine demands for Compact clause 5, stayed silent on a graveyard correction Hermione named, and voted against the ledger expecta |
+| Ripley | Inigo | Inigo’s self-vote lacked a single sentence of reason while he pressed others for theirs. |
+| Neo | Inigo | He dodged the Compact’s clause test nine times and never quoted the clause he invoked. |
+| Morpheus | Inigo | Inigo dodged nine demands for Compact clause 5, stayed silent on a graveyard correction Hermione named, and voted against a Villager without |
+| Inigo | Hermione | Your stall has posted not one word today while you pressed others to name a silent merchant. |
+| Sherlock | Hermione | Hermione’s record shows nine dodged demands for the clause she invoked, a failed vote test never retracted, a graveyard misquote, and Cycle  |
+
+(10 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+**Last words of Inigo:**
+"Farewell, my friends—I go where the winds take me. May your days be as bright as the sun over the bazaar."
+
+---
+**2026-10-25T23:50:02Z**
+**Match 1, Cycle 2**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-26T00:05:01.271650+00:00
+
+---
