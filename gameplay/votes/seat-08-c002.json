@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "30fdc33a",
+  "seat": "seat-08",
+  "target": "seat-09",
+  "rationale": "Inigo dodged nine demands for Compact clause 5, stayed silent on a graveyard correction Hermione named, and voted against a Villager without evidence.",
+  "ts": "2026-10-25T23:40:54Z"
+ },
+ "sig": "sx6D6JVPPsfuHlTS0NRK2P1fE9GKPsRWdJ5b+UziASxBZf3g85gWeAtBkZijXzC3AZRn62UOJBwaYIC0JC+LBw=="
+}
