@@ -491,3 +491,54 @@ verbatim transcript that every bot re-reads before every statement.
 Herald's volumes, the 45-minute round, the Dinner lean, the watch-staged
 council, the Bazaar Compact, claim-meta, and the cron-driven GM with
 `BAZAAR_MATCH_LIMIT`. See CHANGELOG for the full history.*
+
+## 12. Retire the anonymous statements cycle — the cover nobody used (proposed, not built)
+
+Match 1, cycle 2 was the first anonymous cycle under the new reading
+pipeline, and it failed its one job while costing the village accuracy.
+
+### The evidence
+
+- **The cover was never used.** The mechanic's purpose is plausible
+  deniability for role claims — and not one claim, honest or fake, was
+  made under it. The claims-legalized rules (v2.14–v2.18 doctrines) have
+  yet to produce a single reveal anywhere.
+- **Anonymity is a lie at the repo level anyway**: the per-seat
+  filenames (`c002-seat-01.jsonl`) and the commit messages ("Statement
+  c002/5 by seat-01") attribute every "anonymous" statement to its
+  seat. In-game the merchants cannot see this (records carry
+  `seat: null, name: null`), but the archive — and the Elder Council's
+  post-match judgment — sees straight through it.
+- **Misattribution chaos**: the merchants spent the day inventing
+  attributions for statements they cannot know the author of
+  ("Gandalf, your ledger today starts with a correction..." — Gandalf
+  wrote no such thing). A quote-culture village depends on knowing who
+  said what; anonymous texts turn every attribution into a
+  confabulation, and the false ones risk being recorded as notebook
+  memories.
+- The dawn-chorus effect (identical openers from several seats) is
+  amplified when nobody can see who is speaking.
+
+### The options
+
+- **A. Remove it** (recommended): the GM stops drawing `anonymous_cycle`;
+  every day is signed. The manifest paragraph retires; the Herald keeps
+  its "Anonymous Merchant" label only to parse legacy data. If a claim
+  culture ever needs cover, reintroduce on evidence, not on speculation.
+- **B. Fix the leaks, keep the mechanic**: per-epoch pseudonym filenames
+  (`c002-anon-3f7a.jsonl`, the salt vaulted) and scrubbed commit
+  messages. Repairs the promise — but does not touch the misattribution
+  chaos, which is the real cost.
+- **C. Replace with a different variety lever**: re-deal trades from a
+  pool each match (the "20 merchants" design) — variety without
+  sacrificing attribution.
+
+### Implementation sketch (A)
+
+1. `gm/run.py`: stop writing `anonymous_cycle` to state (or gate behind
+   `BAZAAR_ANON_CYCLE=1` for exotic tests).
+2. `src/villager.py`: `is_anonymous` follows the state parameter — a
+   missing key already means "signed"; keep the anonymous write path for
+   reading legacy matches.
+3. Manifest: remove the anonymous statements paragraph.
+4. Docs (`operations.md`, `bot_guide`): strike the feature bullets.
