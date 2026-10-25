@@ -167,3 +167,14 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-25T01:30:01.365129+00:00
 
 ---
+**2026-10-25T01:35:01Z**
+**Stall shuttered!** Neo (6), The Perfumer, shuttered their stall and left the bazaar overnight. Their role was: **Villager**.
+
+---
+**2026-10-25T01:35:01Z**
+**Match 1, Cycle 5**
+The bazaar awakens!
+**Seats alive:** Gandalf (1), Yoda (3), Batman (4)
+**Discussion ends at:** 2026-10-25T02:00:01.819712+00:00
+
+---
