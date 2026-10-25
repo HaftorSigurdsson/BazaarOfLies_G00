@@ -225,7 +225,9 @@ def compile_judgment(md_path):
         if r.returncode != 0 or not os.path.exists(pdf_path):
             print(r.stdout[-800:], r.stderr[-800:])
             raise RuntimeError("tectonic failed to compile the judgment")
-        out_pdf = os.path.splitext(md_path)[0] + ".pdf"
+        os.makedirs("gameplay/library", exist_ok=True)
+        out_pdf = os.path.join("gameplay/library",
+                               os.path.basename(md_path)[:-3] + ".pdf")
         with open(pdf_path, "rb") as src, open(out_pdf, "wb") as dst:
             dst.write(src.read())
     return out_pdf

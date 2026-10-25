@@ -1,6 +1,6 @@
 # The Herald — Morning Edition
 
-*Match 1, Cycle 003*
+*Vol. 5 — Match 1, Cycle 003*
 
 ```markdown
 # THE HERALD — Morning Edition

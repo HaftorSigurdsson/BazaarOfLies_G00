@@ -6,7 +6,7 @@ the front page of an old newspaper, for the humans watching the arena.
 The merchants themselves read the plain markdown — the PDF is pleasure,
 not game input.
 
-    uv run src/town-press.py gameplay/herald/herald-c001-morning.md
+    uv run src/town-press.py gameplay/herald/herald-vol-01-c001-morning.md
 
 The Herald calls compile_edition() automatically after printing an
 edition, so every gameplay/herald/herald-cXXX-{morning,evening}.md gets a
@@ -270,16 +270,21 @@ def sanitize(text):
 def parse_edition(md_text, md_path):
     """Split an edition into masthead metadata and printable blocks."""
     name = os.path.basename(md_path)
-    m = re.match(r"herald-c(\d+)-(morning|evening)\.md", name)
+    vol = None
+    m = re.match(r"herald-vol-(\d+)-c(\d+)-(morning|evening)\.md", name)
     if m:
-        cycle, part = m.group(1), m.group(2)
-    else:               # e.g. the docs sample: herald-sample-evening.md
-        part = "evening" if "evening" in name else "morning"
-        dm = re.search(r"Cycle\s+(\d+)", md_text)
-        cycle = dm.group(1) if dm else "000"
+        vol, cycle, part = int(m.group(1)), m.group(2), m.group(3)
+    else:
+        m = re.match(r"herald-c(\d+)-(morning|evening)\.md", name)
+        if m:
+            cycle, part = m.group(1), m.group(2)
+        else:           # e.g. the docs sample: herald-sample-evening.md
+            part = "evening" if "evening" in name else "morning"
+            dm = re.search(r"Cycle\s+(\d+)", md_text)
+            cycle = dm.group(1) if dm else "000"
 
-    match_no = 1
-    mm = re.search(r"\*Match\s+(\d+)", md_text)
+    match_no = "1"
+    mm = re.search(r"Match\s+(\d+)", md_text)
     if mm:
         match_no = mm.group(1)
 
@@ -344,6 +349,7 @@ def parse_edition(md_text, md_path):
             continue
         body_line(s)
     return {
+        "vol": vol or int(match_no),
         "match": match_no,
         "cycle": cycle,
         "part": part,
@@ -511,7 +517,7 @@ def build_tex(meta, date_str, size, linespread):
 \begin{{center}}
 {{\fontsize{{33}}{{37}}\selectfont\bfseries THE BAZAAR HERALD\par}}
 \doubleRule
-{{\small\itshape Vol. {match} --- No. {cycle} \quad|\quad {edition} Edition
+{{\small\itshape Vol. {vol} --- No. {cycle} \quad|\quad {edition} Edition
   \quad|\quad {date} \quad|\quad Price: one spiced date\par}}
 \vspace{{1pt}}
 {{\footnotesize\itshape {motto}\par}}
@@ -538,7 +544,9 @@ def build_tex(meta, date_str, size, linespread):
 \end{{center}}
 \end{{document}}
 """.format(size=size, linespread=linespread,
-           match=latex_escape(meta["match"]), cycle=latex_escape(meta["cycle"]),
+           match=latex_escape(meta["match"]),
+           cycle=latex_escape(str(int(meta["cycle"]))),
+           vol=latex_escape(str(meta["vol"])),
            edition=latex_escape(meta["part"].capitalize()),
            date=latex_escape(date_str),
            headline=latex_escape(meta["headline"]),
@@ -658,7 +666,7 @@ def render_fpdf(meta, date_str, size):
     pdf.set_y(pdf.get_y() + 2.0)
 
     pdf.set_font("Times", "I", 9.5)
-    dateline = (f"Vol. {meta['match']} \u2014 No. {meta['cycle']}"
+    dateline = (f"Vol. {meta['vol']} \u2014 No. {int(meta['cycle'])}"
                 f"   |   {meta['part'].capitalize()} Edition"
                 f"   |   {date_str}   |   Price: one spiced date")
     pdf.cell(0, 5, fpdf_sanitize(dateline), align="C")
@@ -808,7 +816,9 @@ def compile_edition(md_path, out_path=None, quiet=False):
     with open(md_path) as f:
         meta = parse_edition(f.read(), md_path)
     date_str = datetime.now(timezone.utc).strftime("%d %B %Y")
-    out_path = out_path or os.path.splitext(md_path)[0] + ".pdf"
+    os.makedirs("gameplay/library", exist_ok=True)
+    out_path = out_path or os.path.join(
+        "gameplay/library", os.path.basename(md_path)[:-3] + ".pdf")
 
     engine = find_engine()
     if engine:

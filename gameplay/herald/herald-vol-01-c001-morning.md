@@ -1,6 +1,6 @@
 # The Herald — Morning Edition
 
-*Match 1, Cycle 001*
+*Vol. 1 — Match 1, Cycle 001*
 
 ```markdown
 # BAZAAR AWAKENS—10 SEATS ALIVE, TWO SPEAK AT DAWN

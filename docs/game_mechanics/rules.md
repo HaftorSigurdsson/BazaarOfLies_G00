@@ -111,7 +111,8 @@ bazaar-of-lies/
 │   │   ├── announcements.md         # GM proclamations + published vote tables
 │   │   ├── graveyard.md             # Departed merchants, revealed roles, scores
 │   │   └── match-00-recap.md        # End-of-match full reveal
-│   ├── herald/                      # The Herald's editions (herald-cXXX-{morning,evening}.md + pressed .pdf)
+│   ├── herald/                      # The Herald's editions (herald-vol<VV>-cXXX-{morning,evening}.md)
+│   ├── library/                    # The human archive: every pressed PDF (editions + judgments)
 │   ├── deals/                       # Encrypted role dossiers (one per seat)
 │   ├── dossiers/                    # Encrypted GM→bot private traffic (e.g., Detective results)
 │   ├── votes/                       # Public signed ballots (Ed25519, epoch-scoped)
@@ -130,7 +131,7 @@ bazaar-of-lies/
 | `gameplay/deals/{seat}.enc` | Encrypted role dossier (GM → bot). |
 | `gameplay/votes/{seat}-{cycle}.json` | Public signed ballots (plaintext payload + Ed25519 signature, epoch-scoped). |
 | `gameplay/night/{seat}-{cycle}.enc` | Sealed night actions (shutter, investigate, protect). |
-| `gameplay/herald/herald-cXXX-*.md` | The Herald's morning/evening editions. |
+| `gameplay/herald/herald-vol<VV>-cXXX-*.md` | The Herald's morning/evening editions (the volume rises forever; PDFs in `gameplay/library/`). |
 
 ---
 

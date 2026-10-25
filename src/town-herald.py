@@ -21,7 +21,7 @@ Editions (one writer per file, journal-guarded against double printing):
   - morning edition — printed once when phase becomes 'discussion'
   - evening edition — printed once when phase becomes 'night'
 
-Output: gameplay/herald/herald-c<CCC>-morning.md and gameplay/herald/herald-c<CCC>-evening.md.
+Output: gameplay/herald/herald-vol<VV>-c<CCC>-{morning,evening}.md (the volume rises forever, kept in the vault); the PDF twins land in gameplay/library/ for the humans.
 
 Run from any clone of the arena repo with push access, in its own window:
 
@@ -65,6 +65,19 @@ args = parser.parse_args()
 # src/town-herald.py -> REPO_ROOT is the parent of src/ (the clone root).
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BAZAAR_DIR = os.path.join(os.path.dirname(REPO_ROOT), ".bazaar")
+VOL_FILE = os.path.join(BAZAAR_DIR, "herald-vol.txt")
+
+
+def next_volume():
+    """The Herald's volume rises forever — across matches and resets.
+    The counter lives in the vault, next to the journal."""
+    try:
+        vol = int(open(VOL_FILE).read().strip()) + 1
+    except (OSError, ValueError):
+        vol = 1
+    with open(VOL_FILE, "w") as f:
+        f.write(str(vol))
+    return vol
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, "herald-journal.json")
 
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
@@ -495,10 +508,12 @@ def previous_editions(state, part):
     for c, p in order:
         if c < 1:
             continue
-        path = f"gameplay/herald/herald-c{c:03d}-{p}.md"
         try:
-            text = open(path).read().strip()
-        except OSError:
+            import glob as globmod
+            paths = sorted(globmod.glob(
+                f"gameplay/herald/herald-vol-*-c{c:03d}-{p}.md"))
+            text = open(paths[-1]).read().strip()
+        except (OSError, IndexError):
             continue
         label = ("this cycle's morning paper" if (c, p) == (cycle, "morning")
                  else f"cycle {c:03d}'s {p} paper")
@@ -511,12 +526,15 @@ def print_edition(state, part, journal):
     epoch = state.get("epoch")
     herald_dir = "gameplay/herald"
     os.makedirs(herald_dir, exist_ok=True)
-    path = f"{herald_dir}/herald-c{cycle:03d}-{part}.md"
-    if os.path.exists(path):        # one writer per file, even if the journal is lost
+    existing = sorted(glob.glob(
+        f"{herald_dir}/herald-vol-*-c{cycle:03d}-{part}.md"))
+    if existing:                    # one writer per file, even if the journal is lost
         log(f"{part} edition for cycle {cycle:03d} already printed")
         mark_edition(journal, epoch, cycle, part)
         save_journal(journal)
         return
+    vol = next_volume()
+    path = f"{herald_dir}/herald-vol-{vol:02d}-c{cycle:03d}-{part}.md"
 
     digest = facts_digest(state, part)
     ann = announcements_since(journal)
@@ -550,7 +568,8 @@ def print_edition(state, part, journal):
 
     with open(path, "w") as f:
         f.write(f"# The Herald — {'Morning' if part == 'morning' else 'Evening'} Edition\n\n"
-                f"*Match {state['match']}, Cycle {cycle:03d}*\n\n{edition}\n")
+                f"*Vol. {vol} — Match {state['match']}, Cycle {cycle:03d}*\n\n"
+                f"{edition}\n")
 
     # Press the human copy: a one-page A4 newspaper front page (best-effort —
     # the markdown edition is what the merchants actually read).

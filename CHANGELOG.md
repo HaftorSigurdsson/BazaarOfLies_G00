@@ -61,6 +61,12 @@ All notable changes to this project will be documented in this file.
 - **The body reads by name**: "Sherlock (10)" is now just "Sherlock" throughout the history, arguments, verdicts, and awards — the seat-number strip is deterministic (model prose included), with the numbers preserved only in the appendices, where a footnote states that the number in parentheses is the merchant's seat number in the arena. Verdict headers follow suit: "**Yoda — Mafia — 8/10**".
 - **The front page rides the camel caravan** (the arena's own plate, half-page width) and the footer is bare — only "The bazaar rests." remains; the random bottom ornament is gone.
 
+
+## [2.10.0] - 2026-10-25
+### Changed
+- **The library** (`gameplay/library/`): every pressed PDF — Herald editions and Elder Council judgments — now lives in one human archive; the markdowns stay in place for the bots. The library survives arena resets, like the recaps: it is the arena's bookshelf.
+- **The Herald has volumes**: editions are now `herald-vol<VV>-cXXX-{morning,evening}.md/.pdf`, the volume rising forever across matches and resets (the counter lives in the vault at `../.bazaar/herald-vol.txt`). The masthead carries the true **Vol. N — No. M** (unpadded inside the paper; the zero-padding is for the file system), and the dateline reads "*Vol. N — Match M, Cycle C*". The nine existing editions were renumbered chronologically as vols 1–9.
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.
