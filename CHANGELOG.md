@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.18.0] - 2026-10-25
+### Added
+- **Role playstyles, sealed into the dealt dossier** (gm/run.py + villager prompts): two consecutive matches saw the village banish its own Detective on cycle 1 for public heat with no result behind it — the dealt guidance now teaches the difference between pressure and exposure (Detective: press by question, let dawn results accuse, weigh the claim moment; Doctor: silent protection, stay out of the heat; Mafia: never the loudest accuser; Villager: named suspects, dated quotes). Rendered into the discussion and vote prompts as private GM guidance. Takes effect at the next deal.
+- **Statement records carry the merchant's name** (`name` field beside `seat` in the per-cycle statement JSONL): the public transcript is human-readable without resolving seat IDs. Mirrors the seat's anonymity rule — `null` on the anonymous cycle, or the anonymity is gone.
+
 ## [2.17.0] - 2026-10-25
 ### Changed
 - **The Family's council opens with a debrief** (the first pro-Family lever after a run of pro-village fixes): watch 1 of the candlelight council is no longer a blind target proposal — it is a discussion of the day (who pressed hardest, whose prediction came true, who is closest to finding the Family, whom to fear tomorrow), grounded in a council prompt that now finally **carries the day's transcript (on the diet) and the notebook** — previously the Mafiosi proposed shutters without the day's record in front of them at all. Watch 2 declares from the debrief; watch 3 converges on the majority as before. The Family stops being three solo pickers plus a tally and becomes the coordination team its information advantage implies. The sealed channel, the uniform per-watch cadence, and the GM-minted decoy chorus are unchanged — the night tree still reveals nothing.

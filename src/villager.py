@@ -1076,7 +1076,12 @@ def do_discussion(state, cs, journal):
     os.makedirs(sdir, exist_ok=True)
     path = f"{sdir}/c{state['cycle']:03d}-{MY_SEAT}.jsonl"
     rec = {
-        "match": state["match"], "cycle": state["cycle"], "seat": (None if is_anonymous else MY_SEAT),
+        "match": state["match"], "cycle": state["cycle"],
+        "seat": (None if is_anonymous else MY_SEAT),
+        # The merchant's public name label, for human readability of the
+        # record — mirrors the seat's anonymity rule: unsigned on the
+        # anonymous cycle, or the anonymity is gone.
+        "name": (None if is_anonymous else display_name(MY_SEAT)),
         "seq": cs["statements"] + 1, "text": statement,
         "epoch": state.get("epoch"),
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
