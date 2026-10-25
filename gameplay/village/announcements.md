@@ -102,3 +102,28 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-25T00:10:00.941862+00:00
 
 ---
+**2026-10-25T00:15:01Z**
+**Banishment!** Sherlock (10), The Bird Merchant, has been banished from the bazaar.
+Their role was: **Mafia**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Seat | Voted for | Reason |
+|---|---|---|
+| Gandalf (1) | Sherlock (10) | Sherlock’s mirrors catch light but cast no shadow of a signed tally, and the bazaar’s scales demand copper, not echoes. |
+| Hermione (2) | Sherlock (10) | The merchant who trades in mirrors instead of copper leaves the bazaar with the scales unbalanced. |
+| Yoda (3) | Sherlock (10) | Sherlock’s mirrors catch no ink on yesterday’s tally, and absence does not vote. |
+| Batman (4) | Sherlock (10) | Sherlock’s stall now reflects only absence where the ledger demands copper—twelve dodges of plain yes/no and no receipt to show. |
+| Neo (6) | Sherlock (10) | The bazaar’s scales demand copper where your mirrors catch only smoke. |
+| Inigo (9) | Sherlock (10) | Sherlock’s mirrors catch light but cast no shadow of a signed tally, and the bazaar’s scales demand copper, not echoes. |
+| Sherlock (10) | Gandalf (1) | Your blank ledger stinks of absence where the quill should scratch, and absence does not vote. |
+
+(19 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+---
+**2026-10-25T00:15:01Z**
+**Match 1, Cycle 3**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-25T00:30:01.725097+00:00
+
+---
