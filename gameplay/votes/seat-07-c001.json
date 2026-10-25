@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 1,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-07",
+  "target": "seat-10",
+  "rationale": "Your own dates measured sweetness twice and still named no merchant or quoted a Family trick.",
+  "ts": "2026-10-25T18:45:14Z"
+ },
+ "sig": "uBPonCB8iyCxscURBQr1GKp0ZL5vG+grh3+6oN7ziTVWM+818e9CKC1Cm9Fq0wL7Ta6ZJ3FsEw3IVpfhtKF3AA=="
+}
