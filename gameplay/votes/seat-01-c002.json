@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "30fdc33a",
+  "seat": "seat-01",
+  "target": "seat-10",
+  "rationale": "Sherlock still refuses to quote the clause he demands, and his Lunch act named no merchant to watch.",
+  "ts": "2026-10-25T23:40:12Z"
+ },
+ "sig": "BBQLspZf7DZvwuWKvvkAlDPRYnwc2IOyclWAnaPzywRCR9nsAiqd8SuRAy+LqZrQpr0ZRb+cUUWbSdTrVTMfAA=="
+}
