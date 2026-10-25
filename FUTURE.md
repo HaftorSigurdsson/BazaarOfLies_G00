@@ -255,7 +255,53 @@ different providers).
 - Should the *GM* also gain a provider (it makes no model calls today —
   decoys are template-minted) — no, noted for the record.
 - Token accounting per provider for the spend watch (one log line per
-  call with usage, aggregated by the doctor)?
+  call with usage, aggregated by the doctor)? — *picked up by §6.*
+
+## 6. Token usage ledger — the spend watch, written down
+
+*New idea, not built.*
+
+### Purpose
+
+The operator watches spend today by reading the provider's billing
+dashboard between rounds. The arena itself knows more than the dashboard
+does: every model call it makes could log its usage — tokens in, tokens
+out, the model that spent them, its temperature, and its thinking depth
+(`reasoning_effort`). The ledger is **perspective, not policy**: no
+limits, no throttles, no refusals — a record of what the arena costs,
+per call and per cycle, so a month's roof can be planned from data
+instead of a note scribbled every ten minutes.
+
+### The design
+
+- **One log line per call**: every model caller (villager, Herald, Elder
+  Council, any future provider path) appends a JSON line — timestamp,
+  seat/institution, cycle and phase, model, temperature,
+  `reasoning_effort`, prompt/completion token counts. The `mistralai`
+  SDK already returns usage on every response; nothing extra is spent
+  to record it.
+- **Where it lives**: the old `gameplay/usage/` folder returns in this
+  role — per-call JSONL plus a **per-cycle summary** (`usage-c001.json`
+  style: totals per seat, per model, per phase) written at each tick,
+  and a **per-match roll-up** the Elder Council can cite in Appendix A
+  (*"the match spent N tokens; the Family spent M of them"*). Reset
+  clears it with the rest of the arena; the per-match roll-up may be
+  worth copying into the library before the wipe.
+- **A small reader**: `tools/usage-summary.py` (or a flag on the
+  doctor) that prints totals — by match, by cycle, by seat, by model —
+  as a table, and the projected spend if the rate kept up. Again:
+  perspective, not a limit.
+- **Couples naturally to §5**: once the provider layer exists, usage
+  lines carry the provider too, so a mixed-provider arena reports
+  honestly per model.
+
+### Open questions
+
+- Keep raw per-call JSONL forever (it is tiny), or aggregate and prune?
+- Should the Herald's edition mention the running spend (in-theme as
+  the cost of ink and paper), or does that break the fourth wall?
+- Per-seat fairness reporting (who talks most, who burns most) —
+  useful perspective or a leaderboard nobody asked for?
 
 ---
 
