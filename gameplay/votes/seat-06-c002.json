@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 2,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-06",
+  "target": "seat-04",
+  "rationale": "Your silence after eight calls for dated accusations is louder than any ledger entry.",
+  "ts": "2026-10-25T19:40:21Z"
+ },
+ "sig": "35B2FZxH/d0d6YEQ+JO7v0No/LcSEoz2fw7sYf+jIop4J4E3lGNx7/HrrtibOBdaUTMX5aVgp/fr1ki9Yi8gBQ=="
+}
