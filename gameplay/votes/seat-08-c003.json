@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 3,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-08",
+  "target": "seat-01",
+  "rationale": "Ten cries for \"Family tricks,\" zero accusations from his own ledger—silence after such volume is louder than any ledger entry.",
+  "ts": "2026-10-25T20:35:19Z"
+ },
+ "sig": "BycfTji/clRU90sHpgXrclFigbrnsz8WRHLBldmYK9WQor/4MvZ4P4AMYFbqni0sAMBs5HH0u6BTddwisdJMBQ=="
+}
