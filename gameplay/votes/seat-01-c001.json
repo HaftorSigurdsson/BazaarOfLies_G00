@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "30fdc33a",
+  "seat": "seat-01",
+  "target": "seat-04",
+  "rationale": "His forecast contradicts Compact clause 5—he cited it yet still claims the Detective \"acts tonight,\" and dodged nine demands for the clause he invoked.",
+  "ts": "2026-10-25T22:50:34Z"
+ },
+ "sig": "EW/mCjcAzatTAlD5ic4livXxjDmuB9aYDKMFpqO7y1AIwLu1rO7SSElQi+ZYwf4vGelwGLkDt4upCXGRBL7IDA=="
+}
