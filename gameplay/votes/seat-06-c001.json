@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 1,
+  "epoch": "165f13bd",
+  "seat": "seat-06",
+  "target": "seat-03",
+  "rationale": "Yoda (3), your lantern swings brightest where the ledger is darkest, and the bazaar’s tongs grow cold where the plain question goes unanswered.",
+  "ts": "2026-10-25T12:45:25Z"
+ },
+ "sig": "XPyNv7qpGdZb65e96DdNkHp0F/huxuvlecHu965OFyajUFcOxFOI02Hm/oaaMXrBKPYnBEHTXBFWKVWJuHFoDA=="
+}
