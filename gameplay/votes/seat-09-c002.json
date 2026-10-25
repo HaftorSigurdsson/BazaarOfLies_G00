@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "30fdc33a",
+  "seat": "seat-09",
+  "target": "seat-02",
+  "rationale": "Your stall has not posted today despite your roster claim, and the village remembers who counts.",
+  "ts": "2026-10-25T23:40:12Z"
+ },
+ "sig": "jlby56M1CFDQevg6T0k1pnyBy2aJUzno6YB6D99ZhNxZO2WDiJunteP5qS9TH2r9wflOEDY1V8ZMQbLDeQk5CA=="
+}
