@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "482a98bf",
+  "seat": "seat-07",
+  "target": "seat-08",
+  "rationale": "A claimed Detective role that never walked its watch is a role that never served the bazaar.",
+  "ts": "2026-10-25T22:00:19Z"
+ },
+ "sig": "koVZ28HhvwcwVDCwfBuXrUxsTE5AJR10xYRr7QpEz+SU9NxnzEj/FHD5TEo0pSjLLBmYtK2tcUo2jA9nK0ehAw=="
+}
