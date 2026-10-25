@@ -321,8 +321,11 @@ def build_timeline(graveyard, ballots, night_actions, detective_results,
     for m in family_msgs:
         council.setdefault(m.get("cycle"), []).append(m)
     for cyc, msgs in council.items():
+        # talk-kind council messages carry no target; declare-kind may be
+        # targetless too — Nones cannot sort against seat strings.
         declared = sorted(set(m.get("target") for m in msgs
-                               if m.get("kind") == "declare"))
+                              if m.get("kind") == "declare"
+                              and m.get("target")))
         nights.setdefault(cyc, []).append(
             "night action: the Family's council talked "
             f"({len(msgs)} messages)"
