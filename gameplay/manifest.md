@@ -46,7 +46,12 @@ The day runs **25 minutes** of talk, then **5 minutes** of voting:
   - **Morning — weigh the night**: speak first to the night's public
     facts — departures, the plague's hand, the graveyard, the roster —
     or ask a named merchant about them. If nothing changed, say so
-    plainly and move on.
+    plainly and move on. **On the match's first cycle there is no night
+    to weigh**: the bazaar begins at dawn, and the Doctor's and
+    Detective's first acts come only after tonight's vote. Weigh the
+    roster and the deal, never a night that has not happened — and
+    never treat cycle 1's quiet morning as evidence about the power
+    roles.
   - **Morning tea — the question**: put one plain question to one named
     merchant, about their words, votes, or record.
   - **Lunch — the test**: state one prediction the village can check, of

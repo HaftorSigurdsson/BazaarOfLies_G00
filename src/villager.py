@@ -1038,6 +1038,12 @@ def do_discussion(state, cs, journal):
         phase="discussion",
     )
     statement = trim_statement(statement)
+    if statement and not statement.strip().upper().startswith("NO STATEMENT"):
+        # some models write a full statement and then append the silence
+        # token as a sign-off ("... nothing changed. NO STATEMENT") — strip
+        # the tail so the control token never enters the public record
+        statement = re.sub(r"\s*NO\s+STATEMENT\s*$", "", statement.strip(),
+                           flags=re.IGNORECASE).strip()
 
     # Silence is an answer: nothing new to say is a legitimate, even wise,
     # move — the bot keeps its budget and its peace. The dinner lean is the
