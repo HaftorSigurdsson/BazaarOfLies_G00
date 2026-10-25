@@ -515,17 +515,39 @@ def tally_chart():
     return "\n".join(lines)
 
 
+EDITOR_SYSTEM = (
+    "You are the editor of The Herald, the bazaar's facts-only newspaper, "
+    "writing your signed editorial note — the one column of the paper that "
+    "is allowed an opinion. Voice: dry, economical wit, 19th-century town "
+    "paper; never purple, never sentimental. Write ONLY the note: 2–3 "
+    "sentences on the bazaar's mood, drawn strictly from the public facts "
+    "given. Never speculate about the role or allegiance of any living "
+    "merchant, never invent events, and never write headlines, sections, "
+    "or any other part of the paper."
+)
+
+
 def generate_editors_note(state: dict, part: str) -> str:
-    """Generate the Herald's editorial note (model-written, labeled as opinion)."""
-    prompt = (
-        f"The bazaar is in cycle {state['cycle']}, {part} phase. "
-        f"Public facts:\n{facts_digest(state, part)}\n\n"
-        "Write a 2-3 sentence editorial note summarizing the bazaar's mood this cycle. "
-        "Use the Herald's voice: witty, slightly cynical, and thematic. "
-        "Do not reveal private information. Do not speculate about roles. "
-        "Label it clearly as the **Editor's Note**."
-    )
-    note = ask(prompt)
+    """The Editor's Note: the paper's own view of the mood — 2–3 sentences,
+    clearly labelled opinion. The prompt carries a COMPACT facts brief, not
+    the full digest: a full digest invites a full second edition."""
+    alive = ", ".join(display_name(s) for s in sorted(state["alive"]))
+    brief = [f"Cycle {state['cycle']}, {part} edition. Living merchants: {alive}."]
+    roll = graveyard_roll()
+    if roll:
+        brief.append("Departed: " + "; ".join(roll[-3:]) + ".")
+    tallies = vote_history()
+    if part == "evening" and tallies:
+        brief.append("Latest tally: " + tallies[0])
+    prompt = ("\n".join(brief) + "\n\nWrite the Editor's Note (2–3 sentences "
+              "only), on the mood of the bazaar.")
+    try:
+        note = ask(prompt, system=EDITOR_SYSTEM, temperature=0.5)
+    except Exception as e:
+        log(f"editor's note skipped: {type(e).__name__}: {e}")
+        return ""
+    if not note:
+        return ""
     return f"## Editor's Note\n\n{note}\n"
 
 
@@ -632,16 +654,17 @@ def facts_digest(state, part):
 
 
 # ------------------------------------------------------------ model call ---
-def ask(prompt: str) -> str:
-    """Ask the model a question and return its response."""
+def ask(prompt: str, system: str = HERALD_SYSTEM, temperature: float = 0.4) -> str:
+    """Ask the model a question and return its response (the system prompt
+    defaults to the paper's edition voice; the Editor's Note overrides it)."""
     try:
         response = client.chat.complete(
             model=MODEL,
             messages=[
-                {"role": "system", "content": HERALD_SYSTEM},
+                {"role": "system", "content": system},
                 {"role": "user", "content": prompt},
             ],
-            temperature=0.4,
+            temperature=temperature,
         )
         return (response.choices[0].message.content or "").strip()
     except Exception as e:
@@ -725,7 +748,15 @@ def print_edition(state, part, journal):
     if chart and part == "evening":
         edition += "\n\n## The Tally\n\n```text\n" + chart + "\n```\n"
 
-    # Add Editor's Note and By the Numbers to the edition
+    # The Historian's Chronicle, machine-appended: the quill's summary is
+    # public record, so the paper prints it verbatim (H1 stripped) rather
+    # than trusting the model not to drop it.
+    chron = read_historian_summary(state["cycle"])
+    if chron and part == "evening":
+        body = chron.split("\n\n", 1)[1].strip() if "\n\n" in chron else chron.strip()
+        edition += "\n\n## The Historian's Chronicle\n\n" + body + "\n"
+
+    # The Editor's Note closes the paper: the one opinion column, labelled.
     edition += "\n\n---\n\n" + generate_editors_note(state, part)
     
     with open(path, "w") as f:
