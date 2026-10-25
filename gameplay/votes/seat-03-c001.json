@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 1,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-03",
+  "target": "seat-10",
+  "rationale": "Because you measured sweetness twice yet never named a merchant or quoted a Family trick, while demanding others act.",
+  "ts": "2026-10-25T18:45:18Z"
+ },
+ "sig": "5SkL/8//BLzaFSLi7U8WJU8JP2JaA3YipsfI0YZRNroHdsPBA73UHmLOg3CBdwouGlhf+9uEZJy2z4niXIbDBw=="
+}
