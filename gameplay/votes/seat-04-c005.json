@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 5,
+  "epoch": "bb6846e0",
+  "seat": "seat-04",
+  "target": "seat-01",
+  "rationale": "Gandalf (1) shuttered Neo (6) on absence waved as proof. The bazaar trades in ink, not fog.",
+  "ts": "2026-10-25T02:05:26Z"
+ },
+ "sig": "GzClNJeCZpOeRn6/EmrbR+gA0MzWsFmoI+ipcjevjw0YaEyi5UZWaHIuYUC/lPvQd6WOExee1srw+JfUBoysAw=="
+}
