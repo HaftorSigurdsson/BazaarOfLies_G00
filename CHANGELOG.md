@@ -39,6 +39,15 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **Judgment typography**: the front page's seal now stands alone beneath the ruled line, above the case name (paragraph breaks between the title-page elements — LaTeX was joining them into one line). Every body page carries a running header with the full heading (small italics over a rule) and a centered page number in the footer; the title page stays clean and unnumbered.
 
+
+## [2.9.4] - 2026-10-25
+### Changed
+- **The judgment's History now narrates the nights**: each cycle bullet carries the vote tally, the departures, *and the night's secret doings* — sealed night actions with roles and targets, the Detective's investigation findings, and the Family council's deliberation count and declarations. The final bullet is the computed **Conclusion** (the winner and the standing — machine-derived, not model-invented).
+- **Appendices, not bilag**: renamed and typeset — each Appendix begins on a fresh page.
+- **The front page carries an Abstract**: a 40–60 word executive summary (what happened, who won) in small italics between ruled lines, under the dateline. The seal is now double width (half the page).
+### Fixed
+- Model output is sanitized for control characters (a stray `\x02` from the large model broke the TeX compile); both the Council and the press strip them.
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.

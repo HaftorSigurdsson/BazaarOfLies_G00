@@ -80,6 +80,10 @@ def front_page(md):
                     dateline = cand.strip("*").strip()
                     break
             break
+    abstract = ""
+    m = re.search(r"<!--ABSTRACT-->\n(.*?)\n<!--/ABSTRACT-->", md, re.S)
+    if m:
+        abstract = m.group(1).strip()
     import random
     plates = sorted(f for f in os.listdir(PLATES_DIR) if f.endswith(".png"))
     ornament = os.path.join(PLATES_DIR, random.choice(plates)) if plates else ""
@@ -87,7 +91,7 @@ def front_page(md):
            r"{\scshape\small THE BAZAAR OF LIES \par}",
            r"{\scshape\small THE ARENA RECORD \par}",
            r"\vspace{0.5cm}\rule{0.5\textwidth}{0.5pt}\vspace{0.9cm}",
-           rf"\includegraphics[width=0.25\textwidth]{{{ENGRAVING}}}",
+           rf"\includegraphics[width=0.5\textwidth]{{{ENGRAVING}}}",
            r"\vspace{1.1cm}",
            r"{\Large\scshape In the Matter of\par}",
            r"\vspace{0.3cm}",
@@ -97,6 +101,17 @@ def front_page(md):
     if dateline:
         tex += [r"\vspace{0.55cm}",
                 rf"{{\itshape {latex_inline(dateline)}\par}}"]
+    if abstract:
+        tex += [r"\vspace{0.8cm}",
+                r"\rule{0.5\textwidth}{0.4pt}",
+                r"\vspace{0.35cm}",
+                r"\begin{center}\begin{minipage}{0.82\textwidth}",
+                r"\small\itshape"]
+        for aline in abstract.splitlines():
+            tex.append(latex_inline(aline.strip()) + r" \par")
+        tex += [r"\end{minipage}\end{center}",
+                r"\vspace{0.3cm}",
+                r"\rule{0.5\textwidth}{0.4pt}"]
     tex += [r"\vfill"]
     if ornament:
         tex += [rf"\includegraphics[width=0.16\textwidth]{{{ornament}}}",
@@ -126,8 +141,11 @@ def _table_tex(rows):
 
 
 def md_to_tex(md):
+    md = re.sub(r"[\x00-\x08\x0b-\x1f]", "", md)   # control chars break TeX
     out, in_quote, in_item = [], False, False
     table = []
+    md = re.sub(r"<!--ABSTRACT-->.*?<!--/ABSTRACT-->",
+                "", md, flags=re.S)
     first_title = True
     for raw in md.splitlines():
         s = raw.strip()
@@ -153,6 +171,8 @@ def md_to_tex(md):
                        + latex_inline(s[2:]) + r"}\end{center}")
             out.append(r"\begin{center}\rule{0.6\textwidth}{0.5pt}\end{center}")
         elif s.startswith("## "):
+            if s[3:].strip().startswith("Appendix"):
+                out.append(r"\clearpage")
             out.append(r"\section*{" + latex_inline(s[3:]) + "}")
         elif s.startswith("### "):
             out.append(r"\subsection*{" + latex_inline(s[4:]) + "}")

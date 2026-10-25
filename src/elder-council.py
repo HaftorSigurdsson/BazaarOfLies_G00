@@ -34,6 +34,7 @@ import sys
 
 sys.path.insert(0, "gm")
 from crypto import decrypt_payload, load_gm_private_key  # noqa: E402
+from utils import display_name  # noqa: E402
 from nacl.public import PrivateKey  # noqa: E402
 from mistralai.client import Mistral  # noqa: E402
 
@@ -262,9 +263,12 @@ def render_record(rec):
 
 # ------------------------------------------------------------ judgment ----
 
-def build_timeline(graveyard, ballots):
-    """The authoritative fact sheet: per cycle, the vote tally (computed
-    from the published ballots) and every departure with its mechanism."""
+def build_timeline(graveyard, ballots, night_actions, detective_results,
+                   family_msgs, roles, seats):
+    """The authoritative fact sheet: per cycle, the vote tally, the night's
+    secret doings (sealed actions, the Doctor's/Detective's work, the
+    Family's council), every departure with its mechanism — and the
+    computed conclusion of the match."""
     deaths = {}
     for g in graveyard:
         how = ("the village BANISHED them by day vote"
@@ -272,8 +276,29 @@ def build_timeline(graveyard, ballots):
                "the Family SHUTTERED their stall at night")
         deaths.setdefault(g["cycle"], []).append(
             f"{how}: {g['seat_label']} — true role {g['role']}")
+    nights = {}
+    for a in night_actions:
+        nights.setdefault(a.get("cycle"), []).append(
+            f"night action: {display_name(a.get('seat'))} "
+            f"({a.get('role')}) targeted {display_name(a.get('target'))}")
+    for r in detective_results:
+        nights.setdefault(r.get("cycle"), []).append(
+            f"night action: the Detective investigated "
+            f"{display_name(r.get('target'))} — finding: {r.get('result')}")
+    council = {}
+    for m in family_msgs:
+        council.setdefault(m.get("cycle"), []).append(m)
+    for cyc, msgs in council.items():
+        declared = sorted(set(m.get("target") for m in msgs
+                               if m.get("kind") == "declare"))
+        nights.setdefault(cyc, []).append(
+            "night action: the Family's council talked "
+            f"({len(msgs)} messages)"
+            + (f", declaring {', '.join(display_name(t) for t in declared)}"
+               if declared else ""))
+
     lines = []
-    for cyc in sorted(set(list(deaths) + list(ballots))):
+    for cyc in sorted(set(list(deaths) + list(ballots) + list(nights))):
         parts = []
         if cyc in ballots:
             tally = {}
@@ -283,9 +308,25 @@ def build_timeline(graveyard, ballots):
                 f"{t} = {n}" for t, n in sorted(tally.items(),
                                                key=lambda kv: -kv[1])))
         parts += deaths.get(cyc, [])
+        parts += nights.get(cyc, [])
         if cyc in ballots and not deaths.get(cyc):
             parts.append("→ no banishment (tie or no plurality)")
         lines.append(f"- cycle {cyc}: " + "; ".join(parts))
+
+    # The computed conclusion — the winner, from the roles and survivors.
+    departed = {seat_of(g["seat_label"]) for g in graveyard}
+    survivors = [s for s in sorted(seats) if s not in departed]
+    mafia_left = [s for s in survivors if roles.get(s) == "Mafia"]
+    town_left = len(survivors) - len(mafia_left)
+    if not mafia_left:
+        conclusion = ("Conclusion: THE VILLAGE WINS — all three Family "
+                      "members have left the bazaar.")
+    else:
+        conclusion = (f"Conclusion: THE FAMILY WINS — {len(mafia_left)} "
+                      f"Family member(s) against {town_left} honest "
+                      f"merchant(s) as the match ended; the win condition "
+                      f"is parity or better.")
+    lines.append(f"- {conclusion}")
     return "\n".join(lines)
 
 
@@ -379,7 +420,7 @@ def parse_merit(draft):
     return int(m.group(1)) if m else None
 
 
-def bilag_record(match_no, seats, graveyard, ballots, statements,
+def appendix_record(match_no, seats, graveyard, ballots, statements,
                  night_actions, family_msgs):
     """Bilag A — The Record: pure facts, computed, no model. The match's
     dates, duration, volumes, ledger of departures, and vote tallies."""
@@ -395,7 +436,7 @@ def bilag_record(match_no, seats, graveyard, ballots, statements,
         duration = f"{hours}h {rem // 60:02d}m"
     except Exception:
         pass
-    lines = [f"## Bilag A — The Record",
+    lines = [f"## Appendix A — The Record",
              "",
              f"**Match {match_no}** — began {started}, ended {ended}"
              + (f" (duration {duration})" if duration else "") + ".",
@@ -423,7 +464,7 @@ def bilag_record(match_no, seats, graveyard, ballots, statements,
     return "\n".join(lines)
 
 
-def bilag_ratings(seat_order, drafts, records):
+def appendix_ratings(seat_order, drafts, records):
     """Bilag B — The Ratings: the verdicts' merit scores, best to worst,
     in a table. Parsed from the drafts; the numbers are the Council's."""
     rows = []
@@ -432,7 +473,7 @@ def bilag_ratings(seat_order, drafts, records):
         merit = parse_merit(draft)
         rows.append((merit if merit is not None else -1, seat, rec))
     rows.sort(key=lambda r: (-r[0], r[1]))
-    lines = ["## Bilag B — The Ratings",
+    lines = ["## Appendix B — The Ratings",
              "",
              "The verdicts' merit ratings, from finest thread to most frayed:",
              "",
@@ -488,7 +529,9 @@ def main():
         print(f"  verdict draft: {records[s]['name']}...")
         drafts.append(verdict_draft(records[s], args.match))
 
-    timeline = build_timeline(graveyard, ballots)
+    timeline = build_timeline(graveyard, ballots, night_actions,
+                              detective_results, family_msgs,
+                              roles, seats)
     family_digest = "\n".join(
         f"cycle {m.get('cycle')} {m.get('seat')} ({m.get('kind', 'talk')}): "
         f"{m.get('target')} — {m.get('reason', '')}" for m in family_msgs)
@@ -503,18 +546,36 @@ def main():
     case = case_name(args.match, timeline, graveyard)
     print(f"  case name: {case!r}")
 
+    print("  the abstract is drafted...")
+    abstract = ask(COUNCIL_VOICE +
+                   "\nWrite the Abstract for the judgment's front page: "
+                   "40-60 words, the register of an executive summary — "
+                   "what happened across the match and who won, in plain "
+                   "court prose. Output ONLY the abstract.",
+                   f"The timeline (its last line is the computed "
+                   f"conclusion):\n{timeline}\n\nThe case name: {case}",
+                   max_tokens=300)
+    print(f"  abstract: {abstract[:60]!r}...")
+
     print("  final judgment call...")
     judgment = final_judgment(args.match, case, timeline,
                               family_digest, detective_note, drafts)
 
     judgment = re.sub(r"^```[a-z]*\s*\n", "", judgment.strip())
     judgment = re.sub(r"\n```\s*$", "", judgment.strip())
+    judgment = re.sub(r"[\x00-\x08\x0b-\x1f]", "", judgment)  # model control chars
+
+    # The abstract rides in the md between markers: the press lifts it to
+    # the front page and never typesets it in the body.
+    judgment = re.sub(r"(\n[^\n]*)\n(\n## )", r"\1\n\n<!--ABSTRACT-->\n"
+                      + abstract + "\n<!--/ABSTRACT-->\n\2",
+                      judgment, count=1)
 
     seat_order = sorted(records)
     doc = (judgment + "\n\n---\n\n"
-           + bilag_record(args.match, seats, graveyard, ballots, statements,
-                          night_actions, family_msgs) + "\n\n---\n\n"
-           + bilag_ratings(seat_order, drafts, records) + "\n")
+           + appendix_record(args.match, seats, graveyard, ballots, statements,
+                             night_actions, family_msgs) + "\n\n---\n\n"
+           + appendix_ratings(seat_order, drafts, records) + "\n")
 
     out = f"gameplay/village/match-{args.match:02d}-judgment.md"
     with open(out, "w") as f:
