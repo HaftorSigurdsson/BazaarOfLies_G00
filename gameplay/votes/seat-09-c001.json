@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "482a98bf",
+  "seat": "seat-09",
+  "target": "seat-08",
+  "rationale": "You claimed the Doctor’s shield stayed blank and the Detective investigated no one; that silence is the ledger’s mark.",
+  "ts": "2026-10-25T22:00:14Z"
+ },
+ "sig": "EkVERlJlshae3srZNZ527b2xPNveawPFm7ke6PrqzNSZYj0NqeTpRq1Fbum/K8Gt/WOvDA5dTif/cdq/tE1zBA=="
+}
