@@ -109,3 +109,28 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-25T20:40:01.524731+00:00
 
 ---
+**2026-10-25T20:40:01Z**
+**Banishment!** Gandalf, The Spice Merchant, has been banished from the bazaar.
+Their role was: **Mafia**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Merchant | Voted for | Reason |
+|---|---|---|
+| Gandalf | Ripley | She watched a clear Family hand shutter Elsa yet filed zero dated accusations from her own ledger. |
+| Hermione | Gandalf | Eleven calls for "Family tricks" yet not one dated accusation from your own hand. |
+| Yoda | Gandalf | Eleven calls for "Family tricks" sit beside your ledger of cardamom and scent—no merchant named, no sentence quoted, no date cited. |
+| Ripley | Gandalf | Gandalf’s eleventh call for “Family tricks” still sits beside a ledger of cardamom and scent—no merchant named, no sentence quoted, no date  |
+| Neo | Ripley | She watched a clear Family hand shutter a stall yet filed zero dated accusations from her own ledger. |
+| Morpheus | Gandalf | Ten cries for "Family tricks," zero accusations from his own ledger—silence after such volume is louder than any ledger entry. |
+| Inigo | Gandalf | Eleven calls for "Family tricks" still sit beside a ledger of cardamom and scent—no merchant named, no sentence quoted, no date cited. |
+
+(18 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+---
+**2026-10-25T20:40:01Z**
+**Match 3, Cycle 3**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-25T20:55:01.718471+00:00
+
+---
