@@ -54,7 +54,7 @@ The Council is post-game, so it reads **everything**, public and secret:
 | Graveyard, announcements | `gameplay/village/` | reveals and bells |
 | Match recap | `gameplay/village/match-XX-recap.md` | the GM's full role reveal |
 | Herald editions | `gameplay/herald/` | facts-only narrative the town saw |
-| **The Family's council transcripts** | `../.bazaar/family/c*.jsonl` | the killers' actual reasoning — the juiciest evidence the village never saw |
+| **The Family's council transcripts** | `gameplay/night/chat/c*-w*-seat-*.enc` (in-repo, sealed) — decrypted into `match-XX-truth.md` at match end | the killers' actual reasoning (and the decoy chorus beside it) — the juiciest evidence the village never saw |
 | **The truth file** (new — see Phase 0) | `gameplay/village/match-XX-truth.md` | registry + night resolutions, archived at match end |
 
 **The registry gotcha (must fix first):** `gm/roles.enc` is *overwritten

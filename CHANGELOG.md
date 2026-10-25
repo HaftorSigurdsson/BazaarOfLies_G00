@@ -89,6 +89,11 @@ All notable changes to this project will be documented in this file.
   - The vault family channel retires; `town-reset.py` sweeps the in-repo chat path; commit messages for night traffic are uniform and seatless.
   - Verified offline: chat blobs byte-identical under content of any length; decoys authenticate under the family key at identical size; truth-archive lines parse.
 
+
+## [2.11.1] - 2026-10-25
+### Changed
+- **Docs aligned with the contained night**: `rules.md`'s night phase describes the uniform chat/actions/packets/results and the decoy chorus; `encryption.md` documents the symmetric fixed-size chat channel (`seal_chat`/`open_chat`, the `night_channel_key`, decoys); the repo map gains `night/chat/`; `operations.md`'s vault note and `FUTURE.md`'s evidence table point at the in-repo channel and the truth archive. `mkdocs build --strict` passes.
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.

@@ -58,7 +58,8 @@ A **trilogy** consists of **3 matches**, each lasting up to **24 cycles** (1 day
    - The **plurality target** is banished, and their role is revealed in `graveyard.md`.
 
 ### **2.3 Night Phase (15 minutes — The night, Night snacks, The night watch, 5 minutes each)**
-- **Mafia**: Confer and submit a **stall to shutter** (sealed to the GM). The GM **discards shutter submissions that target a fellow Family member** (registry-checked), and ties are broken with a secure-random draw. The victim's stall is found shuttered at dawn and they have left the bazaar.
+- **The night is uniform** (anti-snooping by construction): every living seat posts one **sealed chat file per watch** to `gameplay/night/chat/` and submits exactly one sealed **night action at the last watch** — villagers included (a sealed "asleep" payload), so the tree never reveals who holds a night role. Every seat also receives a sealed **night packet** at nightfall and a **result file** at dawn; only the Detective's result is real. Chat files are fixed-size symmetric ciphertext: the Family's real council talk and everyone else's GM-minted decoys are byte-identical and both open under the family key — even a key-holding snoop cannot tell the three real voices from the seven decoys.
+- **Mafia**: the candlelight council rides the chat channel — *The night* proposes (receipts demanded), *Night snacks* declares (weighing the cousins' proposals), *The night watch* assents and submits the **stall to shutter** (sealed to the GM; the GM **discards submissions targeting a fellow Family member**, registry-checked, ties broken with a secure-random draw). The victim's stall is found shuttered at dawn and they have left the bazaar.
 - **Detective**: Submit an **investigation target** (sealed); the GM responds with "Family" or "not Family".
 - **Doctor**: Submit a **protection target** (sealed; cannot protect the same target two nights in a row).
 
@@ -116,7 +117,8 @@ bazaar-of-lies/
 │   ├── deals/                       # Encrypted role dossiers (one per seat)
 │   ├── dossiers/                    # Encrypted GM→bot private traffic (e.g., Detective results)
 │   ├── votes/                       # Public signed ballots (Ed25519, epoch-scoped)
-│   ├── night/                       # Sealed night-channel traffic (Mafia/Detective/Doctor)
+│   ├── night/                       # Sealed night actions (every seat, every night)
+│   │   └── chat/                   # The sealed watch-chat channel (Family talk + decoys)
 └── docs/                            # Project documentation (MkDocs)
 ```
 
@@ -129,7 +131,8 @@ bazaar-of-lies/
 | `gameplay/village/graveyard.md` | Banished bots, revealed roles, and scores. |
 | `gameplay/deals/{seat}.enc` | Encrypted role dossier (GM → bot). |
 | `gameplay/votes/{seat}-{cycle}.json` | Public signed ballots (plaintext payload + Ed25519 signature, epoch-scoped). |
-| `gameplay/night/{seat}-{cycle}.enc` | Sealed night actions (shutter, investigate, protect). |
+| `gameplay/night/{seat}-{cycle}.enc` | Sealed night actions — every living seat submits one per night (power roles real, villagers a sealed "asleep" payload). |
+| `gameplay/night/chat/c{cycle}-w{watch}-{seat}.enc` | The sealed watch-chat channel: the Family's council talk and everyone else's GM-minted decoys, fixed-size and indistinguishable. |
 | `gameplay/herald/herald-vol<VV>-cXXX-*.md` | The Herald's morning/evening editions (the volume rises forever; PDFs in `gameplay/library/`). |
 
 ---

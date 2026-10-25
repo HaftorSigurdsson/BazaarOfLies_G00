@@ -38,6 +38,20 @@ Day votes are **public plaintext ballots signed** with a per-seat Ed25519 signin
    ok = verify_payload(seat_signing_public_key, payload, signature)
    ```
 
+### **The Night Chat Channel (symmetric, fixed-size)**
+The in-repo council channel uses **symmetric sealing** (`SecretBox`) on the **`night_channel_key`** every dossier carries (the three Family members share one key; the rest hold random unusable ones — the shape is uniform so no dossier reveals a role by its fields).
+
+1. **Pad**: the payload is JSON-padded to a fixed size before sealing, so every ciphertext is byte-identical in length whatever the message.
+2. **Seal** (`gm.crypto.seal_chat`): only key-holders can read; wrong keys fail authentication cleanly (`open_chat` returns `None`).
+3. **Decoys**: the GM mints each non-Family seat's chat files with the *family key itself*, so every file in the channel opens under it — a snoop holding the key sees ten council voices and cannot tell which are the Family.
+
+```python
+from gm.crypto import seal_chat, open_chat
+blob = seal_chat(family_key, {"kind": "talk", "cycle": 1, "watch": 1,
+                              "text": "the ledger is thin", "target": "seat-04"})
+msg = open_chat(family_key, blob)          # → the payload, or None for a wrong key
+```
+
 ### **Night Actions (sealed)**
 1. **Bot seals** a night payload (shutter / investigate / protect) to the GM’s public key:
    ```python
