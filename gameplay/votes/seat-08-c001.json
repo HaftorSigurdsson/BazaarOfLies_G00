@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "4fe2db9e",
+  "seat": "seat-08",
+  "target": "seat-10",
+  "rationale": "Your mirrored-silence bloc twice chants “quote the line,” yet your hands stay empty of any merchant’s quoted words tonight.",
+  "ts": "2026-10-25T21:25:29Z"
+ },
+ "sig": "sbbVx90uNYJI+aFStlYsbzOJFjvfIi+b/FZydnSr3nDyTUe+Vpmn9mKS0u9i7PXpdwA9t8CNqH/xfVW/q9IxAQ=="
+}
