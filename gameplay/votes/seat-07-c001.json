@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "30fdc33a",
+  "seat": "seat-07",
+  "target": "seat-04",
+  "rationale": "Nine merchants pressed you for the numbered clause you claimed exists and received only silence; your vote rationale contradicts the Compact you invoked.",
+  "ts": "2026-10-25T22:50:20Z"
+ },
+ "sig": "PLF0xSQnjB5zysB9RSN9Y9ugFd+W5Zbkc9n8tXMH9+3vSgH4JR8mzorrMBpD9gyHEHI8uE8Hg/EmXJ3CvWM1Cg=="
+}
