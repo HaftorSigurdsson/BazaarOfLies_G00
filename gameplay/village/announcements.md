@@ -42,3 +42,18 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-25T19:10:01.348849+00:00
 
 ---
+**2026-10-25T19:10:02Z**
+EVENT: A plague has struck the bazaar! One merchant is shuttered at night (non-Family).
+
+---
+**2026-10-25T19:10:02Z**
+**Stall shuttered!** Elsa, The Scribe, shuttered their stall and left the bazaar overnight. Their role was: **Villager**.
+
+---
+**2026-10-25T19:10:02Z**
+**Match 3, Cycle 2**
+The bazaar awakens!
+**Seats alive:** Gandalf, Hermione, Yoda, Batman, Ripley, Neo, Morpheus, Inigo
+**Discussion ends at:** 2026-10-25T19:35:02.062561+00:00
+
+---
