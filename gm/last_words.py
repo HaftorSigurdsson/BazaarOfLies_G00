@@ -21,7 +21,16 @@ from mistralai.client import Mistral
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from gm.utils import display_name
 
-client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
+_client = None
+
+
+def _get_client():
+    """Lazily build the Mistral client — the cron GM runs without the key
+    until a banishment actually needs last words."""
+    global _client
+    if _client is None:
+        _client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
+    return _client
 
 
 def ask_last_words(seat: str, role: str) -> str:
@@ -32,7 +41,7 @@ def ask_last_words(seat: str, role: str) -> str:
         "Do not reveal private information or roles."
     )
     try:
-        response = client.chat.complete(
+        response = _get_client().chat.complete(
             model="mistral-small-2603",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.5,
@@ -40,4 +49,4 @@ def ask_last_words(seat: str, role: str) -> str:
         return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"Failed to get last words for {seat}: {e}", file=sys.stderr)
-        return ""}]}]}]}]}]}]}
+        return ""

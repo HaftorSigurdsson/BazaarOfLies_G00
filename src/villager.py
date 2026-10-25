@@ -65,7 +65,10 @@ load_dotenv()
 
 # The bot lives in src/; the gm package sits at the arena root.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from log_token_usage import log_token_usage
+try:
+    from log_token_usage import log_token_usage      # run as script (src/ on sys.path)
+except ImportError:                                  # imported as a package (tests)
+    from .log_token_usage import log_token_usage
 from gm.crypto import (encrypt_for_seat, load_gm_private_key, decrypt_payload,
                        sign_payload,
                        seal_chat, open_chat)

@@ -15,6 +15,7 @@ Contract with bots (villager.py):
     check, death reveals, recap. Night actions are validated against the
     registry — a bot's self-declared role is never trusted.
 """
+import argparse
 import base64
 import glob
 import json
@@ -26,9 +27,11 @@ import sys
 import time
 from collections import Counter
 from datetime import datetime, timezone, timedelta
+from typing import Optional
 
 from crypto import (load_gm_private_key, decrypt_payload, encrypt_for_seat,
                    verify_payload, seal_chat, open_chat)
+from last_words import ask_last_words
 from utils import (read_state, write_state, update_announcements,
                    update_graveyard, get_seats, is_alive, persona_name,
                    display_name)
