@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 2,
+  "epoch": "165f13bd",
+  "seat": "seat-06",
+  "target": "seat-08",
+  "rationale": "Your kiln’s iron scent lingers where the tongs should speak, and the bazaar buys facts, not shadows that cast no names.",
+  "ts": "2026-10-25T13:45:22Z"
+ },
+ "sig": "2GaK0EhvHxCScptkKRRS3Q7XSRAkvOp+7c0E2UAHoMSe4UaXD3ISPflYFra32HWTOL+SArRR+sgszA2wpq6yBw=="
+}
