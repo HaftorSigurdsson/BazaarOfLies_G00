@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "482a98bf",
+  "seat": "seat-05",
+  "target": "seat-08",
+  "rationale": "You claimed the Detective's role yet left the roster blank and dodged nine straight questions to name the merchant you investigated; the bazaar records one question, one price, and you never paid it.",
+  "ts": "2026-10-25T22:00:22Z"
+ },
+ "sig": "BeKK33/hcVk29JmaYEBtaz5TS/tdH3gwR9wHajlX/yrvLB49Lq8TyDsJZS/jaknjaVW0AHsQ644x3tKV+ZzBCw=="
+}
