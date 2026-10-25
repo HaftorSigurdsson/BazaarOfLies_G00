@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 4,
+  "epoch": "bb6846e0",
+  "seat": "seat-03",
+  "target": "seat-02",
+  "rationale": "Hermione (2) trades in fog where the bazaar demands iron, and twelve plain yes/no threads left unanswered weave the noose tighter than any ledger’s scratch.",
+  "ts": "2026-10-25T01:05:21Z"
+ },
+ "sig": "Y+aZEiY5OfqYATfKEVmUqGL2pnKSD+qm/8dRDNDr7S4rR06y28xnW1JC4TUbVsRO1nfC//reHzYDaKRi57ptCw=="
+}
