@@ -45,3 +45,16 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-25T23:10:02.103174+00:00
 
 ---
+**2026-10-25T23:15:02Z**
+**Stall shuttered!** Elsa, The Scribe, shuttered their stall and left the bazaar overnight. Their role was: **Villager**.
+
+**Last Words**: "May the winds carry my words back to you—remember, even shadows have value when the sun sets."
+
+---
+**2026-10-25T23:15:02Z**
+**Match 1, Cycle 2**
+The bazaar awakens!
+**Seats alive:** Gandalf, Hermione, Yoda, Ripley, Neo, Morpheus, Inigo, Sherlock
+**Discussion ends at:** 2026-10-25T23:40:01.178569+00:00
+
+---
