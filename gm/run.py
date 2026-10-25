@@ -585,7 +585,7 @@ def resolve_night_actions():
             f"{persona_name(seats[shutter_target]['persona'])}, "
             "shuttered their stall and left the bazaar overnight. "
             f"Their role was: **{role}**."
-            + (f"\n\n**Last Words**: {last_words}" if last_words else "")"
+            + (f"\n\n**Last Words**: {last_words}" if last_words else "")
         )
         log(f"stall shuttered: {shutter_target} (role revealed: {role})")
     else:
