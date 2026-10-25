@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 2,
+  "epoch": "165f13bd",
+  "seat": "seat-07",
+  "target": "seat-10",
+  "rationale": "Sherlock (10), your lantern swings closest to seat-07 four times yet names no merchant you fear—the bazaar’s fire melts shadows to truth.",
+  "ts": "2026-10-25T13:45:17Z"
+ },
+ "sig": "uN5b3GZcVZpcgkZaXm+xst2BOY1zYyydR4Jsj+PrD695nDluaCoY3EM/f5OsbFT5I2UC9u+DCdP+c+LWSOiuDQ=="
+}
