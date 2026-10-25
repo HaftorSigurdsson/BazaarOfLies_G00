@@ -48,7 +48,7 @@ import re
 import subprocess
 import sys
 import time
-from typing import Optional
+from typing import List, Optional
 
 from dotenv import load_dotenv
 from mistralai.client import Mistral
