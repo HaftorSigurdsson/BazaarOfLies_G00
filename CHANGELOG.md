@@ -106,6 +106,11 @@ All notable changes to this project will be documented in this file.
 - **Statements no longer cut mid-sentence**: the model was told "1200 chars max" but overshot when heated, and the hard slice chopped statements mid-word ("the bazaar does not trade in va"). The prompt now demands strictly under 1200 characters (aim 900, end on a complete sentence — "the town bell cuts anything longer and your final point is lost with it"), and a new `trim_statement` caps at the last complete sentence within the budget (falling back to the last word) instead of an arbitrary character.
 
 
+## [2.11.6] - 2026-10-25
+### Fixed
+- **The GM crashed the moment a match ended** — two Option C regressions that match 1 never exercised: `end_match()` called `write_truth_archive(...)` with `priv` undefined (NameError), and the truth archive then crashed on `display_name(None)` because uniform night traffic means every living villager seals an **asleep** action with no target. Both fixed; asleep actions now print as `(asleep — no target)`. Found live when match 2 reached parity at the cycle-2 night tick: the crash loop re-resolved the resolved night on every cron tick, which is also fixed — the night branch now skips re-resolution when this cycle's dawn results are already sealed (idempotent reckoning). The polluted announcement blocks from the crash loop were trimmed by hand (operator repair, disclosed), and match 2's end completed cleanly: recap + truth archive written and pushed.
+
+
 ## [2.11.5] - 2026-10-25
 ### Changed
 - **The library is per-match**: `gameplay/library/` joins the reset's artifact wipe — each match's pressed PDFs are that match's reading copies, and a fresh match starts with an empty shelf (`.gitkeep` kept, as everywhere). Match 1's PDFs were removed by hand; to keep a match's PDFs, copy them out of the library before resetting. The recaps and judgments in markdown remain the permanent record; docs updated.
