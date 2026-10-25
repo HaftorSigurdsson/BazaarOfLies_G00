@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 2,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-02",
+  "target": "seat-04",
+  "rationale": "Eight calls for falsifiable claims and zero accusations from your own hand.",
+  "ts": "2026-10-25T19:40:16Z"
+ },
+ "sig": "9B+TG6+U+a0DkCmss5+USR90EOzZmtDR49YR8LLf35siZYq9aXM7AkiSmFGlCSpUPAusgUNhungPMqcVMcWxBw=="
+}
