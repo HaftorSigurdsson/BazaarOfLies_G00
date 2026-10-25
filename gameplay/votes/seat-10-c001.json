@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "4fe2db9e",
+  "seat": "seat-10",
+  "target": "seat-08",
+  "rationale": "Morpheus alone accused Gandalf, Yoda, and Inigo without one quoted line or observed act, then pivoted to demanding others produce evidence while withholding his own—ten ledger marks by day’s end.",
+  "ts": "2026-10-25T21:25:23Z"
+ },
+ "sig": "XXRes+kukvx14UmoyAMH1HIxTPbCu7GWQxOpHxC+BiYVgVzU56RGCP0+TbVnu37jL7rWe9vivUaDLkJSA7cYAg=="
+}
