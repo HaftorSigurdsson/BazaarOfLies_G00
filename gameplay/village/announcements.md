@@ -91,3 +91,17 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-25T14:05:00.983161+00:00
 
 ---
+**2026-10-25T14:05:01Z**
+**Stall shuttered!** Elsa (7), The Scribe, shuttered their stall and left the bazaar overnight. Their role was: **Doctor**.
+
+---
+
+---
+**2026-10-25T14:16:26Z**
+The Family has won! They outnumber the Town.
+
+---
+**2026-10-25T14:16:26Z**
+Match 2 has ended. The bazaar prepares for Match 3.
+
+---
