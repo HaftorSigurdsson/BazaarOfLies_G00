@@ -108,7 +108,7 @@ python3 setup/make_signing_keys.py --vault ../.bazaar
 The **official way** to reset the arena between matches. A partial manual reset once caused the **ghost-replay bug**: the GM re-counted a finished match's stale ballots and re-banished the same seats in the same order. Always use the script.
 
 ### **What It Does**
-- Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/herald/`, `gameplay/usage/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
+- Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/herald/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
 - Rewrites the public boards fresh: `graveyard.md`, `announcements.md`.
 - Resets `gameplay/state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `gameplay/state.json` — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).
 - Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, else the sibling vault `../.bazaar` the bots use, else `~/.bazaar`) — keys and signing keys are untouched.

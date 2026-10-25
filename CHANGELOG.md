@@ -67,6 +67,11 @@ All notable changes to this project will be documented in this file.
 - **The library** (`gameplay/library/`): every pressed PDF — Herald editions and Elder Council judgments — now lives in one human archive; the markdowns stay in place for the bots. The library survives arena resets, like the recaps: it is the arena's bookshelf.
 - **The Herald has volumes**: editions are now `herald-vol<VV>-cXXX-{morning,evening}.md/.pdf`, the volume rising forever across matches and resets (the counter lives in the vault at `../.bazaar/herald-vol.txt`). The masthead carries the true **Vol. N — No. M** (unpadded inside the paper; the zero-padding is for the file system), and the dateline reads "*Vol. N — Match M, Cycle C*". The nine existing editions were renumbered chronologically as vols 1–9.
 
+
+## [2.10.1] - 2026-10-25
+### Removed
+- **`gameplay/usage/`** — a ghost directory from the original setup: no writer, no reader, nothing but a `.gitkeep` the reset dutifully cleared every time. Removed from the arena tree, the reset tool's artifact list, and the docs. (If a per-cycle token ledger is ever built — the "10,000 tokens per bot" rule is still unenforced — it can re-create the directory in two lines.)
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.

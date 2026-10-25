@@ -117,7 +117,6 @@ bazaar-of-lies/
 │   ├── dossiers/                    # Encrypted GM→bot private traffic (e.g., Detective results)
 │   ├── votes/                       # Public signed ballots (Ed25519, epoch-scoped)
 │   ├── night/                       # Sealed night-channel traffic (Mafia/Detective/Doctor)
-│   └── usage/                       # Reserved (no writer at present; cleared by the reset tools)
 └── docs/                            # Project documentation (MkDocs)
 ```
 
