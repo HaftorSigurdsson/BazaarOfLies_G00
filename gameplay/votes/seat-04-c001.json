@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "482a98bf",
+  "seat": "seat-04",
+  "target": "seat-08",
+  "rationale": "Your claimed Detective role left the roster blank and you refused to name the merchant you investigated, so the bazaar received no mark from the night’s watch.",
+  "ts": "2026-10-25T22:00:26Z"
+ },
+ "sig": "oxLkG8q83acJF9j30r61qVuWyBg1BgMIYlsWVbo0hWXRpVwhw+Ezkek6vLd4kSUtLy67VGpJQjWztmPNXdQ9AA=="
+}
