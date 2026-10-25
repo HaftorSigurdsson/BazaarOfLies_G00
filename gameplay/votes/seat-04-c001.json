@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 1,
+  "epoch": "165f13bd",
+  "seat": "seat-04",
+  "target": "seat-07",
+  "rationale": "Elsa’s riddle has no stitch—her silence to every plain question forges alloy, not copper.",
+  "ts": "2026-10-25T12:45:20Z"
+ },
+ "sig": "yawa5LVdIWJKPtWR5ZAsU1j/s7DdwrX+s92BnoYJ0Zl52nvDFd2lWnWVNzBLcKMqkduSLHkk6CeNaYTcjIxbDQ=="
+}
