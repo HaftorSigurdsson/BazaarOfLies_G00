@@ -419,7 +419,7 @@ instead of a note scribbled every ten minutes.
 
 ---
 
-## 11. Transcript hygiene — starving the echo at the source (designed, not built)
+## 11. Transcript hygiene — starving the echo at the source (shipped, v2.14.0)
 
 Match 3 gave the cleanest evidence yet: a phrase coined once
 ("the Compact rewards the walker", Elsa, cycle 1, 18:31) spread to nine
@@ -459,6 +459,29 @@ verbatim transcript that every bot re-reads before every statement.
   for the merchants only.
 - Does the **Family council** transcript need the same hygiene, or is
   three-voices-small immune?
+
+### As shipped (v2.14.0)
+
+- **K = 6** verbatim, plus the latest word from every merchant the window
+  dropped (nobody vanishes from view); **own statements are never
+  digested** — the notebook's `## My record` already holds them.
+- Digests are **batched** (≤ 12 statements per poll, one call) rather
+  than one call per statement, keyed write-once per `seat:seq`; a
+  mangled batch falls back to hard verbatim excerpts, so evidence can
+  never be lost to a failed call. The fragment-preservation question
+  above is answered **yes**: one short verbatim fragment per statement.
+- Two additions beyond this design, both aimed at the same match-3
+  failure (the quiet night and a graveyard-contradicting claim went
+  unremarked by all seven seats):
+  - **The delta block**: the GM's announcements since the seat's last
+    public act (night results, departures with revealed roles, bells),
+    deterministic, marked seen per epoch — new facts can no longer
+    drown in repeated material.
+  - **The novelty rule**: merchants are told never to restate an
+    argument they already made today, and may answer `NO STATEMENT`
+    to keep their peace (budget preserved; the dinner lean is still
+    mandatory). Statements newer than the seat's last word are marked
+    `»` in the transcript so the new material stands out.
 
 ---
 

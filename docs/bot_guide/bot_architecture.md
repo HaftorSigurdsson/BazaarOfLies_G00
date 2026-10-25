@@ -56,6 +56,18 @@ Bots would otherwise wake up amnesiac every dawn — each prompt is rebuilt from
 
 ---
 
+## **2.2 The Merchant's Reading (context diet)**
+Match 3 showed the verbatim transcript is the echo's amplifier: by cycle 3 nearly every prompt was 40+ near-identical statements, and the two genuinely new facts of the day (a quiet night; a claim contradicting the graveyard) went unremarked by all seven living seats. The reading pipeline is now (FUTURE.md §11, shipped v2.14.0):
+
+- **Delta block** (deterministic, no model): the GM's announcements since the seat's last public act — night results, departures with revealed roles, bells — rendered at the top of every discussion/vote prompt with an explicit *ground truth: call out contradictions* instruction. Marked seen in the journal (`ann_seen_ts`, epoch-scoped), so each fact is surfaced exactly once.
+- **Transcript window**: only the `TRANSCRIPT_WINDOW` (6) most recent statements enter the prompt verbatim, plus the latest word from every merchant the window dropped (nobody vanishes from view). Statements newer than the seat's last word are marked `»` so the new material stands out from the repeated.
+- **Private digests**: statements that age out of the window are compressed (names, claims, one short verbatim fragment each) into `../.bazaar/digests/<epoch>-c<cycle>-<seat>.jsonl` — per-bot and vault-local, never a shared in-repo anchor. Write-once per statement, batched (≤ `DIGEST_BATCH` per poll); a mangled batch falls back to hard verbatim excerpts, so evidence is never lost to a failed call. Own statements are never digested — the notebook's `## My record` already holds them.
+- **Novelty rule**: the merchant is told never to restate an argument it already made today and may answer `NO STATEMENT` to keep its peace (statement budget preserved; the dinner lean remains mandatory — a refusal there is retried).
+
+Tuning knobs in `src/villager.py`: `TRANSCRIPT_WINDOW`, `DIGEST_BATCH`, `DIGEST_MODEL` (point at a cheaper alias to save tokens).
+
+---
+
 ## **3. Encryption & Signing**
 ### **Ballots (public, signed)**
 - Plaintext `{seat, cycle, target, rationale, ts}` payloads **signed** with the seat’s Ed25519 signing key (`../.bazaar/<seat>.sign`).

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.14.0] - 2026-10-25
+### Added
+- **The merchant's reading, on a diet** (villager prompts; FUTURE.md §11 shipped): match 3 proved the verbatim transcript is the echo's amplifier — by cycle 3 nearly every prompt was 40+ near-identical statements, and the day's two genuinely new facts (the quiet night; a claim contradicting the graveyard) went unremarked by all seven living seats. Three changes, one diagnosis:
+  - **Delta block** (deterministic, no model): the GM's announcements since the seat's last public act — night results, departures with revealed roles, bells — surfaced at the top of every discussion/vote prompt as explicit *ground truth*, with an instruction to call out claims that contradict it. Seen-marked per epoch (`ann_seen_ts`), so every fresh fact is delivered exactly once instead of drowning in repeated material.
+  - **Transcript window + private digests**: only the `TRANSCRIPT_WINDOW` (6) most recent statements enter the prompt verbatim, plus the latest word from every merchant the window dropped (nobody vanishes); older statements are compressed (names, claims, one short verbatim fragment each) into a **per-bot, vault-local** digest store (`../.bazaar/digests/`, epoch+cycle+seat keyed, write-once, batched ≤ 12 per poll) — never a shared in-repo digest, which would itself become the next verbatim anchor. A mangled or failed batch falls back to hard verbatim excerpts: evidence is never lost to a failed call. Own statements are never digested (the notebook's `## My record` holds them). Measured on match 3, cycle 3: the transcript's ~50 KB became ~10 KB.
+  - **Novelty rule + silence**: merchants are told never to restate an argument they already made today (statements newer than their last word are marked `»` in the transcript so the new material stands out), and may answer `NO STATEMENT` to keep their peace — the statement budget is preserved, and the dinner lean remains mandatory (a refusal there is retried next poll).
+- `ask()` takes a `model` override (the digest compressor points at `DIGEST_MODEL`, default the pinned discussion model — aim it at a cheaper alias to save tokens).
+
 ## [2.13.5] - 2026-10-25
 ### Fixed
 - **The night channel, stress-tested and hardened** (ground truth via the GM registry: the two oversize files were decoys, not Family talk — the design held, but two latent holes were found and closed):
