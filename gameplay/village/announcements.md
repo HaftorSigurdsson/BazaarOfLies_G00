@@ -127,3 +127,14 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-25T00:30:01.725097+00:00
 
 ---
+**2026-10-25T00:35:01Z**
+**Stall shuttered!** Inigo (9), The Tea Seller, shuttered their stall and left the bazaar overnight. Their role was: **Villager**.
+
+---
+**2026-10-25T00:35:01Z**
+**Match 1, Cycle 4**
+The bazaar awakens!
+**Seats alive:** Gandalf (1), Hermione (2), Yoda (3), Batman (4), Neo (6)
+**Discussion ends at:** 2026-10-25T01:00:01.080284+00:00
+
+---
