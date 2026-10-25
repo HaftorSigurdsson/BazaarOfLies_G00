@@ -41,8 +41,16 @@ An **eleventh voice** in the arena: the bazaar's only newspaper, printed twice d
 - When public statements exist, the paper closes with a **"Letter to the Editor"**: one statement quoted verbatim, attributed by name, with at most a one-line neutral introduction.
 - **The Tally** is computed by the Herald (never model-written) and appended to **evening editions only** — the morning paper reports the news, the evening paper carries the day's returns: an election-returns chart — solid bars per candidate, ballots and abstentions counted. The press re-renders it in the PDF as an old-style bar graph (ruled frame, small-caps caption, solid black bars), and the masthead carries the motto *"All the facts fit to print — the rumours you may trade elsewhere."*
 - **Editorial continuity**: before writing, the Herald re-reads its own last two editions (public record) and may follow up on its own reporting in one brief line ("as we reported at dawn") — or state plainly when today's facts differ from yesterday's paper.
+- **Editor's Note**: The Herald now includes a short editorial note summarizing the bazaar's mood each cycle, labeled as the **Editor's Note**. It provides thematic commentary without revealing private information or speculating about roles.
 - **PERSONALS** (PDF-only classifieds, never game input): two in-theme ads per edition from a deterministic pool — lost keys, wanted apprentices, slightly singed rugs.
 - **The tea clock**: every merchant prompt carries the current in-theme region of the day — *Morning, Morning tea, Lunch, Afternoon tea, Dinner* (the five 5-minute regions of a 25-minute discussion), then *Evening* for the 5-minute vote, and at night the three 5-minute watches (*The night, Night snacks, The night watch*) — computed from the arena clock by `gm.utils.day_region`. The Herald states the time of print in its digest ("printed at Morning tea"). See [The Bazaar — Setting & Tone](./game_mechanics/the_bazaar.md).
+
+### **New Features**
+
+- **Anonymous Statements**: On a random cycle (2–4), all statements are published without seat IDs. Labeled as "Anonymous Merchant" in the Herald to preserve strategic ambiguity while keeping votes public.
+- **Last Words**: Banished merchants (non-Family) may leave a final statement, published in the next morning edition under "Last Words". Family members are excluded to avoid metagaming.
+- **Historian Role**: A randomly assigned Villager writes a cycle summary for the Herald, published in evening editions under "The Historian's Chronicle". Adds narrative depth without unbalancing core roles.
+- **First Morning Edition**: Introduces the merchants and sets the scene for new matches, providing context for readers.
 
 ### **Editions**
 | Edition | Trigger | Villagers read it | Output |
@@ -143,12 +151,19 @@ The original bash version (`setup/reset_match.sh`) does the same wipe; `src/town
 ---
 
 ## **6. Match Lifecycle**
-1. **Deal**: GM mints a fresh **epoch** and deals roles (encrypted dossiers per seat).
+1. **Deal**: GM mints a fresh **epoch** and deals roles (encrypted dossiers per seat). A **Historian** is randomly assigned from the Villagers.
 2. **Day** (25 + 5 minutes): Dawn announcement → discussion across the five tea-clock regions (public statements in `gameplay/village/statements/`; **Dinner is the reckoning** — every merchant must state their lean, budget-exempt) → the **Evening** vote (public signed ballots in `gameplay/votes/`) → tally + banishment.
+   - **Anonymous Statements**: On a random cycle (2–4), all statements are published without seat IDs (labeled "Anonymous Merchant" in the Herald).
+   - **Last Words**: Banished merchants (non-Family) may leave a final statement, published in the next morning edition under "Last Words".
 3. **Night** (15 minutes, the three watches) — **uniform by construction**: every living seat posts one sealed **chat file per watch** (`gameplay/night/chat/cCCC-wN-seat-XX.enc`, fixed-size symmetric ciphertext) and submits exactly one sealed **night action at the last watch** (`night/seat-XX-cCCC.enc`, villagers included — a sealed "asleep" payload). The Family's chat is real council talk sealed with the shared `night_channel_key`; everyone else posts **GM-minted decoys — ciphertexts sealed with the same family key**, decrypting to plausible council lines. Every file in the channel opens under the family key, so even a key-holding snoop sees ten council voices and cannot tell which are the Family. The GM publishes a **night packet** to every seat at nightfall (the decoys) and a **result file** to every seat at dawn (only the Detective's is real) — the night tree reveals nothing about roles, targets, or who talks to whom. The council's rhythm: *The night* is the proposal (receipts from the day's record), *Night snacks* the declaration, *The night watch* the assent and the sealed shutter. At match end the whole channel is decrypted into the truth archive for the Elder Council.
 4. **Win check** runs right after the tally; a banishment that ends the match skips straight to the recap.
 5. **Recap + truth archive**: GM publishes `gameplay/village/match-XX-recap.md` with the full reveal **and `match-XX-truth.md`** (the decrypted registry and every sealed night action — written before the next deal can overwrite them), then auto-chains the next match — **unless `BAZAAR_MATCH_LIMIT` parks the arena** (`phase: halted`).
 6. **The Elder Council** (post-match, manual): `src/elder-council.py --match N` compiles the complete record and writes the court-style judgment (`match-XX-judgment.md` + the shelved PDF in `gameplay/library/`) — history with the nights narrated, per-seat verdicts with merit ratings, the awards, and the appendices.
+
+### **Herald Editions**
+- **First Morning Edition**: Introduces the merchants and sets the scene for new matches.
+- **Morning Edition**: Reports overnight events and today's plan. Includes "Last Words" from banished merchants (if any) and the **Editor's Note** (thematic commentary).
+- **Evening Edition**: Reports the day's banishment and vote tallies. Includes "The Historian's Chronicle" (cycle summary) and the **Editor's Note**.
 
 ### **Epoch Safety**
 Every deal mints an **epoch**. Ballots, night actions, statements and journal keys are all epoch-scoped, and the GM additionally rejects anything timestamped before the current cycle's dawn — a sloppy reset can no longer resurrect a finished match.

@@ -33,25 +33,47 @@ TWO-STAGE REASONING: every public act (statement, vote, night action) is
 preceded by a private thinking call (low temperature) whose output is fed
 to the act call. The small model no longer has to reason and roleplay in
 the same breath, and its private thinking becomes the memory.
+
+## New Features
+
+- **Anonymous Statements**: On a random cycle (2–4), statements are published without seat IDs.
+  Labeled as "Anonymous Merchant" in the Herald.
+- **Last Words**: Banished merchants (non-Family) may leave a final statement,
+  published in the next Herald edition under "Last Words".
+- **Historian Role**: A randomly assigned Villager writes a cycle summary for the Herald,
+  published in evening editions under "The Historian's Chronicle".
+- **Editor's Note**: The Herald now includes a short editorial note summarizing the bazaar's mood.
+- **First Morning Edition**: Introduces the merchants and sets the scene for new matches.
 """
 import argparse
 import glob
 import json
+import logging
 import os
 import random
 import re
 import subprocess
 import sys
 import time
+from typing import Dict, List, Optional, Tuple, Union
 
+from dotenv import load_dotenv
 from mistralai.client import Mistral
+
+# Load environment variables from .env
+load_dotenv()
 
 # The bot lives in src/; the gm package sits at the arena root.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from log_token_usage import log_token_usage
 from gm.crypto import (encrypt_for_seat, load_gm_private_key, decrypt_payload,
                        sign_payload,
                        seal_chat, open_chat)
 from gm.utils import display_name, day_region, seat_from_label
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------- config ---
 MODEL = "mistral-small-2603"            # PIN the exact versioned model ID
@@ -107,56 +129,77 @@ SIGNKEY_PATH = args.signkey or os.path.join(BAZAAR_DIR, f"{MY_SEAT}.sign")
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 
-def log(msg):
-    print(f"[{time.strftime('%H:%M:%S')}] {MY_SEAT}: {msg}", flush=True)
+def log(message: str) -> None:
+    """Log a message to stderr with a timestamp."""
+    logger.info(message)
 
 
 # ------------------------------------------------------------------- git ---
-def git(*argv, check=True):
-    return subprocess.run(["git", *argv], check=check,
-                          capture_output=True, text=True)
+def git(*argv: str, check: bool = True) -> subprocess.CompletedProcess:
+    """Run a git command and return the result."""
+    try:
+        return subprocess.run(["git", *argv], check=check,
+                              capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        logger.error(f"git {' '.join(argv)} failed: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"git {' '.join(argv)} error: {type(e).__name__}: {e}")
+        raise
 
 
-def safe_push():
+def safe_push() -> None:
     """Push with retry: ten bots share one branch, rejections are guaranteed."""
-    for attempt in range(1, PUSH_ATTEMPTS + 1):
-        r = git("push", check=False)
-        if r.returncode == 0:
+    try:
+        for attempt in range(1, PUSH_ATTEMPTS + 1):
+            r = git("push", check=False)
+            if r.returncode == 0:
+                return
+            log(f"push rejected (attempt {attempt}/{PUSH_ATTEMPTS}); rebasing")
+            git("pull", "--rebase", check=False)
+            # jittered backoff: after a deal-time thundering herd (ten bots
+            # pushing at once) deterministic retries re-collide; the jitter
+            # spreads the herd out
+            time.sleep(2 * attempt + random.uniform(0, 2 * attempt))
+        raise RuntimeError(f"push rejected {PUSH_ATTEMPTS} times — needs a human")
+    except Exception as e:
+        logger.error(f"safe_push failed: {type(e).__name__}: {e}")
+        raise
+
+
+def commit_and_push(paths: List[str], msg: str) -> None:
+    """Commit and push changes to the arena repo."""
+    try:
+        git("add", *paths)
+        r = git("commit", "-m", msg, check=False)
+        if r.returncode != 0:
+            log(f"nothing to commit for: {msg}")
             return
-        log(f"push rejected (attempt {attempt}/{PUSH_ATTEMPTS}); rebasing")
-        git("pull", "--rebase", check=False)
-        # jittered backoff: after a deal-time thundering herd (ten bots
-        # pushing at once) deterministic retries re-collide; the jitter
-        # spreads the herd out
-        time.sleep(2 * attempt + random.uniform(0, 2 * attempt))
-    raise RuntimeError(f"push rejected {PUSH_ATTEMPTS} times — needs a human")
-
-
-def commit_and_push(paths, msg):
-    git("add", *paths)
-    r = git("commit", "-m", msg, check=False)
-    if r.returncode != 0:
-        log(f"nothing to commit for: {msg}")
-        return
-    safe_push()
+        safe_push()
+    except Exception as e:
+        logger.error(f"commit_and_push failed: {type(e).__name__}: {e}")
+        raise
 
 
 # --------------------------------------------------------------- journal ---
-def load_journal():
+def load_journal() -> Dict[str, Union[Dict, List, str, None]]:
+    """Load the bot's journal from disk."""
     if os.path.exists(JOURNAL_PATH):
-        with open(JOURNAL_PATH) as f:
+        with open(JOURNAL_PATH, "r") as f:
             return json.load(f)
     return {"cycles": {}, "seen": [],
             "notebook": "", "notebook_epoch": None, "last_digest_cycle": None}
 
 
-def save_journal(journal):
+def save_journal(journal: Dict[str, Union[Dict, List, str, None]]) -> None:
+    """Save the bot's journal to disk."""
     os.makedirs(os.path.dirname(JOURNAL_PATH), exist_ok=True)
     with open(JOURNAL_PATH, "w") as f:
         json.dump(journal, f, indent=2)
 
 
-def cycle_state(journal, epoch, cycle):
+def cycle_state(journal: Dict[str, Union[Dict, List, str, None]], epoch: str, cycle: int) -> Dict[str, Union[int, bool]]:
+    """Get or create the state for a given cycle."""
     key = f"{epoch}:{cycle}"
     if key not in journal["cycles"]:
         journal["cycles"] = journal.get("cycles", {})
@@ -168,7 +211,7 @@ def cycle_state(journal, epoch, cycle):
 
 
 # ------------------------------------------------------- private notebook ---
-def ensure_notebook(journal, epoch):
+def ensure_notebook(journal: Dict[str, Union[Dict, List, str, None]], epoch: str) -> None:
     """Reset the notebook when the epoch changes. A new deal mints a new
     epoch and the memory of the previous match must not bleed into this
     one — same guard philosophy as the dossier cache."""
@@ -180,7 +223,7 @@ def ensure_notebook(journal, epoch):
         log(f"notebook: fresh memory for epoch {epoch}")
 
 
-def notebook_block(journal):
+def notebook_block(journal: Dict[str, Union[Dict, List, str, None]]) -> str:
     """The notebook rendered for prompts. Empty string until first entry."""
     nb = (journal.get("notebook") or "").strip()
     if not nb:
@@ -474,14 +517,18 @@ def herald_paper(cycle, part, limit=4000):
             f"{text[:limit]}\n")
 
 
-def graveyard_roll():
+def graveyard_roll() -> List[Tuple[str, str, str]]:
     """Public obituaries from village/graveyard.md — facts the whole village
     knows: seat, merchant name, role revealed on departure, cause. Nothing
     else. Rows may name the merchant ('Gandalf') or carry the older
-    'Name (number)' labels — seat_from_label resolves both."""
+    'Name (number)' labels — seat_from_label resolves both.
+    
+    Returns:
+        List of tuples: (seat, display_name, role).
+    """
     entries = []
     try:
-        text = open("gameplay/village/graveyard.md").read()
+        text = open("gameplay/village/graveyard.md", "r").read()
     except OSError:
         return entries
     for line in text.splitlines():
@@ -506,7 +553,7 @@ def graveyard_roll():
     return entries
 
 
-def public_facts_block(state):
+def public_facts_block(state: Dict[str, Union[int, str, List[str], Dict]]) -> str:
     """Public facts every merchant knows: who lives, who has left and how.
     Merchants are named; seat numbers are bookkeeping, never prose."""
     roll = graveyard_roll()
@@ -516,7 +563,7 @@ def public_facts_block(state):
             f"{'; '.join(roll) if roll else 'empty so far'}")
 
 
-def time_of_day_block(state):
+def time_of_day_block(state: Dict[str, Union[int, str, List[str], Dict]]) -> str:
     """The bazaar's tea clock: the current in-theme region of the day,
     computed from the arena clock. Merchants speak of it naturally."""
     label, flavour = day_region(state)
@@ -528,15 +575,19 @@ MANIFEST_PATH = os.path.join(REPO_ROOT, "gameplay", "manifest.md")
 _manifest_cache = (None, "")             # (mtime, text)
 
 
-def manifest_block():
+def manifest_block() -> str:
     """The Bazaar Compact (gameplay/manifest.md): the rules of the game
     every merchant knows — purpose, roles, clock, winning, vocabulary.
-    Cached by mtime; absent file means no block (older arenas)."""
+    Cached by mtime; absent file means no block (older arenas).
+    
+    Returns:
+        The manifest text, or a fallback message if missing.
+    """
     global _manifest_cache
     try:
         mtime = os.path.getmtime(MANIFEST_PATH)
         if _manifest_cache[0] != mtime:
-            with open(MANIFEST_PATH) as f:
+            with open(MANIFEST_PATH, "r") as f:
                 _manifest_cache = (mtime, f.read())
     except OSError:
         return ""
@@ -558,29 +609,68 @@ def _content_text(content):
     return ""
 
 
-def ask(system, user, temperature=0.7, reasoning_effort="none"):
+def ask(system: str, user: str, temperature: float = 0.7, reasoning_effort: str = "none", cycle: Optional[int] = None, phase: Optional[str] = None) -> str:
     """One model call. reasoning_effort rides the API's reasoning control:
     "none" for public acts (fast, in-character), "high" for private
-    thinking — the two-stage reasoning calls run the model harder."""
-    r = client.chat.complete(
-        model=MODEL,
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user", "content": user},
-        ],
-        temperature=temperature,
-        reasoning_effort=reasoning_effort,
-    )
-    return _content_text(r.choices[0].message.content).strip()
+    thinking — the two-stage reasoning calls run the model harder.
+    
+    Args:
+        system: The system prompt (doctrine).
+        user: The user prompt (question).
+        temperature: Sampling temperature.
+        reasoning_effort: Reasoning effort level ("none", "low", "medium", "high").
+        cycle: Current cycle (for token logging).
+        phase: Current phase (for token logging).
+        
+    Returns:
+        The model's response, or an empty string on failure.
+    """
+    try:
+        r = client.chat.complete(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            temperature=temperature,
+            reasoning_effort=reasoning_effort,
+        )
+        response = _content_text(r.choices[0].message.content).strip()
+        
+        # Log token usage
+        if hasattr(r, 'usage') and r.usage:
+            log_token_usage(
+                script="villager",
+                model=MODEL,
+                tokens_in=r.usage.prompt_tokens,
+                tokens_out=r.usage.completion_tokens,
+                temperature=temperature,
+                reasoning_effort=reasoning_effort,
+                cycle=cycle,
+                phase=phase,
+            )
+        
+        return response
+    except Exception as e:
+        logger.error(f"ask() failed: {type(e).__name__}: {e}")
+        return ""
 
 
-def trim_statement(text, limit=STATEMENT_MAX_CHARS):
+def trim_statement(text: Optional[str], limit: int = STATEMENT_MAX_CHARS) -> str:
     """Cap a statement at the limit without chopping it mid-sentence.
     The model is told the limit but overshoots when heated; a cut at an
     arbitrary character makes the merchant look gagged and loses their
-    final point — so cut at the last complete sentence instead."""
-    if len(text) <= limit:
-        return text
+    final point — so cut at the last complete sentence instead.
+    
+    Args:
+        text: The statement text.
+        limit: Maximum allowed characters.
+        
+    Returns:
+        The trimmed statement.
+    """
+    if not text or len(text) <= limit:
+        return text.strip() if text else ""
     cut = text[:limit]
     best = max(cut.rfind(". "), cut.rfind("! "), cut.rfind("? "))
     if best < len(cut) * 0.4:          # no clean sentence in range — last word
@@ -601,6 +691,15 @@ def parse_seat_id(text):
 
 # ------------------------------------------------------------- phase acts ---
 def do_discussion(state, cs, journal):
+    # Check if this is the anonymous cycle
+    registry = load_role_registry(get_gm_private_key())
+    anonymous_cycle = registry.get("anonymous_cycle", 0)
+    is_anonymous = (state["cycle"] == anonymous_cycle)
+    
+    # Check if this seat is the Historian
+    historian = registry.get("historian")
+    is_historian = (MY_SEAT == historian)
+    
     # Dinner is the village's reckoning: the last fifth of the day, when
     # every merchant is expected to state, publicly, who they lean toward
     # banishing. The dinner lean overrides the statement budget (once).
@@ -660,6 +759,9 @@ def do_discussion(state, cs, journal):
         + ("\nIt is DINNER. This statement must state, publicly and clearly, "
            "who you lean toward banishing tonight and why — name them. The "
            "village is counting heads." if at_dinner else "")
+        + ("\n\n**This cycle's statements are ANONYMOUS.** Do not sign your name or reveal your identity." if is_anonymous else ""),
+        cycle=state["cycle"],
+        phase="discussion",
     )
     statement = trim_statement(statement)
 
@@ -667,7 +769,7 @@ def do_discussion(state, cs, journal):
     os.makedirs(sdir, exist_ok=True)
     path = f"{sdir}/c{state['cycle']:03d}-{MY_SEAT}.jsonl"
     rec = {
-        "match": state["match"], "cycle": state["cycle"], "seat": MY_SEAT,
+        "match": state["match"], "cycle": state["cycle"], "seat": (None if is_anonymous else MY_SEAT),
         "seq": cs["statements"] + 1, "text": statement,
         "epoch": state.get("epoch"),
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -680,6 +782,24 @@ def do_discussion(state, cs, journal):
     cs["last_statement_ts"] = time.time()
     if at_dinner:
         cs["dinner_stated"] = True
+    
+    # Historian writes a summary
+    if is_historian and cs["statements"] == 1:
+        summary = ask(
+            system,
+            "You are the Historian. Write a 3-4 sentence summary of today's discussion "
+            "so far for the Herald. Do not reveal private information or roles. "
+            "Label it clearly as the Historian's Summary.",
+            temperature=0.3,
+            cycle=state["cycle"],
+            phase="discussion",
+        )
+        summary_path = f"gameplay/village/cycle-summaries/c{state['cycle']:03d}.md"
+        os.makedirs(os.path.dirname(summary_path), exist_ok=True)
+        with open(summary_path, "w") as f:
+            f.write(f"# Historian's Summary — Cycle {state['cycle']}\n\n{summary}\n")
+        commit_and_push([summary_path], f"Historian summary c{state['cycle']:03d}")
+    
     save_journal(journal)
     log(f"posted statement {cs['statements']}/{MAX_STATEMENTS_PER_DAY} for cycle {state['cycle']:03d}"
         + (" (dinner lean)" if at_dinner else ""))
