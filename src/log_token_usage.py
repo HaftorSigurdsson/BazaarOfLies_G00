@@ -4,6 +4,7 @@
 Hook into villager.py and elder-council.py to log API calls to gameplay/usage/.
 """
 import csv
+import json
 import os
 from datetime import datetime, timezone
 from typing import Dict, Optional

@@ -9,3 +9,6 @@ site/
 
 # local statement transcript mirror (assembled, never committed)
 gameplay/village/statements/_assembled-*.jsonl
+
+# Token usage ledger (perspective only, never game input)
+gameplay/usage/

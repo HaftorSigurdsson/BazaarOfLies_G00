@@ -19,6 +19,7 @@ import argparse
 import base64
 import glob
 import json
+import logging
 import os
 import random
 import secrets
@@ -28,6 +29,9 @@ import time
 from collections import Counter
 from datetime import datetime, timezone, timedelta
 from typing import Optional
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 from crypto import (load_gm_private_key, decrypt_payload, encrypt_for_seat,
                    verify_payload, seal_chat, open_chat)
@@ -474,12 +478,19 @@ def tally_votes():
     if banished:
         state["alive"].remove(banished)
         role = load_role_registry(get_gm_private_key()).get(banished, "Unknown")
-        update_graveyard(banished, seats[banished]["persona"], role, "Village vote")
+        # Last words: the banished may address the village one final time —
+        # the Family's parting words would only be misdirection, so the
+        # Family departs silent.
+        last_words = ask_last_words(banished, role) if role != "Mafia" else None
+        update_graveyard(banished, seats[banished]["persona"], role, "Village vote",
+                         last_words=last_words)
         update_announcements(
             f"**Banishment!** {display_name(banished)}, "
             f"{persona_name(seats[banished]['persona'])}, "
             "has been banished from the bazaar.\n"
             f"Their role was: **{role}**.\n\n{table_text}"
+            + (f"\n\n**Last words of {display_name(banished)}:**\n{last_words}"
+               if last_words else "")
         )
         log(f"banished {banished} (role revealed: {role})")
     else:
@@ -582,13 +593,11 @@ def resolve_night_actions():
     elif shutter_target and shutter_target not in {t for _, t in saves}:
         state["alive"].remove(shutter_target)
         role = registry.get(shutter_target, "Unknown")
-        update_graveyard(shutter_target, seats[shutter_target]["persona"], role, last_words=last_words)
-        # Prompt for last words
-        last_words = None
-        if role != "Mafia":  # Family doesn't get last words
-            last_words = ask_last_words(shutter_target, role)
-        
-        update_graveyard(shutter_target, seats[shutter_target]["persona"], role, last_words=last_words)
+        # Last words for the departed — the Family gets none (a silenced
+        # voice cannot steer the village from the grave).
+        last_words = ask_last_words(shutter_target, role) if role != "Mafia" else None
+        update_graveyard(shutter_target, seats[shutter_target]["persona"], role,
+                         last_words=last_words)
         update_announcements(
             f"**Stall shuttered!** {display_name(shutter_target)}, "
             f"{persona_name(seats[shutter_target]['persona'])}, "

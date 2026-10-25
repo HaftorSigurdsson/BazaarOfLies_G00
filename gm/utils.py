@@ -1,5 +1,7 @@
-from datetime import datetime, timezone
+import json
+import os
 import re
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple, Union
 
 
@@ -48,12 +50,16 @@ GRAVEYARD_TEMPLATE = """# Bazaar Graveyard
 
 
 def update_graveyard(seat: str, persona: str, role: str,
-                     banished_by: Optional[str] = None) -> None:
+                     banished_by: Optional[str] = None,
+                     last_words: Optional[str] = None) -> None:
     """Add a seat to the graveyard in village/graveyard.md.
 
     The row is inserted directly under the table header (not appended at the
     end of the file, which lands after any later sections and used to mangle
     the markdown). The persona column holds the short name only.
+
+    The departed's last words (when granted) are appended to
+    village/last_words.md — public record the next Herald carries.
     """
     state = read_state()
     line = (f"| {state['match']} | {state['cycle']} | {display_name(seat)} | "
@@ -69,6 +75,10 @@ def update_graveyard(seat: str, persona: str, role: str,
     lines.insert(insert_at, line)
     with open(path, "w") as f:
         f.write("\n".join(lines) + "\n")
+    if last_words:
+        with open("gameplay/village/last_words.md", "a") as f:
+            f.write(f"## {display_name(seat)} (Match {state['match']}, "
+                    f"Cycle {state['cycle']})\n\n{last_words}\n\n")
 
 
 def get_seats() -> Dict[str, Dict[str, Union[str, int]]]:
