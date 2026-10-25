@@ -40,6 +40,19 @@ The day runs **25 minutes** of talk, then **5 minutes** of voting:
 - **Morning → Morning tea → Lunch → Afternoon tea → Dinner** (5 minutes
   each): public discussion. Every merchant may post up to **8 statements**
   per day, at least 90 seconds apart, in their own voice.
+- **The square's customs** — every region except the free one carries one
+  act, and every merchant's FIRST statement in a region must honour it;
+  after the first, the region is free:
+  - **Morning — weigh the night**: speak first to the night's public
+    facts — departures, the plague's hand, the graveyard, the roster —
+    or ask a named merchant about them. If nothing changed, say so
+    plainly and move on.
+  - **Morning tea — the question**: put one plain question to one named
+    merchant, about their words, votes, or record.
+  - **Lunch — the test**: state one prediction the village can check, of
+    the form "If X is honest, X's vote tonight will follow X's ledger —
+    watch whether it does."
+  - **Afternoon tea**: free speech, no custom.
 - **Dinner**: the village's reckoning — **every merchant must state,
   publicly, who they lean toward banishing and why.**
 - **Evening** (5 minutes): **the vote**. Ballots are public, signed, and

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.16.0] - 2026-10-25
+### Added
+- **The square's customs** (the forced-discussion anti-echo): the proof of concept was the dinner lean — ten minutes of "name your suspect" broke Match 1 Cycle 1's meta-pandemic faster than every vocabulary guard combined, because a forced concrete act cannot be answered with commentary about how others argue. Each tea-clock region now carries one act, owed by every merchant's FIRST statement in that region (after the first, the region is free):
+  - **Morning — weigh the night**: speak first to the night's public facts (departures, the plague's hand, the graveyard) or ask a named merchant about them — the direct fix for Match 3's cardinal failure, where a quiet night and a graveyard-contradicting claim went unremarked by all seven living seats.
+  - **Morning tea — the question**: one plain question to one named merchant (questions are directed — ten questions make ten threads, not one chorus).
+  - **Lunch — the test**: one checkable prediction of the form "If X is honest, X's vote tonight will follow X's ledger — watch whether it does" (a prediction is by definition something nobody has said yet).
+  - **Afternoon tea stays free**; **Dinner** keeps its existing mandatory lean.
+  - The customs live in the manifest (public game rule, symmetric to the dinner lean) and are surfaced in both the private-thinking and the statement prompts, gated per region per cycle via the journal (`custom_done`), honoured on the merchant's first post of the region.
+
 ## [2.15.0] - 2026-10-25
 ### Changed
 - **The Herald's numbering, reorganized as a classic newspaper** (scheme B of the volume review): **Vol. = the match number** and **No. = the edition's ordinal within the match** (mornings odd, evenings even — cycle 3's papers are No. 5 and No. 6). Filenames follow: `herald-vol<MM>-no<NN>-cXXX-{morning,evening}.md`; the masthead dateline reads `*Vol. 4 — No. 5 — Cycle 3*`; the pressed PDF carries `Vol. 4 — No. 5`.

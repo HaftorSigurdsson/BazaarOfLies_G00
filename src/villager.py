@@ -120,6 +120,31 @@ DIGEST_MODEL = MODEL            # the compressor; point at a cheaper alias to sa
 REASONING_TEMPERATURE = 0.3             # private thinking runs cooler than speech
 REASONING_EFFORT = "high"
 
+# --------------------------------------------------- the square's customs ---
+# Each tea-clock region carries one act (manifest, "The day — the tea
+# clock"): the merchant's FIRST statement in a region must perform it;
+# after that the region is free. Forced concrete acts — react, question,
+# predict — are the chorus's antidote: they cannot be answered with
+# meta-commentary, and a prediction is by definition something nobody has
+# said yet. The dinner lean (the original proof this works) keeps its own
+# mandatory handling via at_dinner; afternoon tea stays free.
+REGION_CUSTOMS = {
+    "Morning": (
+        "weigh the night — speak first to the night's public facts (the "
+        "GM's boards since your last word: departures, the plague's hand, "
+        "the graveyard, the roster), or put a question about them to one "
+        "named merchant; if nothing changed, say so plainly and move on"),
+    "Morning tea": (
+        "the question — put ONE plain question to ONE named merchant, "
+        "about their words, votes, or record"),
+    "Lunch": (
+        "the test — state ONE prediction the village can check, of the "
+        "form 'If X is honest, X's vote tonight will follow X's ledger — "
+        "watch whether it does'"),
+    # Afternoon tea: free. Dinner: the mandatory lean (at_dinner).
+}
+
+
 # ------------------------------------------------------------------ args ---
 parser = argparse.ArgumentParser(description="Bazaar of Lies Villager")
 parser.add_argument("--seat", required=True, help="Seat ID (e.g., seat-01)")
@@ -234,7 +259,7 @@ def cycle_state(journal: Dict[str, Union[Dict, List, str, None]], epoch: str, cy
         journal["cycles"] = journal.get("cycles", {})
         journal["cycles"][key] = {
             "statements": 0, "last_statement_ts": 0, "last_statement_iso": "",
-            "voted": False, "night_action": False,
+            "voted": False, "night_action": False, "custom_done": [],
         }
     return journal["cycles"][key]
 
@@ -932,6 +957,13 @@ def do_discussion(state, cs, journal):
         log("phase=discussion → pacing, idle")
         return
 
+    # The square's custom for this region: due only on the seat's FIRST
+    # statement of the region; marked honoured on the first post whatever
+    # it says (prompt-level nudge, never a hard gate).
+    region_label, _ = day_region(state)
+    custom = REGION_CUSTOMS.get(region_label, "")
+    custom_due = bool(custom) and region_label not in cs.setdefault("custom_done", [])
+
     # Transcript hygiene runs before every word: compress what has aged out
     # of the verbatim window into this seat's private digest (vault-local,
     # write-once), so the prompt below reads a small recent window plus the
@@ -968,7 +1000,9 @@ def do_discussion(state, cs, journal):
         "contradicts the public record (the GM's boards and the graveyard are "
         "ground truth); 3) what should this statement accomplish; 4) any "
         "risk to avoid (contradicting your earlier statements, exposing your "
-        "role, revealing your notebook). Max 6 short bullets.",
+        "role, revealing your notebook). Max 6 short bullets."
+        + (f"\nThe square's custom for {region_label} is: {custom} — plan "
+           f"your statement to perform it first." if custom_due else ""),
         temperature=REASONING_TEMPERATURE,
                             reasoning_effort=REASONING_EFFORT)
 
@@ -993,6 +1027,9 @@ def do_discussion(state, cs, journal):
         f"the record). If you have nothing new to add, reply with exactly "
         f"'NO STATEMENT' and keep your peace: silence costs you nothing "
         f"today, and your remaining statements are saved."
+        + (f"\nIt is {region_label} and this is your first statement in this "
+           f"region: honour the square's custom FIRST — {custom}."
+           if custom_due else "")
         + ("\nIt is DINNER. This statement must state, publicly and clearly, "
            "who you lean toward banishing tonight and why — name them. The "
            "village is counting heads." if at_dinner else "")
@@ -1030,6 +1067,10 @@ def do_discussion(state, cs, journal):
     cs["statements"] += 1
     cs["last_statement_ts"] = time.time()
     cs["last_statement_iso"] = rec["ts"]      # the » marker's reference point
+    if custom_due:
+        # the custom is honoured by the first post of the region, whatever
+        # it says — the manifest and the prompt are the nudge, not a gate
+        cs["custom_done"].append(region_label)
     if at_dinner:
         cs["dinner_stated"] = True
     
