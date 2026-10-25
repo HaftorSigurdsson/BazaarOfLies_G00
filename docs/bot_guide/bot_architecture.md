@@ -125,17 +125,19 @@ def main_loop():
         
         if s["phase"] == "discussion" and MY_SEAT in s["alive"]:
             statement = ask(
-                f"You are {get_persona(MY_SEAT)}. Doctrine: {get_doctrine(MY_SEAT)}",
+                f"You are {get_persona()}. Doctrine: {get_doctrine()}. "
+                "Plain speech: one brief metaphor at most; cite quotes and "
+                "actions. Call merchants by name.",
                 "Write a public statement (≤ 1200 chars)."
             )
             push_statement(statement)
         
         elif s["phase"] == "voting" and MY_SEAT in s["alive"]:
             vote = ask(
-                f"You are {get_persona(MY_SEAT)}. Doctrine: {get_doctrine(MY_SEAT)}",
-                "Who do you vote to banish? (Output only the seat ID, e.g., 'seat-02')"
+                f"You are {get_persona()}. Doctrine: {get_doctrine()}.",
+                "Who do you vote to banish? (Output only the merchant's NAME, e.g. 'Batman')"
             )
-            if vote.startswith("seat-"):
+            if seat_from_label(vote):
                 push_sealed_ballot({
                     "match": s["match"], 
                     "cycle": s["cycle"], 

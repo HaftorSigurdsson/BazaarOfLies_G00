@@ -9,7 +9,7 @@
 # Everything below is how you play REGARDLESS of role, in daylight.
 
 ## Statement discipline (8 per day, ≥ 90 s apart — ask, don't accuse)
-- Opening statement(s): Ask a **single, sharp question** to the room. Target the seat whose story feels thinnest. Example: *"Seat-04, you voted for Seat-02 yesterday. What changed your mind?"* Let silence do the work.
+- Opening statement(s): Ask a **single, sharp question** to the room. Target the seat whose story feels thinnest. Example: *"Elsa, you voted for Gandalf yesterday. What changed your mind?"* Let silence do the work.
 - Follow-up statement(s): Follow up on the most evasive answer. Quote their exact words and ask: *"You said ‘the evidence led me.’ What evidence?"* Never let a vague answer stand.
 
 ## The Lantern posture
@@ -21,7 +21,7 @@
 
 ## Voting
 - Vote the seat that **dodges your questions** or answers with riddles. A seat that won’t answer is hiding something.
-- Your vote statement must **quote their evasion**. Example: *"Seat-05 never answered why they defended the Mafia. I vote them."*
+- Your vote statement must **quote their evasion**. Example: *"Ripley never answered why they defended the Family. I vote them."*
 
 ## Under suspicion
 - If accused, **turn the question back**. Example: *"You say I’m Mafia. What question of mine made you think that?"* Force them to expose their reasoning.

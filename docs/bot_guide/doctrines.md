@@ -53,30 +53,31 @@ Every doctrine must follow this structure:
 ## **3. Example Doctrines**
 Explore the [`example_doctrines`](../example_doctrines/README.md) folder for full doctrine templates.
 
-| Name                | Strategy               | Persona Alignment          | Example Tactic                                  |
+| Name                | Strategy               | Trade Alignment            | Example Tactic                                  |
 |---------------------|------------------------|----------------------------|------------------------------------------------|
-| **The Riddler’s Veil** | Deflection             | Spice Merchant             | *"The one who smells most of guilt is the one accusing fastest."* |
-| **The Weaver’s Loom**  | Pattern-checking       | Scribe                    | *"Bank every mismatch, even small ones."*     |
-| **The Lantern’s Gaze** | Questioning            | Lantern Seller            | *"Why did you defend X yesterday but vote for them today?"* |
-| **The Smith’s Hammer** | Pressure-testing       | Blacksmith                | *"Prove your accusation or withdraw it."*     |
-| **The Bird’s Whisper** | Noise                  | Storyteller               | *"Post cryptic statements to confuse the room."* |
+| **The Ledger-Keeper** | Debt-collecting        | Moneylender                | *"You promised this yesterday; today you broke it. Explain."* |
+| **The Weaver’s Loom**  | Pattern-checking       | Scribe                     | *"Bank every mismatch, even small ones."*     |
+| **The Lantern’s Gaze** | Questioning            | Lantern Seller             | *"Why did you defend Elsa yesterday but vote for her today?"* |
+| **The Smith’s Hammer** | Pressure-testing        | Coppersmith                | *"Prove your accusation or withdraw it."*     |
+| **The Quiet Listener** | Silence-tracking       | Bird Merchant              | *"Report who goes quiet under pressure, and when."* |
 
 ---
 
 ## **4. How to Write a Doctrine**
 ### **Step 1: Choose a Strategy**
-Pick a **core tactic** that aligns with the bot’s persona. Examples:
-- **Riddler**: Deflect with metaphors.
+Pick a **core tactic** — argued always in plain speech (see the Bazaar
+Compact's *How the bazaar argues*):
+- **Ledger-Keeper**: Collect broken promises, quoted with dates.
 - **Weaver**: Expose inconsistencies.
 - **Lantern**: Ask sharp questions.
 - **Smith**: Pressure-test claims.
-- **Bird**: Create noise.
+- **Listener**: Track who talks and who goes quiet.
 
-### **Step 2: Align with Persona**
-- The doctrine’s **voice** must match the persona’s tone.
-- Example:
-  - *The Spice Merchant* → Riddles and metaphors.
-  - *The Camel Driver* → Blunt questions.
+### **Step 2: Give the Trade a Job**
+- The persona is a **one-line trade identity** — the doctrine is the
+  only behavior home. Give the trade a concrete job in the strategy:
+  - *The Scribe* → quote the record, exactly.
+  - *The Moneylender* → count debts, with dates.
 
 ### **Step 3: Test the Doctrine**
 - **Simulate accusations**: Write a mock accusation and test how the bot responds.
@@ -109,8 +110,8 @@ Every doctrine must include these **4 rules** (copy verbatim):
 | Issue                          | Fix                                                                                     |
 |-------------------------------|----------------------------------------------------------------------------------------|
 | Bot is too passive            | Add a **pressure tactic** (e.g., *"Demand answers from the quietest seat."*).        |
-| Bot is too predictable        | Introduce **noise** (e.g., *"Post cryptic statements to obscure intent."*).          |
-| Bot’s voice feels unnatural   | **Refine metaphors** to match the persona.                                             |
+| Bot is too predictable        | Vary the openings (ledger update, question, debt) rather than the substance.          |
+| Bot is too flowery            | Tighten the doctrine's Voice section: one metaphor per statement at most.              |
 
 ---
 
@@ -122,7 +123,7 @@ Every doctrine must include these **4 rules** (copy verbatim):
 # Everything below is how you play REGARDLESS of role, in daylight.
 
 ## Statement discipline (up to 8 per day — pace them out, never spend them all early)
-- Opening statement(s): Ask a **direct question** to the quietest seat. Example: *"Seat-04, who do YOU fear tonight?"*
+- Opening statement(s): Ask a **direct question** to the quietest seat. Example: *"Elsa, who do YOU fear tonight?"*
 - Follow-up statement(s): Report who answered plainly and who deflected.
 
 ## The Light
@@ -130,7 +131,7 @@ Every doctrine must include these **4 rules** (copy verbatim):
 - Keep a **private tally** of deflections vs. plain answers.
 
 ## Voting
-- Vote the seat with the most deflections. Example: *"Seat-05 dodged my question. I vote them."*
+- Vote the seat with the most deflections. Example: *"Ripley dodged my question. I vote them."*
 
 ## Under suspicion
 - Answer plainly, then relight the lamp: *"Now, my question again — you haven’t answered it."*

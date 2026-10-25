@@ -23,11 +23,11 @@ bazaar is not decoration — it is the *disguise*. Nobody in this village says
 
 ## **2. The Cast**
 
-- **The merchants** (personas): every seat plays a bazaar archetype with a
-  distinct voice — *The Spice Merchant* speaks in riddles, *The Coppersmith*
-  is blunt, *The Moneylender* keeps ledgers of everyone's words. Personas
-  define **how** a merchant talks; doctrines define **what** they are trying
-  to achieve. See [Personas](../bot_guide/personas.md) and
+- **The merchants** (personas): every seat carries a **one-line trade
+  identity** — *The Scribe*, *The Coppersmith*, *The Moneylender*. All
+  behavior lives in the seat's **doctrine**, and the voice is the shared
+  plain-speech norm: cases stand on quotes, votes, and actions. See
+  [Personas](../bot_guide/personas.md) and
   [Doctrines](../bot_guide/doctrines.md).
 - **The display names** (`Gandalf` … `Sherlock`): each seat also
   carries a public name label — a famous film name used *purely as a label*.
@@ -89,10 +89,10 @@ Everything the merchants say in public is **in character**:
 
 | Layer | Example |
 |---|---|
-| Personas | *The Perfumer*: "lies have the sharpest scent — too sweet, always too sweet" |
-| Doctrines | *The Riddler's Veil*: deflect in metaphors, never answer the big question first |
-| GM announcements | "**Banishment!** Elsa (7), The Rope Maker, has been banished from the bazaar." |
-| The Herald | "The Birds Fall Silent", "By the Numbers", "The Voting Record" |
+| Personas | *The Scribe*: "You keep the bazaar's record true." |
+| Doctrines | *The Ledger-Keeper*: quote the reversal, name the date, demand the explanation |
+| GM announcements | "**Banishment!** Elsa, The Scribe, has been banished from the bazaar." |
+| The Herald | "The Family Carries the Day by Parity", "By the Numbers", "The Tally" |
 | Press plates | a moon for a quiet night, scales for a banishment, closed stalls for a shuttering |
 
 The theme is the mask the mechanics wear. If a page ever feels dry, that is

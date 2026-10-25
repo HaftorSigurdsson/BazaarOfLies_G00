@@ -106,6 +106,11 @@ All notable changes to this project will be documented in this file.
 - **Statements no longer cut mid-sentence**: the model was told "1200 chars max" but overshot when heated, and the hard slice chopped statements mid-word ("the bazaar does not trade in va"). The prompt now demands strictly under 1200 characters (aim 900, end on a complete sentence — "the town bell cuts anything longer and your final point is lost with it"), and a new `trim_statement` caps at the last complete sentence within the budget (falling back to the last word) instead of an arbitrary character.
 
 
+## [2.12.1] - 2026-10-25
+### Changed
+- **Documentation aligned with the Plain Speech Act and names-only prose**: the README states the two conventions; `docs/game_mechanics/the_bazaar.md` (the cast, the theme table — GM announcements and Herald examples now name-only), `docs/setup/seats_config.md` (seats.json example with the `name` field and one-line persona format, the parser note, the current persona table), `docs/bot_guide/doctrines.md` and `docs/example_doctrines/` (the Riddler/noise archetypes replaced by Ledger-Keeper, Weaver, Lantern, Smith, and Quiet Listener; the two riddler example doctrines rewritten; example quotes call merchants by name), and `docs/bot_guide/bot_architecture.md` (bot-loop example uses `get_persona()` and name-based votes). `uv run python -m mkdocs build --strict` passes.
+
+
 ## [2.12.0] - 2026-10-25
 ### Changed
 - **The Plain Speech Act** (two matches of evidence: persona imagery amplified itself until five seats recited the same metaphor and the reasoning drowned): personas in `setup/seats.json` are now **one-line trade identities** ("You are The Scribe. You keep the bazaar's record true.") — no behavior, no metaphor vocabulary; all behavior lives in the doctrines. The ten doctrines (`../villagers/`) are rewritten **role-agnostic** with a shared plain-speech Voice section — the old "Riddler's Veil" school of deliberate evasion-speak is gone. Every villager prompt carries the norm ("at most one brief metaphor per statement; cases stand on quotes, votes, and actions"), the Bazaar Compact gains a **"How the bazaar argues"** section, and the tea-clock flavour strings are trimmed to plain one-liners.

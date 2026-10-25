@@ -33,13 +33,17 @@ Use the `src/town-setup.py` script to generate keypairs for all seats:
 {
   "seats": {
     "seat-01": {
-      "persona": "The Spice Merchant",
+      "name": "Gandalf",
+      "persona": "You are The Spice Merchant. You trade in scent and season.",
       "public_key": "base64-encoded-public-key-here",
+      "signing_public_key": "base64-encoded-signing-public-key-here",
       "git_identity": "git-username-for-seat-01"
     },
     "seat-02": {
-      "persona": "The Camel Driver",
+      "name": "Hermione",
+      "persona": "You are The Carpet Weaver. You know every thread by heart.",
       "public_key": "base64-encoded-public-key-here",
+      "signing_public_key": "base64-encoded-signing-public-key-here",
       "git_identity": "git-username-for-seat-02"
     }
   }
@@ -49,7 +53,8 @@ Use the `src/town-setup.py` script to generate keypairs for all seats:
 ### **Fields**
 | Field         | Description                                                                                     |
 |---------------|-------------------------------------------------------------------------------------------------|
-| `persona`     | The bot’s character (e.g., *The Spice Merchant*). Must align with the doctrine.                |
+| `name`        | The public display name (`Gandalf`) — how the merchant is called in all prose.                   |
+| `persona`     | The seat's **one-line trade identity**: "You are The <Trade>. <grounding sentence>" (parsed by `persona_name()` for announcements and the graveyard). |
 | `public_key`  | Base64-encoded public key for sealing dossiers and communications.                             |
 | `signing_public_key` | Base64-encoded **Ed25519 signing** public key (verifies the seat's public day ballots).   |
 | `git_identity`| Git username for commits (e.g., `bazaar-bot-seat-01`).                                         |
@@ -58,18 +63,27 @@ Use the `src/town-setup.py` script to generate keypairs for all seats:
 
 ## **4. Design Personas**
 ### **Guidelines**
-- **Unique voice**: Each persona should have a distinct speaking style.
-- **Bazaar theme**: Align with the setting (e.g., merchants, travelers, artisans).
-- **Doctrine alignment**: The persona’s voice should match its doctrine (e.g., *The Riddler’s Veil* for a mysterious merchant).
+- **Identity, not behavior**: one line per seat — the trade and a
+  grounding sentence. No speaking styles, no metaphor vocabulary; all
+  behavior lives in the doctrine (`../villagers/<seat>.md`).
+- **Bazaar theme**: a trade of the marketplace (merchant, artisan,
+  keeper of records).
+- **Parser note**: the first sentence must be "You are The <Trade>." —
+  `gm.utils.persona_name()` greps it for announcements and the graveyard.
 
-### **Example Personas**
-| Seat      | Persona               | Voice/Tone                          | Example Doctrine               |
-|----------|-----------------------|------------------------------------|----------------------------------|
-| `seat-01`| The Spice Merchant    | Riddles, metaphors               | The Merchant’s Enigma            |
-| `seat-02`| The Camel Driver      | Blunt, direct                     | The Anvil’s Strike               |
-| `seat-03`| The Scribe            | Pattern-checking, quotes          | The Weaver’s Loom                |
-| `seat-04`| The Storyteller       | Noise, misdirection               | The Bird’s Whisper               |
-| `seat-05`| The Lantern Seller    | Questions, illumination           | The Lantern’s Beacon             |
+### **Current Personas**
+| Seat | Name | Persona |
+|---|---|---|
+| `seat-01` | Gandalf | The Spice Merchant — trades in scent and season |
+| `seat-02` | Hermione | The Carpet Weaver — knows every thread by heart |
+| `seat-03` | Yoda | The Lantern Seller — knows light and shadow |
+| `seat-04` | Batman | The Coppersmith — works with what is real |
+| `seat-05` | Ripley | The Moneylender — keeps the bazaar's ledger |
+| `seat-06` | Neo | The Perfumer — notices what others overlook |
+| `seat-07` | Elsa | The Scribe — keeps the bazaar's record true |
+| `seat-08` | Morpheus | The Potter — knows how vessels are tested |
+| `seat-09` | Inigo | The Tea Seller — everyone has sat at their stove |
+| `seat-10` | Sherlock | The Bird Merchant — their ear catches every chirp |
 
 ---
 
