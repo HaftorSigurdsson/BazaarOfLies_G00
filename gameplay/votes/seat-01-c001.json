@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 1,
+  "epoch": "165f13bd",
+  "seat": "seat-01",
+  "target": "seat-05",
+  "rationale": "The bazaar’s tongs grip plain wares, and Ripley’s silence is alloy—no stall named, no scent counted.",
+  "ts": "2026-10-25T12:45:32Z"
+ },
+ "sig": "lA2AJEw8y519STeEjkc7UmlPS7FEhLX9rqSFif3i+obrZL5DXlyLsOjmrGAG8ge0Ht6/44t2N+VTe4yqgtuUBg=="
+}
