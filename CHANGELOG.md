@@ -95,6 +95,11 @@ All notable changes to this project will be documented in this file.
 - **Docs aligned with the contained night**: `rules.md`'s night phase describes the uniform chat/actions/packets/results and the decoy chorus; `encryption.md` documents the symmetric fixed-size chat channel (`seal_chat`/`open_chat`, the `night_channel_key`, decoys); the repo map gains `night/chat/`; `operations.md`'s vault note and `FUTURE.md`'s evidence table point at the in-repo channel and the truth archive. `mkdocs build --strict` passes.
 
 
+## [2.11.3] - 2026-10-25
+### Added
+- **`src/town-reset.py --keep-match`**: a mid-chain reset. The default reset restarts the match counter at 0, so the next deal is Match 1 again — overwriting the previous match's recap, judgment, and truth archive. `--keep-match` preserves the counter the GM already bumped at `end_match`, so the next GM tick deals the **next** match (Match 2 after Match 1) with a fresh epoch and clean artifacts, history intact. Documented in `docs/operations.md`.
+
+
 ## [2.11.2] - 2026-10-25
 ### Changed
 - **`FUTURE.md` refreshed**: the built Elder Council phases are removed (only the trilogy ledger remains of it); The Early Bell keeps its full design. Three new future items: **game archiving** (per-match snapshots of `gameplay/` + a manifest, zip by default / rar optional, `archive/` at the repo root), **player-machine onboarding** (per-platform bootstrap scripts on uv, a `doctor.py` preflight, a player quickstart, and the open question of encrypted seat-bundle key handoff for external players), and **multi-provider support** (an `src/llm.py` provider layer — mistralai plus one OpenAI-compatible client covering most of the market, `setup/models.json` per-role config, optional per-stable models making the arena a model-vs-model arena).

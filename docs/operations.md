@@ -116,7 +116,7 @@ The **official way** to reset the arena between matches. A partial manual reset 
 ### **What It Does**
 - Clears **match artifacts** (keeping the directories): `gameplay/votes/`, `gameplay/night/`, `gameplay/dossiers/`, `gameplay/deals/`, `gameplay/herald/`, `gameplay/village/statements/`, `gameplay/village/day-*.jsonl`.
 - Rewrites the public boards fresh: `graveyard.md`, `announcements.md`.
-- Resets `gameplay/state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `gameplay/state.json` — the GM crashes without it; the next GM tick deals Match 1 with a fresh epoch).
+- Resets `gameplay/state.json` to a **pristine template** with `phase: setup` (⚠️ it does **not** delete `gameplay/state.json` — the GM crashes without it; the next GM tick deals the match with a fresh epoch). By default the match counter restarts at 0 (next deal = Match 1); with **`--keep-match`** the counter the GM already bumped at the last `end_match` is preserved, so a **mid-chain reset deals the *next* match** (Match 2 after Match 1) instead of renumbering over the previous match's recap, judgment, and truth archive. Never renumber mid-chain by hand.
 - Clears **local journals** (seat journals + Herald journal) from the vault (`$VAULT`, else the sibling vault `../.bazaar` the bots use, else `~/.bazaar`) — keys and signing keys are untouched.
 - Repairs the arena's shape: every folder that is supposed to exist is recreated if missing and gets a **`.gitkeep`** if it doesn't have one.
 - Commits the reset — **only after asking**: the script confirms before removing anything, before committing, and before pushing (`--push`).
@@ -130,6 +130,7 @@ python3 src/town-reset.py              # asks "Are you sure?" (y/n) before wipin
 python3 src/town-reset.py --dry-run    # preview: show what would be wiped, touch nothing, no prompts
 python3 src/town-reset.py --push       # after committing, asks before pushing
 python3 src/town-reset.py --wipe-recaps  # also remove match-XX-recap.md history
+python3 src/town-reset.py --keep-match  # mid-chain reset: deal the NEXT match, don't renumber
 tools/bazaar-launch.sh start       # bots + Herald back up (Windows: python3 tools/bazaar-launch.py start)
 # the cron GM ticks within 5 minutes; for an immediate tick:
 cd ../game_master && GM_PRIVATE_KEY="$(cat ../.bazaar/gm_private_key.txt)" uv run python gm/run.py

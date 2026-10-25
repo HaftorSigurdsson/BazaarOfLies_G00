@@ -159,14 +159,21 @@ def rewrite_boards(dry):
     return len(BOARDS)
 
 
-def reset_state(dry):
+def reset_state(dry, keep_match=False):
     """Pristine state — phase 'setup' makes the next GM tick deal Match 1
-    with a fresh epoch. Do NOT delete the file: the GM crashes without it."""
+    with a fresh epoch. Do NOT delete the file: the GM crashes without it.
+    With keep_match, the match counter the GM bumped at the last end_match
+    is preserved, so a mid-chain reset deals the NEXT match instead of
+    renumbering over the previous one's history (recap, judgment, truth)."""
     seats_path = os.path.join(REPO_ROOT, SEATS_FILE)
     with open(seats_path) as f:
         seats = json.load(f)["seats"]
+    prev_match = 0
+    if keep_match:
+        with open(os.path.join(REPO_ROOT, STATE_FILE)) as f:
+            prev_match = int(json.load(f).get("match") or 0)
     state = {
-        "match": 0,
+        "match": prev_match,
         "cycle": 0,
         "epoch": None,
         "phase": "setup",
@@ -180,7 +187,8 @@ def reset_state(dry):
         with open(path, "w") as f:
             json.dump(state, f, indent=2)
             f.write("\n")
-    print(f"    {'would reset' if dry else 'reset  '} {STATE_FILE} (phase=setup, epoch=None, "
+    print(f"    {'would reset' if dry else 'reset  '} {STATE_FILE} "
+          f"(phase=setup, epoch=None, match={state['match']}, "
           f"{len(state['alive'])} seats alive)")
     return 1
 
@@ -279,6 +287,10 @@ def main():
     ap.add_argument("--wipe-recaps", action="store_true",
                     help="Also remove match recaps "
                          "(gameplay/village/match-XX-recap.md).")
+    ap.add_argument("--keep-match", action="store_true",
+                    help="Keep the match counter (mid-chain reset): the "
+                         "next GM deal is the NEXT match, not a renumbered "
+                         "match 1 over the previous one's history.")
     args = ap.parse_args()
 
     os.chdir(REPO_ROOT)
@@ -317,7 +329,7 @@ def main():
         log(f"Removed {n} match recap(s)")
     n = rewrite_boards(args.dry_run)
     log(f"Rewrote {n} public board(s) to template")
-    n = reset_state(args.dry_run)
+    n = reset_state(args.dry_run, args.keep_match)
     log(f"Reset {n} state file")
     n = clear_vault_journals(vault, args.dry_run)
     log(f"Cleared {n} journal(s) from vault")
