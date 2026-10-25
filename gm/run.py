@@ -228,7 +228,7 @@ def advance_phase():
             "The sun sets. The bazaar sleeps. Night actions begin!\n"
             f"**Night ends at:** {state['clock']['night_deadline']}"
         )
-        publish_night_packets(state, priv)
+        publish_night_packets(state, get_gm_private_key())
         commit_and_push(f"cycle {state['cycle']} tally done, night falls")
 
     elif phase == "night":
