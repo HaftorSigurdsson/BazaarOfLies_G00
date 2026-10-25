@@ -361,15 +361,20 @@ def deal_roles():
         assignment.setdefault(seat, "Villager")
 
     mafia_key = base64.b64encode(os.urandom(32)).decode()
-    
-    # Assign Historian (random Villager)
+
+    # Assign Historian (random Villager) — told privately, via the dossier:
+    # knowing who holds the quill would exclude them from the Family, so
+    # the identity never appears in public state.
     villagers = [seat for seat in living if assignment[seat] == "Villager"]
     historian = SECURE_RANDOM.choice(villagers)
-    assignment[historian] = "Historian"
-    
-    # Anonymous statements: random cycle between 2-4
+
+    # Anonymous statements: random cycle between 2-4 — a public game
+    # parameter (every merchant must know to keep their statements
+    # unsigned), so it lives in state.json, not the sealed registry.
     anonymous_cycle = SECURE_RANDOM.randint(2, 4)
-    
+    state["anonymous_cycle"] = anonymous_cycle
+    write_state(state)
+
     for seat in living:
         dossier = {
             "role": assignment[seat],
@@ -379,6 +384,7 @@ def deal_roles():
             # share one, the rest hold random unusable ones.
             "night_channel_key": (mafia_key if assignment[seat] == "Mafia"
                                   else base64.b64encode(os.urandom(32)).decode()),
+            "historian": seat == historian,
         }
         sealed = encrypt_for_seat(seats[seat]["public_key"], dossier)
         with open(f"gameplay/deals/{seat}.enc", "w") as f:

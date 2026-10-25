@@ -342,19 +342,12 @@ def read_statements(state):
 
 def statements_digest(state):
     """The current cycle's public statements (facts, attributed to seats).
-    Anonymous statements (cycle >= anonymous_cycle) are labeled as 'Anonymous Merchant'."""
+    A record with no seat is an anonymous-cycle statement by construction —
+    the paper prints it as 'a merchant, unsigned'."""
     statements = []
-    anonymous_cycle = None
-    try:
-        with open("gm/roles.enc", "r") as f:
-            roles = json.load(f)
-            anonymous_cycle = roles.get("anonymous_cycle")
-    except (OSError, json.JSONDecodeError, KeyError):
-        pass
-    
     for r in read_statements(state):
-        if anonymous_cycle and state.get("cycle", 0) >= anonymous_cycle and r.get("seat") is None:
-            statements.append(f"Anonymous Merchant: {r['text']}")
+        if r.get("seat") is None:
+            statements.append(f"An unsigned merchant: {r['text']}")
         else:
             statements.append(f"{display_name(r['seat'])}: {r['text']}")
     return statements

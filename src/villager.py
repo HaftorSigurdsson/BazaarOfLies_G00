@@ -694,14 +694,16 @@ def parse_seat_id(text):
 
 # ------------------------------------------------------------- phase acts ---
 def do_discussion(state, cs, journal):
-    # Check if this is the anonymous cycle
-    registry = load_role_registry(get_gm_private_key())
-    anonymous_cycle = registry.get("anonymous_cycle", 0)
+    # Anonymous statements: a public game parameter (state.json), set at the
+    # deal — the merchant is told not to sign, and the statement record
+    # carries no seat. Historian: this seat's private dossier flag —
+    # the GM never publishes who holds the quill.
+    anonymous_cycle = int(state.get("anonymous_cycle") or 0)
     is_anonymous = (state["cycle"] == anonymous_cycle)
-    
-    # Check if this seat is the Historian
-    historian = registry.get("historian")
-    is_historian = (MY_SEAT == historian)
+    try:
+        is_historian = bool(get_role_dossier(state).get("historian"))
+    except Exception:                       # no dossier yet / unreadable —
+        is_historian = False                  # not the historian's problem now
     
     # Dinner is the village's reckoning: the last fifth of the day, when
     # every merchant is expected to state, publicly, who they lean toward

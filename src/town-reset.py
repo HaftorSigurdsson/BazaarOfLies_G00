@@ -53,7 +53,14 @@ ARTIFACT_DIRS = [
     "gameplay/deals",
     "gameplay/herald",
     "gameplay/village/statements",
+    "gameplay/village/cycle-summaries",
     "gameplay/library",
+]
+
+# Single-file artifacts of the social-dynamics features: the departed's
+# last words and the Historian's chronicles belong to one match only.
+ARTIFACT_FILES = [
+    "gameplay/village/last_words.md",
 ]
 
 # Folders that must always exist and carry a .gitkeep so git keeps them.
@@ -129,6 +136,15 @@ def clear_artifact_dirs(dry):
             if remove(os.path.join(path, entry), dry):
                 cleared += 1
     return cleared
+
+
+def remove_artifact_files(dry):
+    """Single-file match artifacts (last words, and the like)."""
+    removed = 0
+    for rel in ARTIFACT_FILES:
+        if remove(os.path.join(REPO_ROOT, rel), dry):
+            removed += 1
+    return removed
 
 
 def remove_day_transcripts(dry):
@@ -326,6 +342,8 @@ def main():
 
     n = clear_artifact_dirs(args.dry_run)
     log(f"Cleared {n} artifact entries from {len(ARTIFACT_DIRS)} directories")
+    n = remove_artifact_files(args.dry_run)
+    log(f"Removed {n} single-file artifact(s)")
     n = remove_day_transcripts(args.dry_run)
     log(f"Removed {n} legacy day transcript(s)")
     if args.wipe_recaps:
