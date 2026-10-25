@@ -17,14 +17,28 @@ import subprocess
 import sys
 import tempfile
 
-PREAMBLE = r"""\documentclass[11pt]{article}
+PACKAGES = r"""\documentclass[11pt]{article}
 \usepackage[a4paper,margin=2.4cm]{geometry}
 \usepackage{parskip}
 \usepackage{microtype}
 \usepackage{graphicx}
-\pagestyle{plain}
-\begin{document}
+\usepackage{fancyhdr}
 """
+
+
+def header_setup(full_title):
+    """Running header (the full heading, small italics, under a rule) and
+    centered page numbers in the footer, on every page of the body."""
+    return (PACKAGES
+            + r"\pagestyle{fancy}" + "\n"
+            + r"\fancyhf{}" + "\n"
+            + r"\fancyhead[L]{\small\itshape "
+            + latex_escape(full_title) + "}" + "\n"
+            + r"\fancyhead[R]{}" + "\n"
+            + r"\fancyfoot[C]{\thepage}" + "\n"
+            + r"\renewcommand{\headrulewidth}{0.4pt}" + "\n"
+            + r"\setlength{\headheight}{14pt}" + "\n"
+            + r"\begin{document}" + "\n")
 
 POSTAMBLE = "\n\\end{document}\n"
 
@@ -89,7 +103,7 @@ def front_page(md):
                 r"\vspace{0.4cm}"]
     tex += [r"{\small\itshape The bazaar rests.\par}",
             r"\end{titlepage}", ""]
-    return "\n".join(tex)
+    return "\n\n".join(tex)
 
 
 def _table_tex(rows):
@@ -168,7 +182,10 @@ def md_to_tex(md):
 def compile_judgment(md_path):
     with open(md_path) as f:
         md = f.read()
-    tex = PREAMBLE + front_page(md) + "\n" + md_to_tex(md) + POSTAMBLE
+    lines = [l.strip() for l in md.splitlines() if l.strip()]
+    full_title = next((l[2:].strip() for l in lines if l.startswith("# ")), "")
+    tex = (header_setup(full_title) + "\n"
+           + front_page(md) + "\n" + md_to_tex(md) + POSTAMBLE)
     with tempfile.TemporaryDirectory() as td:
         tex_path = os.path.join(td, "judgment.tex")
         with open(tex_path, "w") as f:

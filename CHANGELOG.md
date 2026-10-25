@@ -34,6 +34,11 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - The press compiles from a temp directory — asset paths (engraving, plates) are now absolute; Python 3.14 hard-errors on invalid escape sequences in the title-page strings (now raw f-strings).
 
+
+## [2.9.3] - 2026-10-25
+### Changed
+- **Judgment typography**: the front page's seal now stands alone beneath the ruled line, above the case name (paragraph breaks between the title-page elements — LaTeX was joining them into one line). Every body page carries a running header with the full heading (small italics over a rule) and a centered page number in the footer; the title page stays clean and unnumbered.
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.
