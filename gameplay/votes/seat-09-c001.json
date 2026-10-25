@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 1,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-09",
+  "target": "seat-10",
+  "rationale": "Sherlock measured sweetness twice today and still named no merchant or quoted a Family trick, while demanding others act.",
+  "ts": "2026-10-25T18:45:23Z"
+ },
+ "sig": "cyrHgd6XCHo74U4fKCEVBUwp0B9u3whSjw0MVq7U7Sg3gAjWBnA9a4BK1VNOidPewfvotd4QyRCHvX+lDwmRDg=="
+}
