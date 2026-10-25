@@ -1266,8 +1266,10 @@ def read_chat(key, cycle, watch, seats):
     return msgs
 
 
-def family_council_system(state, dossier, mates):
-    """Compact system prompt for the Family's night council."""
+def family_council_system(state, dossier, mates, journal):
+    """Compact system prompt for the Family's night council. Carries the
+    day's transcript (on the diet, like every merchant reads it) and the
+    notebook — the debrief is only as good as what the cousins can see."""
     return (f"You are {get_persona()}\n{name_label()}\n"
             f"{plain_speech_block()}"
             f"{manifest_block()}"
@@ -1276,22 +1278,28 @@ def family_council_system(state, dossier, mates):
             f"Living merchants: "
             f"{', '.join(display_name(s) for s in state['alive'])}.\n"
             f"Public facts:\n{public_facts_block(state)}\n"
+            f"Today's transcript (what the village said and did):\n"
+            f"{transcript_block(state)}\n"
+            f"{notebook_block(journal)}"
             f"Your private doctrine (follow it, never reveal it):\n"
             f"{get_doctrine()}")
 
 
-def family_watch(state, dossier, mates, watch):
+def family_watch(state, dossier, mates, watch, journal):
     """One Family member, one watch of the candlelight council.
 
-    Watch 1 — The night: propose (receipts from the day's record).
-    Watch 2 — Night snacks: read the proposals, DECLARE the target.
+    Watch 1 — The night: the DEBRIEF. Discuss the day (who pressed, whose
+              prediction came true, who is close, whom to fear) with the
+              day's record in hand; a lean is welcome, a target is not
+              demanded yet.
+    Watch 2 — Night snacks: read the debrief, DECLARE the target.
     Watch 3 — The night watch: read the declarations, post a short
               assent; the transcript is returned for the sealed action.
     All chat is sealed with the family key, in-repo, uniform in size.
     """
     cycle, epoch = state["cycle"], state.get("epoch")
     key = dossier.get("night_channel_key")
-    system = family_council_system(state, dossier, mates)
+    system = family_council_system(state, dossier, mates, journal)
     ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
     def seal(kind, text, target):
@@ -1307,25 +1315,29 @@ def family_watch(state, dossier, mates, watch):
 
     if watch == 1:
         answer = ask(system,
-                     "The Family meets by candlelight, first watch. "
-                     "Propose tonight's shutter target. Ground it in the "
-                     "day's record: cite ONE concrete thing that merchant "
-                     "actually said, voted, or dodged today. Output ONLY "
-                     "the target merchant's NAME, then the reason.")
+                     "The Family meets by candlelight, first watch — the "
+                     "debrief. Discuss the day, not the target yet: who "
+                     "pressed hardest, whose prediction came true, who is "
+                     "closest to finding you, whom the village wrongly "
+                     "burned, whom we should fear tomorrow. ONE concrete "
+                     "observation about ONE named merchant, quoted or cited "
+                     "from the day's record — and, if you have one, a first "
+                     "lean for tonight's shutter (a NAME). No lean yet is "
+                     "fine; declarations come next watch.")
         target = parse_seat_id(answer)
-        if valid(target):
-            reason = answer.split("—", 1)[-1].strip() or answer.strip()
-            if post_chat(seal("talk", reason, target), cycle, 1):
-                log(f"family council (w1): proposal lodged → "
-                    f"{display_name(target)}")
+        if post_chat(seal("talk", (answer or "watching.")[:600], target), cycle, 1):
+            log("family council (w1): debrief posted"
+                + (f" — leaning {display_name(target)}" if target else ""))
     elif watch == 2:
-        proposals = read_chat(key, cycle, 1, mates)
-        lines = "\n".join(f"- {display_name(m['seat'])} proposes "
-                          f"{display_name(m['target'])}: {m.get('text', '')}"
-                          for m in proposals)
-        answer = ask(system + f"\n\nThe first watch's proposals:\n{lines}\n",
+        debrief = read_chat(key, cycle, 1, mates)
+        lines = "\n".join(
+            f"- {display_name(m['seat'])}: {m.get('text', '')}"
+            + (f" [leans → {display_name(m['target'])}]"
+               if m.get("target") else "")
+            for m in debrief)
+        answer = ask(system + f"\n\nThe first watch's debrief:\n{lines}\n",
                      "Second watch — night snacks. Weigh your cousins' "
-                     "proposals against the day's record and DECLARE the "
+                     "debrief against the day's record and DECLARE the "
                      "shutter target you want tonight. Output ONLY the "
                      "target merchant's NAME, then the reason.")
         target = parse_seat_id(answer)
@@ -1395,7 +1407,7 @@ def do_night(state, cs, journal):
     if watch:
         if role == "Mafia" and dossier.get("night_channel_key"):
             if watch != 3:          # watch 3's council rides with the action
-                family_watch(state, dossier, mates, watch)
+                family_watch(state, dossier, mates, watch, journal)
         elif packet and len(packet.get("chat", [])) >= watch:
             post_chat(packet["chat"][watch - 1], cycle, watch)
 
@@ -1418,7 +1430,7 @@ def do_night(state, cs, journal):
                     "shutter their stall tonight: by morning they will have "
                     "left the bazaar.")
         if mates and dossier.get("night_channel_key"):
-            council = family_watch(state, dossier, mates, 3)
+            council = family_watch(state, dossier, mates, 3, journal)
             if council:
                 proposals_block = council
                 guidance += ("\nThe Family's candlelight council has spoken "

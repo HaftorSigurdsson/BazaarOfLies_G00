@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.17.0] - 2026-10-25
+### Changed
+- **The Family's council opens with a debrief** (the first pro-Family lever after a run of pro-village fixes): watch 1 of the candlelight council is no longer a blind target proposal — it is a discussion of the day (who pressed hardest, whose prediction came true, who is closest to finding the Family, whom to fear tomorrow), grounded in a council prompt that now finally **carries the day's transcript (on the diet) and the notebook** — previously the Mafiosi proposed shutters without the day's record in front of them at all. Watch 2 declares from the debrief; watch 3 converges on the majority as before. The Family stops being three solo pickers plus a tally and becomes the coordination team its information advantage implies. The sealed channel, the uniform per-watch cadence, and the GM-minted decoy chorus are unchanged — the night tree still reveals nothing.
+- The council's watch-1 chat entries may carry a lean (target) or none; the declaration watch renders both. Byte-exact sealing shrinks oversize debrief text, so the envelope shape is constant.
+
 ## [2.16.0] - 2026-10-25
 ### Added
 - **The square's customs** (the forced-discussion anti-echo): the proof of concept was the dinner lean — ten minutes of "name your suspect" broke Match 1 Cycle 1's meta-pandemic faster than every vocabulary guard combined, because a forced concrete act cannot be answered with commentary about how others argue. Each tea-clock region now carries one act, owed by every merchant's FIRST statement in that region (after the first, the region is free):
