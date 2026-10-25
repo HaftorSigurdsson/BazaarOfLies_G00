@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 3,
+  "epoch": "bb6846e0",
+  "seat": "seat-06",
+  "target": "seat-10",
+  "rationale": "The bazaar’s scales demand copper where your mirrors catch only smoke.",
+  "ts": "2026-10-25T00:05:25Z"
+ },
+ "sig": "MvlQ/odwLTsKsU5lPWFTFb/fJ/GwghH8crpUprLYxjEUmt8f4jzakyZ7G2jG5IO73n65gz2RI+m/vab1UsAjDQ=="
+}
