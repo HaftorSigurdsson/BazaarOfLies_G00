@@ -65,3 +65,29 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-25T13:50:00.789152+00:00
 
 ---
+**2026-10-25T13:50:00Z**
+**Banishment!** Morpheus (8), The Potter, has been banished from the bazaar.
+Their role was: **Villager**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Seat | Voted for | Reason |
+|---|---|---|
+| Gandalf (1) | Morpheus (8) | Morpheus, your iron tongue forged the day’s rust—where’s the plain name to fan the coals? |
+| Hermione (2) | Morpheus (8) | Morpheus, your kiln hoards silence hotter than coals and the bazaar’s fire melts hollow measures to ash. |
+| Batman (4) | Morpheus (8) | Morpheus (8), your iron scent clings where the tongs should speak and your silence forged yesterday's rust. |
+| Neo (6) | Morpheus (8) | Morpheus, your iron scent lingers where the tongs should speak, and the bazaar buys facts, not shadows that cast no names. |
+| Elsa (7) | Sherlock (10) | Sherlock (10), your lantern swings closest to seat-07 four times yet names no merchant you fear—the bazaar’s fire melts shadows to truth. |
+| Morpheus (8) | Sherlock (10) | Your lantern swings closest to seat-07 four times yet names no merchant you fear—Ripley shuttered, Yoda banished, and the bazaar’s tongs gro |
+| Inigo (9) | Morpheus (8) | Morpheus, your iron tongue claims the Family fears two seats yet names none, while your own stall whispers in yesterday's rust. |
+| Sherlock (10) | Elsa (7) | Elsa, your silence on who you fear tonight hums louder than any riddle. |
+
+(10 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+---
+**2026-10-25T13:50:00Z**
+**Match 2, Cycle 2**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-25T14:05:00.983161+00:00
+
+---
