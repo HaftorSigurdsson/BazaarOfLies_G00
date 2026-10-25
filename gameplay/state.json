@@ -1,7 +1,7 @@
 {
   "match": 3,
   "cycle": 0,
-  "epoch": null,
+  "epoch": "b3d9e23c",
   "phase": "setup",
   "clock": {
     "dawn": null,
