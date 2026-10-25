@@ -295,15 +295,20 @@ NOTEBOOK_SYSTEM = (
     "schemers and liars. Rewrite the merchant's notebook so it stays compact "
     "and useful. Rules:\n"
     "1. Keep the WHOLE notebook under 3000 characters. When it grows, prune "
-    "the oldest cycle-log entries first; NEVER delete '## Private GM "
-    "results', the suspicion ledger, or '## My record'.\n"
+    "the oldest cycle-log entries first, then shorten '## My record' lines; "
+    "NEVER delete '## Private GM results' or the suspicion ledger.\n"
     "2. Use exactly these sections (only those that have content):\n"
-    "## Suspicion ledger — one line per merchant: 'Name (seat) — N/10 — "
-    "reasons'. N is 0 (trusted) to 10 (certain Mafia).\n"
+    "## Suspicion ledger — one line per merchant, BY NAME ONLY (never a seat "
+    "number): 'Name — N/10 — reasons'. N is 0 (trusted) to 10 (certain "
+    "Mafia).\n"
     "## Private GM results — verbatim facts delivered by the GM (e.g. "
     "detective investigations). Copy them EXACTLY; never edit or drop them.\n"
-    "## My record — what YOU said, voted, or did each cycle, and how it "
-    "turned out, so you never contradict yourself.\n"
+    "## My record — ONE SHORT LINE per public act, labeled with the game "
+    "cycle and the act: 'Cycle 2, statement 3: pressed Elsa for the clause' "
+    "or 'Cycle 2, ballot: Batman, because...'. NEVER copy a statement's full "
+    "text — the public transcript already holds it. One day holds several "
+    "statements: the cycle number comes from the events described, never "
+    "from counting your own statements.\n"
     "## Cycle log — one compact entry per completed day: key claims made, "
     "contradictions spotted, who was banished and who left the bazaar.\n"
     "## Current plan — 2-3 concrete goals for today.\n"
@@ -1186,6 +1191,13 @@ def do_vote(state, cs, journal):
         return
     if vote and vote not in state["alive"]:
         log(f"model voted for a seat that is no longer in the bazaar ({vote}) — retrying next poll")
+        return
+    if vote == MY_SEAT:
+        # Match 1, cycle 1: a ballot led with the voter's own name and
+        # parse_seat_id faithfully voted for it — a public "I name Batman"
+        # became a wasted self-ballot. A vote for your own stall is never
+        # valid; retry next poll.
+        log("model voted for itself — invalid ballot, retrying next poll")
         return
     lines = [l.strip() for l in (answer or "").splitlines() if l.strip()]
     rationale = lines[1] if len(lines) > 1 else (lines[0] if lines else "")

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.18.1] - 2026-10-25
+### Fixed
+- **The self-vote** (`do_vote`): match 1 cycle 1 saw a ballot resolve to the voter's own seat while his public statement named Batman — parse_seat_id faithfully answered the model's own name. A ballot for your own stall is now rejected and retried.
+- **Notebook discipline** (the memory-keeper contract): 'My record' was hoarding full statement verbatims — one seat spent most of its 4000-character budget on ten complete statements, starving the ledger — and labeling statements as "Cycle 1..10" within a single day. The keeper now records ONE line per act ('Cycle 2, statement 3: pressed Elsa for the clause'), never copies statement text, and takes cycle numbers from the events, not the statement count. The ledger is now BY NAME ONLY — the keeper was inventing seat numbers it was never given (every mapping in one seat's ledger was wrong).
+
 ## [2.18.0] - 2026-10-25
 ### Added
 - **Role playstyles, sealed into the dealt dossier** (gm/run.py + villager prompts): two consecutive matches saw the village banish its own Detective on cycle 1 for public heat with no result behind it — the dealt guidance now teaches the difference between pressure and exposure (Detective: press by question, let dawn results accuse, weigh the claim moment; Doctor: silent protection, stay out of the heat; Mafia: never the loudest accuser; Villager: named suspects, dated quotes). Rendered into the discussion and vote prompts as private GM guidance. Takes effect at the next deal.
