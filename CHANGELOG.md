@@ -95,6 +95,11 @@ All notable changes to this project will be documented in this file.
 - **Docs aligned with the contained night**: `rules.md`'s night phase describes the uniform chat/actions/packets/results and the decoy chorus; `encryption.md` documents the symmetric fixed-size chat channel (`seal_chat`/`open_chat`, the `night_channel_key`, decoys); the repo map gains `night/chat/`; `operations.md`'s vault note and `FUTURE.md`'s evidence table point at the in-repo channel and the truth archive. `mkdocs build --strict` passes.
 
 
+## [2.11.6] - 2026-10-25
+### Fixed
+- **Statements no longer cut mid-sentence**: the model was told "1200 chars max" but overshot when heated, and the hard slice chopped statements mid-word ("the bazaar does not trade in va"). The prompt now demands strictly under 1200 characters (aim 900, end on a complete sentence — "the town bell cuts anything longer and your final point is lost with it"), and a new `trim_statement` caps at the last complete sentence within the budget (falling back to the last word) instead of an arbitrary character.
+
+
 ## [2.11.5] - 2026-10-25
 ### Changed
 - **The library is per-match**: `gameplay/library/` joins the reset's artifact wipe — each match's pressed PDFs are that match's reading copies, and a fresh match starts with an empty shelf (`.gitkeep` kept, as everywhere). Match 1's PDFs were removed by hand; to keep a match's PDFs, copy them out of the library before resetting. The recaps and judgments in markdown remain the permanent record; docs updated.

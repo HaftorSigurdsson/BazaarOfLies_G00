@@ -60,7 +60,7 @@ JITTER_SECONDS = 5                      # random extra sleep, avoids herd pushes
 MAX_STATEMENTS_PER_DAY = 8              # per game rules
 MIN_SECONDS_BETWEEN_STATEMENTS = 90     # pace the statements out
 PUSH_ATTEMPTS = 5                       # retries before giving up loudly
-STATEMENT_MAX_CHARS = 1200               # per game rules
+STATEMENT_MAX_CHARS = 1200               # hard cap; the model is told to aim under
 
 # ---- private notebook (memory) ----
 NOTEBOOK_ENABLED = True                # master switch for the memory system
@@ -564,6 +564,20 @@ def ask(system, user, temperature=0.7, reasoning_effort="none"):
     return _content_text(r.choices[0].message.content).strip()
 
 
+def trim_statement(text, limit=STATEMENT_MAX_CHARS):
+    """Cap a statement at the limit without chopping it mid-sentence.
+    The model is told the limit but overshoots when heated; a cut at an
+    arbitrary character makes the merchant look gagged and loses their
+    final point — so cut at the last complete sentence instead."""
+    if len(text) <= limit:
+        return text
+    cut = text[:limit]
+    best = max(cut.rfind(". "), cut.rfind("! "), cut.rfind("? "))
+    if best < len(cut) * 0.4:          # no clean sentence in range — last word
+        best = cut.rfind(" ")
+    return cut[:best + 1].rstrip()
+
+
 def parse_seat_id(text):
     """Seat ID from model output: 'seat-07', 'seat-7', 'Gandalf (7)',
     '(10)', or a bare number leading the answer."""
@@ -626,7 +640,10 @@ def do_discussion(state, cs, journal):
         system + f"\nYour private thinking (never reveal it):\n{reasoning}\n\n",
         f"This is public statement {cs['statements'] + 1} of "
         f"{MAX_STATEMENTS_PER_DAY} allowed today. "
-        f"Write your statement ({STATEMENT_MAX_CHARS} chars max), in character.\n\n"
+        f"Write your statement, in character, STRICTLY UNDER "
+        f"{STATEMENT_MAX_CHARS} characters (aim for 900): the town bell "
+        f"cuts anything longer and your final point is lost with it. "
+        f"Keep it tight and end on a complete sentence.\n\n"
         f"Conversation rules: read the transcript above. If other merchants have "
         f"spoken today, engage with what they said — agree, push back, or ask "
         f"them something. Address them by their name and seat number, exactly "
@@ -636,7 +653,8 @@ def do_discussion(state, cs, journal):
         + ("\nIt is DINNER. This statement must state, publicly and clearly, "
            "who you lean toward banishing tonight and why — name them. The "
            "village is counting heads." if at_dinner else "")
-    )[:STATEMENT_MAX_CHARS]
+    )
+    statement = trim_statement(statement)
 
     sdir = "gameplay/village/statements"
     os.makedirs(sdir, exist_ok=True)
