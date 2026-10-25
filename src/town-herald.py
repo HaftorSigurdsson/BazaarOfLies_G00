@@ -41,19 +41,29 @@ patterns as villager.py) so it can run from any seat clone without arguments.
 import argparse
 import glob
 import json
+import logging
 import os
 import random
 import re
 import subprocess
 import sys
 import time
+from typing import Optional
 
+from dotenv import load_dotenv
 from mistralai.client import Mistral
+
+# Load environment variables from .env
+load_dotenv()
 
 # gm/ sits at the arena root — the tea clock (day regions) lives there.
 _ARENA_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ARENA_ROOT)
 from gm.utils import day_region, seat_from_label
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------- config ---
 MODEL = "mistral-large-latest"
@@ -67,7 +77,15 @@ BALLOT_TABLES_MAX = 2
 parser = argparse.ArgumentParser(description="Bazaar of Lies — The Herald")
 parser.add_argument("--journal", default=None,
                     help="Journal path (default ../.bazaar/herald-journal.json)")
+parser.add_argument("--dry-run", action="store_true",
+                    help="Preview markdown output without generating PDF or committing")
+parser.add_argument("--verbose", action="store_true",
+                    help="Enable verbose logging")
 args = parser.parse_args()
+
+if args.verbose:
+    logging.basicConfig(level=logging.DEBUG)
+    logger.setLevel(logging.DEBUG)
 
 # src/town-herald.py -> REPO_ROOT is the parent of src/ (the clone root).
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -87,7 +105,10 @@ def next_volume():
     return vol
 JOURNAL_PATH = args.journal or os.path.join(BAZAAR_DIR, "herald-journal.json")
 
-client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
+client = Mistral(api_key=os.environ.get("MISTRAL_API_KEY"))
+if not os.environ.get("MISTRAL_API_KEY"):
+    logger.error("MISTRAL_API_KEY not set in .env")
+    sys.exit(1)
 
 HERALD_SYSTEM = (
     "You are The Herald, the bazaar's only newspaper, printed twice daily "
@@ -136,35 +157,54 @@ HERALD_SYSTEM = (
 )
 
 
-def log(msg):
-    print(f"[{time.strftime('%H:%M:%S')}] HERALD: {msg}", flush=True)
+def log(message: str) -> None:
+    """Log a message to stderr with a timestamp."""
+    logger.info(message)
 
 
 # ------------------------------------------------------------------- git ---
-def git(*argv, check=True):
-    return subprocess.run(["git", *argv], check=check,
-                          capture_output=True, text=True)
+def git(*argv: str, check: bool = True) -> subprocess.CompletedProcess:
+    """Run a git command and return the result."""
+    try:
+        return subprocess.run(["git", *argv], check=check,
+                              capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        logger.error(f"git {' '.join(argv)} failed: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"git {' '.join(argv)} error: {type(e).__name__}: {e}")
+        raise
 
 
-def safe_push():
-    for attempt in range(1, PUSH_ATTEMPTS + 1):
-        r = git("push", check=False)
-        if r.returncode == 0:
+def safe_push() -> None:
+    """Push with retry: the Herald shares the branch with ten bots."""
+    try:
+        for attempt in range(1, PUSH_ATTEMPTS + 1):
+            r = git("push", check=False)
+            if r.returncode == 0:
+                return
+            log(f"push rejected (attempt {attempt}/{PUSH_ATTEMPTS}); rebasing")
+            git("pull", "--rebase", check=False)
+            # jittered backoff so simultaneous writers re-collide less
+            time.sleep(2 * attempt + random.uniform(0, 2 * attempt))
+        raise RuntimeError(f"push rejected {PUSH_ATTEMPTS} times — needs a human")
+    except Exception as e:
+        logger.error(f"safe_push failed: {type(e).__name__}: {e}")
+        raise
+
+
+def commit_and_push(paths: List[str], msg: str) -> None:
+    """Commit and push changes to the arena repo."""
+    try:
+        git("add", *paths)
+        r = git("commit", "-m", msg, check=False)
+        if r.returncode != 0:
+            log(f"nothing to commit for: {msg}")
             return
-        log(f"push rejected (attempt {attempt}/{PUSH_ATTEMPTS}); rebasing")
-        git("pull", "--rebase", check=False)
-        # jittered backoff so simultaneous writers re-collide less
-        time.sleep(2 * attempt + random.uniform(0, 2 * attempt))
-    raise RuntimeError(f"push rejected {PUSH_ATTEMPTS} times — needs a human")
-
-
-def commit_and_push(paths, msg):
-    git("add", *paths)
-    r = git("commit", "-m", msg, check=False)
-    if r.returncode != 0:
-        log(f"nothing to commit for: {msg}")
-        return
-    safe_push()
+        safe_push()
+    except Exception as e:
+        logger.error(f"commit_and_push failed: {type(e).__name__}: {e}")
+        raise
 
 
 # --------------------------------------------------------------- journal ---
@@ -300,8 +340,23 @@ def read_statements(state):
 
 
 def statements_digest(state):
-    """The current cycle's public statements (facts, attributed to seats)."""
-    return [f"{display_name(r['seat'])}: {r['text']}" for r in read_statements(state)]
+    """The current cycle's public statements (facts, attributed to seats).
+    Anonymous statements (cycle >= anonymous_cycle) are labeled as 'Anonymous Merchant'."""
+    statements = []
+    anonymous_cycle = None
+    try:
+        with open("gm/roles.enc", "r") as f:
+            roles = json.load(f)
+            anonymous_cycle = roles.get("anonymous_cycle")
+    except (OSError, json.JSONDecodeError, KeyError):
+        pass
+    
+    for r in read_statements(state):
+        if anonymous_cycle and state.get("cycle", 0) >= anonymous_cycle and r.get("seat") is None:
+            statements.append(f"Anonymous Merchant: {r['text']}")
+        else:
+            statements.append(f"{display_name(r['seat'])}: {r['text']}")
+    return statements
 
 
 def read_ballot_tables():
@@ -466,6 +521,71 @@ def tally_chart():
     return "\n".join(lines)
 
 
+def generate_editors_note(state: dict, part: str) -> str:
+    """Generate the Herald's editorial note (model-written, labeled as opinion)."""
+    prompt = (
+        f"The bazaar is in cycle {state['cycle']}, {part} phase. "
+        f"Public facts:\n{facts_digest(state, part)}\n\n"
+        "Write a 2-3 sentence editorial note summarizing the bazaar's mood this cycle. "
+        "Use the Herald's voice: witty, slightly cynical, and thematic. "
+        "Do not reveal private information. Do not speculate about roles. "
+        "Label it clearly as the **Editor's Note**."
+    )
+    note = ask(prompt)
+    return f"## Editor's Note\n\n{note}\n"
+
+
+def generate_by_the_numbers(state: dict, part: str) -> str:
+    """Machine-written 'By the Numbers' section (factual, never model-written).
+    Ballot figures are evening news only."""
+    cycle = state["cycle"]
+    alive = len(state["alive"])
+    graveyard_count = 0
+    try:
+        with open("gameplay/village/graveyard.md", "r") as f:
+            graveyard = f.read()
+            graveyard_count = len([line for line in graveyard.splitlines() 
+                                  if line.startswith("|") and not line.startswith("|---") and not line.startswith("| Match")])
+    except OSError:
+        pass
+
+    numbers = [
+        f"- Merchants alive: {alive}",
+        f"- Merchants departed: {graveyard_count}",
+        f"- Cycle: {cycle}",
+    ]
+
+    if part == "evening":
+        # Add ballot participation (evening-only)
+        try:
+            with open("gameplay/village/ballot.md", "r") as f:
+                ballot = f.read()
+                votes = len([line for line in ballot.splitlines() if line.startswith("|") and not line.startswith("|---")])
+                numbers.append(f"- Votes cast this cycle: {votes}")
+        except OSError:
+            pass
+    
+    return "## By the Numbers\n\n" + "\n".join(numbers) + "\n"
+
+
+def read_last_words():
+    """Read last words from gameplay/village/last_words.md."""
+    try:
+        with open("gameplay/village/last_words.md", "r") as f:
+            return f.read()
+    except OSError:
+        return ""
+
+
+def read_historian_summary(cycle):
+    """Read Historian's summary for the given cycle."""
+    try:
+        with open(f"gameplay/village/cycle-summaries/c{cycle:03d}.md", "r") as f:
+            return f.read()
+    except OSError:
+        return ""
+
+
 def facts_digest(state, part):
     """Public facts only. Morning: what happened overnight + today's plan.
     Evening: the day's banishment + what was said."""
@@ -481,32 +601,58 @@ def facts_digest(state, part):
     for label in ("discussion_deadline", "voting_deadline", "night_deadline"):
         if clock.get(label):
             digest.append(f"{label.replace('_', ' ')}: {clock[label]}")
-    digest.append("By the numbers (public facts, counted by the Herald):\n"
-                  + "\n".join(by_the_numbers(state, part)))
+    
+    # Replace model-written "By the Numbers" with machine-written version
+    digest.append(generate_by_the_numbers(state, part))
+    
+    # Add Historian's summary (evening editions only)
+    if part == "evening":
+        historian_summary = read_historian_summary(state["cycle"])
+        if historian_summary:
+            digest.append("\n\n## The Historian's Chronicle\n\n" + historian_summary)
+    
+    # Add last words (morning editions only, after banishment)
+    if part == "morning":
+        last_words = read_last_words()
+        if last_words:
+            digest.append("\n\n## Last Words\n\n" + last_words)
+    
     if part == "evening":
         tallies = vote_history()
         if tallies:
             digest.append("Recent ballot tallies (from the GM's public tables, "
                           "newest first):\n" + "\n".join(tallies))
+    
+    # First morning edition: introduce the bazaar and merchants
     if part == "morning" and int(state.get("cycle") or 0) == 1:
-        digest.insert(2, "FIRST MORNING OF THE MATCH: the bazaar has just "
-                        "opened. The merchants listed above have all arrived "
-                        "and opened their stalls. Introduce the bazaar and "
-                        "its merchants to your readers — public facts only.")
+        merchants = ", ".join(display_name(s) for s in sorted(state["alive"]))
+        digest.insert(2, (
+            "FIRST MORNING OF THE MATCH: The bazaar has just opened its gates, "
+            "and the following merchants have arrived to set up their stalls: "
+            f"{merchants}. Today marks the beginning of a new cycle of trade, "
+            "rumors, and alliances. The merchants are eager to establish their "
+            "reputations, but only time will tell who can be trusted."
+        ))
+    
     return "\n".join(digest)
 
 
 # ------------------------------------------------------------ model call ---
-def ask(user):
-    r = client.chat.complete(
-        model=MODEL,
-        messages=[
-            {"role": "system", "content": HERALD_SYSTEM},
-            {"role": "user", "content": user},
-        ],
-        temperature=0.4,
-    )
-    return (r.choices[0].message.content or "").strip()
+def ask(prompt: str) -> str:
+    """Ask the model a question and return its response."""
+    try:
+        response = client.chat.complete(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": HERALD_SYSTEM},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.4,
+        )
+        return (response.choices[0].message.content or "").strip()
+    except Exception as e:
+        logger.error(f"ask() failed: {type(e).__name__}: {e}")
+        return ""
 
 
 # ------------------------------------------------------------------ work ---
@@ -585,6 +731,9 @@ def print_edition(state, part, journal):
     if chart and part == "evening":
         edition += "\n\n## The Tally\n\n```text\n" + chart + "\n```\n"
 
+    # Add Editor's Note and By the Numbers to the edition
+    edition += "\n\n---\n\n" + generate_editors_note(state, part)
+    
     with open(path, "w") as f:
         # Inside the paper the numbers print small (Vol. 1, Cycle 1);
         # only the FILENAME pads (vol-01, c001) for clean sorting.
@@ -609,11 +758,15 @@ def print_edition(state, part, journal):
     except Exception as e:  # a press failure must never stop the paper
         log(f"press skipped: {type(e).__name__}: {e}")
 
-    commit_and_push([path] + ([pdf_path] if pdf_path else []),
-                    f"Herald {part} edition c{cycle:03d}")
-    mark_edition(journal, epoch, cycle, part)
-    save_journal(journal)
-    log(f"printed {part} edition for cycle {cycle:03d}")
+    if not args.dry_run:
+        commit_and_push([path] + ([pdf_path] if pdf_path else []),
+                        f"Herald {part} edition c{cycle:03d}")
+        mark_edition(journal, epoch, cycle, part)
+        save_journal(journal)
+        log(f"printed {part} edition for cycle {cycle:03d}")
+    else:
+        log(f"[DRY RUN] Preview of {part} edition for cycle {cycle:03d}:")
+        log(edition)
 
 
 # ------------------------------------------------------------- main loop ---

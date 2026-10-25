@@ -159,11 +159,25 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **`FUTURE.md` refreshed**: the built Elder Council phases are removed (only the trilogy ledger remains of it); The Early Bell keeps its full design. Three new future items: **game archiving** (per-match snapshots of `gameplay/` + a manifest, zip by default / rar optional, `archive/` at the repo root), **player-machine onboarding** (per-platform bootstrap scripts on uv, a `doctor.py` preflight, a player quickstart, and the open question of encrypted seat-bundle key handoff for external players), and **multi-provider support** (an `src/llm.py` provider layer — mistralai plus one OpenAI-compatible client covering most of the market, `setup/models.json` per-role config, optional per-stable models making the arena a model-vs-model arena).
 
+## [2.13.0] - 2026-10-26
+### Added
+- **Social Dynamics (B)**:
+  - **Anonymous Statements**: On a random cycle (2–4), all statements are published without seat IDs (labeled "Anonymous Merchant").
+  - **Last Words**: Banished merchants (non-Mafia) may leave a final statement, published in the next Herald edition.
+  - **Historian Role**: A randomly assigned Villager writes a cycle summary for the Herald, adding narrative depth.
+- **Editor's Note**: The Herald now includes a short editorial note summarizing the bazaar's mood each cycle.
+- **First Morning Edition**: Introduces the merchants and sets the scene for new matches.
+- **Evening Editions**: Expanded to include more quotes and discussion context, filling the page.
+
+### Changed
+- **By the Numbers**: Ballot references removed from morning editions.
+- **Herald Prose**: Names only (no seat numbers) throughout the paper.
+- **Volume Tracking**: Ensured correct volume numbers in the masthead.
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (token usage ledger)**: a designed-not-built spend watch — one JSON usage line per model call (tokens in/out, model, temperature, `reasoning_effort`), the `gameplay/usage/` folder returning as its home, per-cycle summaries and per-match roll-ups the Elder Council can cite, and a small reader that prints totals and projections. Explicitly perspective, not policy: no limits, no throttles.
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.
-- **`FUTURE.md`** — the design plan for the **Elder Council**: a post-match historian-judge that reviews the complete record (statements, ballots, graveyard, recap, Herald editions, the Family's council transcripts, and a to-be-archived truth file) and delivers a 3–4 page court-style judgment — per-seat verdicts with citations, MVP / Golden Sacrifice / Worst Misjudgment awards — plus a trilogy-end overall AI ranking ledger. Five build phases, open questions, and non-goals; designed 2026-10-25, build resumes next session.
 
 ## [2.8.3] - 2026-10-25
 ### Fixed
