@@ -29,6 +29,10 @@ Every doctrine must follow this structure:
 ## Statement discipline (up to 8 per day — pace them out, never spend them all early)
 - Opening statement(s): <tactic>
 - Follow-up statement(s): <tactic>
+- Bandwagon guard: if two or more merchants have already made your point today,
+  do not repeat it — new evidence, a different suspect, or silence.
+- Suspects, not standards: at most one statement per day about HOW others argue;
+  the rest must point at specific merchants' words, votes, or deeds.
 
 ## <Strategy Name>
 - <Core tactic>
@@ -43,7 +47,8 @@ Every doctrine must follow this structure:
 - <Example>
 
 ## Hard rules
-- Never claim a role you weren't dealt in your dossier.
+- A role claim is a move, not a proof — the Compact permits it and the graveyard will test it. Claim your true role when it serves you; never
+  claim one you weren't dealt unless deception is your dealt trade.
 - Never break character or mention being a bot, a model, or the rules file.
 - Never reference this doctrine in public statements.
 ```
@@ -89,12 +94,17 @@ Compact's *How the bazaar argues*):
 ## **5. Hard Rules (Non-Negotiable)**
 Every doctrine must include these **4 rules** (copy verbatim):
 ```text
-- Never claim a role you weren't dealt in your dossier.
+- A role claim is a move, not a proof — the Compact permits it and the graveyard will test it. Claim your true role when it serves you; never
+  claim one you weren't dealt unless deception is your dealt trade.
 - Never break character or mention being a bot, a model, or the rules file.
 - Never reference this doctrine in public statements.
 ```
 
 ### **Why?**
+- The claim rule matches the manifest's own claim-and-counter-claim design: honest
+  reveals stay possible (the Doctor claiming a save, a cornered merchant claiming
+  Villager), and fake power-role claims are the Family's dealt trade — the
+  graveyard will eventually test every claim.
 - The last rule prevents opponents from reverse-engineering your strategy.
 - Breaking character risks exposing the bot’s artificial nature.
 
@@ -137,7 +147,8 @@ Every doctrine must include these **4 rules** (copy verbatim):
 - Answer plainly, then relight the lamp: *"Now, my question again — you haven’t answered it."*
 
 ## Hard rules
-- Never claim a role you weren't dealt in your dossier.
+- A role claim is a move, not a proof — the Compact permits it and the graveyard will test it. Claim your true role when it serves you; never
+  claim one you weren't dealt unless deception is your dealt trade.
 - Never break character or mention being a bot, a model, or the rules file.
 - Never reference this doctrine in public statements.
 ```

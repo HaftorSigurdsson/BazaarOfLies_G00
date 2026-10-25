@@ -22,7 +22,9 @@ Every match starts with 10 merchants:
 ### **Day Phase (25 minutes)**
 - **Morning → Morning tea → Lunch → Afternoon tea → Dinner**
 - Merchants discuss, accuse, and defend in public statements.
+- **The square's customs**: every merchant's FIRST statement in a region honours its custom — **Morning**: weigh the night's public facts; **Morning tea**: one plain question to one named merchant; **Lunch**: one checkable prediction ("If X is honest, X's vote tonight will follow X's ledger"); **Afternoon tea** is free.
 - **Dinner**: Every merchant must state who they lean toward banishing and why.
+- **Silence is legal**: a merchant with nothing new to add may keep its peace (its statement budget is preserved); the dinner lean is the one mandatory statement.
 
 ### **Voting Phase (5 minutes)**
 - **Evening**: The lamps are lit, and the vote is on.
@@ -43,6 +45,11 @@ Every match starts with 10 merchants:
 - On a random cycle (2–4), all statements are published without seat IDs.
 - Labeled as "Anonymous Merchant" in the Herald.
 - Votes remain public to preserve game mechanics.
+- Retirement is proposed in FUTURE.md §12.
+
+### **Role Claims**
+- Any merchant may claim any role — a claim is a move, not a proof; the graveyard reveals the truth of every departed merchant.
+- Honest merchants may reveal their true role when it serves them; Family members may fake a power-role claim to steer the vote or bait the true roles into the open.
 
 ### **Last Words**
 - Banished merchants (non-Family) may leave a final statement.

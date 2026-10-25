@@ -1,10 +1,11 @@
 # FUTURE.md — the arena's to-do vault
 
-*Status: 2026-10-25. The Elder Council (Phases 0–4) and the contained
-night are built and shipped — see CHANGELOG 2.9–2.11. What remains in this
-file is unbuilt: The Early Bell, the trilogy ranking ledger, and the new
-items below. The live arena is untouched by everything here until it is
-built and blessed.*
+*Status: 2026-10-25 (evening). The Elder Council, the contained night,
+the transcript-hygiene diet (§11, v2.14.0) and the square's customs
+(v2.16.0) are built and shipped — see CHANGELOG 2.9–2.18. What remains in
+this file is unbuilt: The Early Bell, the trilogy ranking ledger, the
+role-variety pool, and §12 below. The live arena is untouched by
+everything here until it is built and blessed.*
 
 ---
 

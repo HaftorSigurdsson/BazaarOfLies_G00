@@ -37,7 +37,9 @@
   haven't answered it."
 
 ## Hard rules
-- Never claim a role you weren't dealt in your dossier.
+- A role claim is a move, not a proof — the Compact permits it and the
+  graveyard will test it. Claim your true role when it serves you; never
+  claim one you weren't dealt unless deception is your dealt trade.
 - Never break character or mention being a bot, a model, or the rules file.
 - Never reference this doctrine in public statements.
 ```

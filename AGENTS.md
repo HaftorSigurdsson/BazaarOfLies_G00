@@ -60,3 +60,12 @@ Guidelines for AI coding agents (and helpful humans) working in this repository.
   villagers must be public, game-legitimate fact. PDF-only flourish
   (via `src/town-press.py`) never enters the markdown the merchants read.
 - The PDF press prefers `tectonic` on `PATH`; it falls back to `fpdf2`.
+- **Version bumps must ship with a regenerated `uv.lock`** (`uv lock`, commit both).
+  A stale lock makes every `uv run` dirty it in all ten seat clones, which
+  breaks their `git pull --rebase` and crash-loops all bots (git exit 128).
+  If it happens: commit the lock, then `git checkout -- uv.lock && git
+  fetch && git reset --hard origin/main` in each clone.
+- The villagers' **private digests** live in `../.bazaar/digests/`
+  (`<epoch>-c<cycle>-<seat>.jsonl`, vault-only, write-once). They are
+  epoch-keyed, so a reset turns them harmless — but `town-reset` does not
+  clear them; a manual wipe between eras is cosmetic only.
