@@ -94,6 +94,11 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **Docs aligned with the contained night**: `rules.md`'s night phase describes the uniform chat/actions/packets/results and the decoy chorus; `encryption.md` documents the symmetric fixed-size chat channel (`seal_chat`/`open_chat`, the `night_channel_key`, decoys); the repo map gains `night/chat/`; `operations.md`'s vault note and `FUTURE.md`'s evidence table point at the in-repo channel and the truth archive. `mkdocs build --strict` passes.
 
+
+## [2.11.2] - 2026-10-25
+### Changed
+- **`FUTURE.md` refreshed**: the built Elder Council phases are removed (only the trilogy ledger remains of it); The Early Bell keeps its full design. Three new future items: **game archiving** (per-match snapshots of `gameplay/` + a manifest, zip by default / rar optional, `archive/` at the repo root), **player-machine onboarding** (per-platform bootstrap scripts on uv, a `doctor.py` preflight, a player quickstart, and the open question of encrypted seat-bundle key handoff for external players), and **multi-provider support** (an `src/llm.py` provider layer — mistralai plus one OpenAI-compatible client covering most of the market, `setup/models.json` per-role config, optional per-stable models making the arena a model-vs-model arena).
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.
