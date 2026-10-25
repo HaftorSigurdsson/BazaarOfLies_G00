@@ -1,11 +1,11 @@
 {
-  "match": 0,
-  "cycle": 0,
-  "epoch": "5d7f330b",
-  "phase": "setup",
+  "match": 1,
+  "cycle": 1,
+  "epoch": "482a98bf",
+  "phase": "discussion",
   "clock": {
-    "dawn": null,
-    "discussion_deadline": null,
+    "dawn": "2026-10-25T21:33:24.413897+00:00",
+    "discussion_deadline": "2026-10-25T21:58:24.413897+00:00",
     "voting_deadline": null,
     "night_deadline": null
   },
@@ -21,5 +21,6 @@
     "seat-09",
     "seat-10"
   ],
-  "graveyard": {}
+  "graveyard": {},
+  "anonymous_cycle": 4
 }
