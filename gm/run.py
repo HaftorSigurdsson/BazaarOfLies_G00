@@ -99,6 +99,7 @@ def commit_and_push(label, attempts=3):
     paths = [p for p in ["gameplay/state.json", "gameplay/village",
                          "gameplay/deals", "gameplay/dossiers", GM_ROLES_FILE]
              if os.path.exists(p)]
+    committed = False
     for attempt in range(1, attempts + 1):
         r = subprocess.run(["git", "pull", "--rebase", "--autostash"],
                            capture_output=True, text=True)
@@ -106,13 +107,19 @@ def commit_and_push(label, attempts=3):
             log(f"pull failed (attempt {attempt}): {r.stderr.strip()[:200]}")
             time.sleep(2 * attempt)
             continue
-        subprocess.run(["git", "add", *paths], check=False)
-        c = subprocess.run(["git", "diff", "--cached", "--quiet"])
-        if c.returncode == 0:
-            log(f"nothing to publish for: {label}")
-            return
-        subprocess.run(["git", "commit", "-m", f"GM: {label}"],
-                       check=True, capture_output=True, text=True)
+        if not committed:
+            subprocess.run(["git", "add", *paths], check=False)
+            c = subprocess.run(["git", "diff", "--cached", "--quiet"])
+            if c.returncode == 0:
+                log(f"nothing to publish for: {label}")
+                return
+            subprocess.run(["git", "commit", "-m", f"GM: {label}"],
+                           check=True, capture_output=True, text=True)
+            committed = True
+        # The work is committed but possibly still unpushed — on a busy
+        # branch the push may need several pull+push rounds, and the
+        # staged-diff check above must not make us give up with the
+        # commit stranded locally (that once lost the GM a whole night).
         p = subprocess.run(["git", "push"], capture_output=True, text=True)
         if p.returncode == 0:
             log(f"published: {label}")
