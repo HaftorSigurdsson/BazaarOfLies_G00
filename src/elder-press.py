@@ -21,6 +21,7 @@ PREAMBLE = r"""\documentclass[11pt]{article}
 \usepackage[a4paper,margin=2.4cm]{geometry}
 \usepackage{parskip}
 \usepackage{microtype}
+\usepackage{graphicx}
 \pagestyle{plain}
 \begin{document}
 """
@@ -42,6 +43,53 @@ def latex_inline(text):
     text = re.sub(r"\*\*(.+?)\*\*", r"\\textbf{\1}", text)
     text = re.sub(r"\*(.+?)\*", r"\\emph{\1}", text)
     return text
+
+
+
+PLATES_DIR = os.path.abspath("docs/assets/plates")
+ENGRAVING = os.path.abspath("docs/assets/images/bazaar-engraving.png")
+
+
+def front_page(md):
+    """A formal title page in the spirit of a historical legal document:
+    the arena's seal (the engraving, a quarter of the width), the case
+    name, the dateline — and one small plate chosen at random from the
+    arena's own collection as an ornament."""
+    lines = [l.strip() for l in md.splitlines() if l.strip()]
+    title = next((l[2:].strip() for l in lines if l.startswith("# ")), "")
+    case = title.split(" — ", 1)[-1] if " — " in title else title
+    dateline = ""
+    for i, l in enumerate(lines):
+        if l.startswith("# "):
+            for cand in lines[i + 1:i + 3]:
+                if not cand.startswith("#"):
+                    dateline = cand.strip("*").strip()
+                    break
+            break
+    import random
+    plates = sorted(f for f in os.listdir(PLATES_DIR) if f.endswith(".png"))
+    ornament = os.path.join(PLATES_DIR, random.choice(plates)) if plates else ""
+    tex = [r"\begin{titlepage}", r"\centering",
+           r"{\scshape\small THE BAZAAR OF LIES \par}",
+           r"{\scshape\small THE ARENA RECORD \par}",
+           r"\vspace{0.5cm}\rule{0.5\textwidth}{0.5pt}\vspace{0.9cm}",
+           rf"\includegraphics[width=0.25\textwidth]{{{ENGRAVING}}}",
+           r"\vspace{1.1cm}",
+           r"{\Large\scshape In the Matter of\par}",
+           r"\vspace{0.3cm}",
+           rf"{{\LARGE\itshape {latex_escape(case)}\par}}",
+           r"\vspace{0.45cm}",
+           r"{\large The Judgment of the Council of Elders\par}"]
+    if dateline:
+        tex += [r"\vspace{0.55cm}",
+                rf"{{\itshape {latex_inline(dateline)}\par}}"]
+    tex += [r"\vfill"]
+    if ornament:
+        tex += [rf"\includegraphics[width=0.16\textwidth]{{{ornament}}}",
+                r"\vspace{0.4cm}"]
+    tex += [r"{\small\itshape The bazaar rests.\par}",
+            r"\end{titlepage}", ""]
+    return "\n".join(tex)
 
 
 def _table_tex(rows):
@@ -66,6 +114,7 @@ def _table_tex(rows):
 def md_to_tex(md):
     out, in_quote, in_item = [], False, False
     table = []
+    first_title = True
     for raw in md.splitlines():
         s = raw.strip()
         if s.startswith("|"):
@@ -82,7 +131,10 @@ def md_to_tex(md):
             in_item = False
         if not s:
             continue
-        if s.startswith("# "):                      # the caption/title
+        if s.startswith("# "):                      # the front page owns it
+            if first_title:
+                first_title = False
+                continue
             out.append(r"\begin{center}{\Large\bfseries "
                        + latex_inline(s[2:]) + r"}\end{center}")
             out.append(r"\begin{center}\rule{0.6\textwidth}{0.5pt}\end{center}")
@@ -110,13 +162,13 @@ def md_to_tex(md):
         out.append(r"\end{quote}")
     if in_item:
         out.append(r"\end{itemize}")
-    return "\n".join(out) + "\n"
+    return "\n\n".join(out) + "\n"
 
 
 def compile_judgment(md_path):
     with open(md_path) as f:
         md = f.read()
-    tex = PREAMBLE + md_to_tex(md) + POSTAMBLE
+    tex = PREAMBLE + front_page(md) + "\n" + md_to_tex(md) + POSTAMBLE
     with tempfile.TemporaryDirectory() as td:
         tex_path = os.path.join(td, "judgment.tex")
         with open(tex_path, "w") as f:

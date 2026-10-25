@@ -332,7 +332,7 @@ def final_judgment(match_no, case, timeline, family_digest,
         "# The Judgment of the Council of Elders — <THE CASE NAME GIVEN BELOW>\n"
         "A dateline line: the match number and its dates.\n"
         "A formal preamble (the Council convenes, the match reviewed).\n"
-        "## The History\n The match's arc, cycle by cycle, brief.\n"
+        "## The History\n One bullet per cycle — each line exactly '- **Cycle N**: ...' carrying the cycle's tally and departures. No prose paragraphs in this section.\n"
         "## The Main Arguments\n The best cases made on each side — the "
         "strongest reasoning the bazaar produced, with quotes.\n"
         "## The Verdicts\n One compact paragraph per merchant, drawn from "

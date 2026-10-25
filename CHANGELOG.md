@@ -25,6 +25,15 @@ All notable changes to this project will be documented in this file.
 - **Bilag B — The Ratings**: the verdicts' merit scores parsed from the drafts and ranked best-to-worst in a table — the Council's numbers, typeset by machine so no rating can drift.
 - **The elder press renders markdown tables** (ruled LaTeX tabulars) and strips wrapping code fences from model output (large liked to gift-wrap its judgment).
 
+
+## [2.9.2] - 2026-10-25
+### Changed
+- **The History is one bullet per cycle** — each carrying its tally and departures in the timeline's own words; no more dense prose paragraphs.
+- **A formal front page** for the judgment PDF: the arena's seal (the bazaar engraving at a quarter width), "In the Matter of" the case name in large italics, the dateline, and one small plate drawn at random from the arena's collection as a footer ornament — a historical legal document's title page.
+- **Paragraph spacing fixed**: the press joins blocks with blank lines, so a section heading can never run into the paragraph before it (the overflow bug).
+### Fixed
+- The press compiles from a temp directory — asset paths (engraving, plates) are now absolute; Python 3.14 hard-errors on invalid escape sequences in the title-page strings (now raw f-strings).
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.
