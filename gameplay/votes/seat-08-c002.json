@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 2,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-08",
+  "target": "seat-04",
+  "rationale": "Eight calls for falsifiable claims, zero accusations from your own hand—silence after such volume is louder than any ledger entry.",
+  "ts": "2026-10-25T19:40:22Z"
+ },
+ "sig": "QyXUS3RnT7+PFFRkPHn3/BSjnljBEJCA5ns93MQyECImmJvH5Kvo6rcWhwvk3rkeC8urrKyTKvcmq7L//sqnDg=="
+}
