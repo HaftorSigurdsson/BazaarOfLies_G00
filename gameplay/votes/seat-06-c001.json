@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "482a98bf",
+  "seat": "seat-06",
+  "target": "seat-08",
+  "rationale": "Claimed Detective role yet left the roster blank and dodged naming the single merchant investigated last night.",
+  "ts": "2026-10-25T22:00:13Z"
+ },
+ "sig": "dNVzEqc5etFUFpAVFwkYA/cKcf0Z/KpKJLnBWJ2cRB26U6Cu/oHpqmLHi6IVT3kbjCYvtMw7BX6ACjfs1zvKDg=="
+}
