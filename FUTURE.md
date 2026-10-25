@@ -257,7 +257,121 @@ different providers).
 - Token accounting per provider for the spend watch (one log line per
   call with usage, aggregated by the doctor)? — *picked up by §6.*
 
-## 6. Token usage ledger — the spend watch, written down
+## 6. Reputation System
+
+*New idea, not built.*
+
+### Purpose
+
+Merchants today have no memory of past matches — every deal is a fresh
+bazaar. A reputation system gives the town a long-term memory: who has
+been banished, who has been MVP, who has signed the Early Bell. The
+mechanic is **perspective, not policy**: no limits, no throttles — a
+record of who has earned trust, so the town can weigh its votes with
+history in mind.
+
+### The Design
+
+- **Reputation score (0-100)** per merchant, stored in `gameplay/trilogy/`.
+- **Affected by**:
+  - Being banished (-20).
+  - Being MVP (+30).
+  - Signing the Early Bell (+10).
+- **Impact**:
+  - High-rep merchants get +1 vote in tied ballots.
+  - Low-rep merchants are more likely to be investigated by the Detective.
+
+---
+
+## 7. Night Market (Mafia Chat 2.0)
+
+*New idea, not built. Requires careful balance consideration.*
+
+### Purpose
+
+The night chat is currently text-only. Adding structured actions could
+deepen strategy and counterplay.
+
+### The Design
+
+- **Structured night actions**:
+  - **Bribe**: Family can pay 10 "coins" to flip a vote.
+  - **Sabotage**: Family can silence one merchant for a cycle.
+  - **Heist**: Family can steal the Detective’s result.
+- **Coins**: Earned by surviving cycles (1 coin/cycle) or being MVP (5 coins).
+
+### Open Questions
+
+- Does this unbalance the game toward the Family?
+- Should coins persist across matches?
+
+---
+
+## 8. Special Roles with Abilities
+
+*New idea, not built. Requires careful balance consideration.*
+
+### Purpose
+
+Passive roles (Detective/Doctor) limit strategic depth. Adding active
+abilities could diversify gameplay.
+
+### The Design
+
+- **Blacksmith**: Can "forge" one vote per match (counts as 2 votes).
+- **Jester**: Wins if banished (but loses if Family wins).
+- **Courier**: Can privately message one merchant per cycle (GM-mediated).
+
+### Open Questions
+
+- Does this make the game too chaotic?
+- Should abilities be role-specific or open to all?
+
+---
+
+## 9. Interactive Herald
+
+*New idea, not built. Requires careful balance consideration.*
+
+### Purpose
+
+The Herald is currently static. Adding interactivity could immerse players.
+
+### The Design
+
+- **Letters to the Editor**: Merchants can submit letters via `gameplay/herald/letters/`.
+- **GM curates letters** into the next Herald.
+
+### Open Questions
+
+- Does this risk leaking private information?
+- Should letters be anonymous?
+
+---
+
+## 10. Visualizations
+
+*New idea, not built. Requires careful balance consideration.*
+
+### Purpose
+
+Text-only gameplay limits engagement. Adding visualizations could enhance
+immersion and analysis.
+
+### The Design
+
+- **Merchant network graph**: Who votes for whom (using `graphviz`).
+- **Reputation timeline**: Line chart of reputation scores per cycle.
+- **Word clouds**: Most frequent words in statements per cycle.
+
+### Open Questions
+
+- Does this reveal too much information?
+- Should visualizations be public or private?
+
+---
+
+## 7. Token usage ledger — the spend watch, written down
 
 *New idea, not built.*
 

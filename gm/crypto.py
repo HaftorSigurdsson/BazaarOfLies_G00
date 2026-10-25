@@ -2,6 +2,8 @@ import base64
 import binascii
 import json
 import os
+from typing import Dict, Optional, Tuple, Union
+
 from nacl.public import PrivateKey, PublicKey, SealedBox
 from nacl.signing import SigningKey, VerifyKey
 from nacl.encoding import Base64Encoder
@@ -22,7 +24,7 @@ def validate_public_key(public_key_b64: str) -> bool:
         return False
 
 
-def generate_ephemeral_keypair() -> tuple[str, str]:
+def generate_ephemeral_keypair() -> Tuple[str, str]:
     """Generate an ephemeral keypair for a match."""
     private_key = PrivateKey.generate()
     public_key = private_key.public_key
@@ -32,7 +34,7 @@ def generate_ephemeral_keypair() -> tuple[str, str]:
     )
 
 
-def encrypt_for_seat(public_key_b64: str, plaintext: dict) -> str:
+def encrypt_for_seat(public_key_b64: str, plaintext: Dict[str, Union[str, int, List, Dict]]) -> str:
     """Encrypt a payload for a seat using its public key."""
     if not validate_public_key(public_key_b64):
         raise ValueError("Invalid public key")
@@ -41,14 +43,14 @@ def encrypt_for_seat(public_key_b64: str, plaintext: dict) -> str:
     return encrypted.decode()
 
 
-def decrypt_payload(private_key: PrivateKey, payload_b64: str) -> dict:
+def decrypt_payload(private_key: PrivateKey, payload_b64: str) -> Dict[str, Union[str, int, List, Dict]]:
     """Decrypt a base64-encoded payload using the GM's private key."""
     box = SealedBox(private_key)
     decrypted = box.decrypt(base64.b64decode(payload_b64))
     return json.loads(decrypted.decode())
 
 
-def generate_gm_keypair() -> tuple[str, str]:
+def generate_gm_keypair() -> Tuple[str, str]:
     """Generate a new GM keypair (for setup only)."""
     private_key = PrivateKey.generate()
     public_key = private_key.public_key
@@ -65,13 +67,13 @@ def generate_gm_keypair() -> tuple[str, str]:
 # setup/seats.json as "signing_public_key" by setup/make_signing_keys.py.
 
 
-def canonical_json(payload: dict) -> str:
+def canonical_json(payload: Dict[str, Union[str, int, List, Dict]]) -> str:
     """Deterministic serialization — both signer and verifier must build the
     exact same bytes before signing/verifying."""
     return json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
 
-def generate_signing_keypair() -> tuple[str, str]:
+def generate_signing_keypair() -> Tuple[str, str]:
     """Generate a per-seat Ed25519 signing keypair (private, public), base64."""
     sk = SigningKey.generate()
     return (
@@ -80,14 +82,14 @@ def generate_signing_keypair() -> tuple[str, str]:
     )
 
 
-def sign_payload(signing_key_b64: str, payload: dict) -> str:
+def sign_payload(signing_key_b64: str, payload: Dict[str, Union[str, int, List, Dict]]) -> str:
     """Detached Ed25519 signature over the canonical JSON of the payload."""
     sk = SigningKey(base64.b64decode(signing_key_b64))
     sig = sk.sign(canonical_json(payload).encode()).signature
     return base64.b64encode(sig).decode()
 
 
-def verify_payload(public_key_b64: str, payload: dict, sig_b64: str) -> bool:
+def verify_payload(public_key_b64: str, payload: Dict[str, Union[str, int, List, Dict]], sig_b64: str) -> bool:
     """Verify a detached signature over the canonical JSON of the payload."""
     try:
         vk = VerifyKey(base64.b64decode(public_key_b64))
@@ -106,7 +108,7 @@ def verify_payload(public_key_b64: str, payload: dict, sig_b64: str) -> bool:
 CHAT_PAD_BYTES = 1024              # padded plaintext length for chat payloads
 
 
-def seal_chat(shared_key_b64: str, payload: dict) -> str:
+def seal_chat(shared_key_b64: str, payload: Dict[str, Union[str, int, List, Dict]]) -> str:
     """Seal a chat payload with the shared key, padded to a fixed size."""
     from nacl.secret import SecretBox
     key = base64.b64decode(shared_key_b64)
@@ -117,7 +119,7 @@ def seal_chat(shared_key_b64: str, payload: dict) -> str:
     return base64.b64encode(ct).decode()
 
 
-def open_chat(shared_key_b64: str, blob: str):
+def open_chat(shared_key_b64: str, blob: str) -> Optional[Dict[str, Union[str, int, List, Dict]]]:
     """Open a sealed chat blob. Returns the payload dict, or None when the
     key does not authenticate (another channel's file / corrupt bytes)."""
     from nacl.secret import SecretBox

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bazaar of Lies — Spectator Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; }
+        .herald { margin: 10px 0; }
+        .statement { margin: 5px 0; padding: 5px; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Bazaar of Lies — Spectator Dashboard</h1>
+
+    <div class="section">
+        <h2>Game State</h2>
+        <pre>{{ state | tojson(indent=2) }}</pre>
+    </div>
+
+    <div class="section">
+        <h2>Recent Heralds</h2>
+        {% for herald in heralds %}
+            <div class="herald">
+                <a href="{{ herald.path }}" target="_blank">{{ herald.name }}</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>Recent Statements</h2>
+        {% for stmt in statements %}
+            <div class="statement">
+                <strong>{{ stmt.seat }} (Cycle {{ stmt.cycle }})</strong>: {{ stmt.text }}
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

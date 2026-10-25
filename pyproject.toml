@@ -23,8 +23,12 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.3",
+    "pytest-cov>=5.0",
     "black>=24.8",
     "flake8>=7.1",
+    "mypy>=1.9.0",
+    "ruff>=0.4.0",
+    "python-dotenv>=1.0.0",
 ]
 
 # This repo is a collection of arena scripts, not an installable package:

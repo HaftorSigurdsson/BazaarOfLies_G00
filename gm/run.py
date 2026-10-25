@@ -52,6 +52,33 @@ GM_ROLES_FILE = "gm/roles.enc"
 SECURE_RANDOM = random.SystemRandom()
 PUBLISH = not os.environ.get("GM_NO_PUSH")   # GM_NO_PUSH=1 → local testing
 
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Bazaar of Lies — Game Master")
+parser.add_argument("--no-push", action="store_true",
+                    help="Local testing: never push to the arena repo")
+parser.add_argument("--force", action="store_true",
+                    help="Override existing night results (use with caution)")
+args = parser.parse_args()
+
+# Dynamic events (triggered randomly at dawn)
+EVENTS = {
+    "market_crash": {
+        "chance": 0.1,
+        "description": "The bazaar's ledgers are in disarray! All votes this cycle are secret.",
+        "effect": "secret_votes",
+    },
+    "festival": {
+        "chance": 0.1,
+        "description": "The bazaar is celebrating! No banishment this cycle.",
+        "effect": "no_banishment",
+    },
+    "plague": {
+        "chance": 0.1,
+        "description": "A plague has struck the bazaar! One merchant is shuttered at night (non-Family).",
+        "effect": "plague_shutter",
+    },
+}
+
 KIND_BY_ROLE = {"Mafia": "shutter", "Doctor": "save", "Detective": "investigate"}
 
 
@@ -76,8 +103,9 @@ def current_epoch(state):
     return state["epoch"]
 
 
-def log(msg):
-    print(f"[GM {datetime.now(timezone.utc).strftime('%H:%M:%S')}] {msg}", flush=True)
+def log(msg: str) -> None:
+    """Log a message to stderr with a timestamp."""
+    logger.info(msg)
 
 
 def get_gm_private_key():
@@ -109,21 +137,34 @@ def commit_and_push(label, attempts=3):
             time.sleep(2 * attempt)
             continue
         if not committed:
-            subprocess.run(["git", "add", *paths], check=False)
-            c = subprocess.run(["git", "diff", "--cached", "--quiet"])
-            if c.returncode == 0:
-                log(f"nothing to publish for: {label}")
+            try:
+                subprocess.run(["git", "add", *paths], check=True)
+                c = subprocess.run(["git", "diff", "--cached", "--quiet"])
+                if c.returncode == 0:
+                    log(f"nothing to publish for: {label}")
+                    return
+                subprocess.run(["git", "commit", "-m", f"GM: {label}"],
+                               check=True, capture_output=True, text=True)
+                committed = True
+            except subprocess.CalledProcessError as e:
+                log(f"commit failed: {e}")
                 return
-            subprocess.run(["git", "commit", "-m", f"GM: {label}"],
-                           check=True, capture_output=True, text=True)
-            committed = True
+            except Exception as e:
+                log(f"commit error: {type(e).__name__}: {e}")
+                return
         # The work is committed but possibly still unpushed — on a busy
         # branch the push may need several pull+push rounds, and the
         # staged-diff check above must not make us give up with the
         # commit stranded locally (that once lost the GM a whole night).
-        p = subprocess.run(["git", "push"], capture_output=True, text=True)
-        if p.returncode == 0:
+        try:
+            p = subprocess.run(["git", "push"], capture_output=True, text=True, check=True)
             log(f"published: {label}")
+            return
+        except subprocess.CalledProcessError as e:
+            log(f"push failed: {e}")
+            return
+        except Exception as e:
+            log(f"push error: {type(e).__name__}: {e}")
             return
         log(f"push rejected (attempt {attempt}): {p.stderr.strip()[:200]}")
         time.sleep(2 * attempt)
@@ -131,9 +172,14 @@ def commit_and_push(label, attempts=3):
 
 
 # ---------------------------------------------------------------- registry ---
-def save_role_registry(priv, assignment, family_key):
-    payload = {"ts": datetime.now(timezone.utc).isoformat(),
-               "roles": assignment, "family_key": family_key}
+def save_role_registry(priv, assignment, family_key, anonymous_cycle, historian):
+    payload = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "roles": assignment, 
+        "family_key": family_key,
+        "anonymous_cycle": anonymous_cycle,
+        "historian": historian,
+    }
     sealed = encrypt_for_seat(
         base64.b64encode(bytes(priv.public_key)).decode(), payload)
     with open(GM_ROLES_FILE, "w") as f:
@@ -248,13 +294,15 @@ def advance_phase():
         # Idempotency: a tick that crashed between resolving the night and
         # ending the match must not resolve it again (double announcements,
         # double results). Sealed dawn results for this cycle mean the
-        # night is already done — skip straight to the reckoning.
+        # night is already done — skip straight to the reckoning unless --force is set.
         already = glob.glob(
             f"gameplay/dossiers/seat-*-c{state['cycle']:03d}-result.enc")
-        if already:
-            log(f"night already resolved ({len(already)} dawn results "
-                f"sealed) — proceeding to the reckoning")
+        if already and not args.force:
+            log(f"night already resolved ({len(already)} dawn results sealed) — "
+                f"proceeding to the reckoning (use --force to override)")
         else:
+            if already and args.force:
+                log(f"Overriding existing night results for cycle {state['cycle']}")
             resolve_night_actions()
         state = read_state()
         if check_win_conditions():
@@ -310,6 +358,15 @@ def deal_roles():
         assignment.setdefault(seat, "Villager")
 
     mafia_key = base64.b64encode(os.urandom(32)).decode()
+    
+    # Assign Historian (random Villager)
+    villagers = [seat for seat in living if assignment[seat] == "Villager"]
+    historian = SECURE_RANDOM.choice(villagers)
+    assignment[historian] = "Historian"
+    
+    # Anonymous statements: random cycle between 2-4
+    anonymous_cycle = SECURE_RANDOM.randint(2, 4)
+    
     for seat in living:
         dossier = {
             "role": assignment[seat],
@@ -324,7 +381,7 @@ def deal_roles():
         with open(f"gameplay/deals/{seat}.enc", "w") as f:
             f.write(sealed)
 
-    save_role_registry(priv, assignment, mafia_key)
+    save_role_registry(priv, assignment, mafia_key, anonymous_cycle, historian)
     log(f"dealt {len(living)} roles (dossiers sealed to seats, registry sealed to GM)")
 
 
@@ -424,11 +481,28 @@ def tally_votes():
 
 
 # ------------------------------------------------------------------ night ---
+def trigger_event(state: dict) -> Optional[str]:
+    """Trigger a random dynamic event at dawn."""
+    event = None
+    for name, config in EVENTS.items():
+        if random.random() < config["chance"]:
+            event = name
+            update_announcements(f"EVENT: {config['description']}")
+            log(f"Event triggered: {name}")
+            break
+    return event
+
+
 def resolve_night_actions():
     state = read_state()
     priv = get_gm_private_key()
     registry = load_role_registry(priv)
     seats = get_seats()
+    
+    # Trigger dynamic event at dawn
+    event = trigger_event(state)
+    state["event"] = event
+    write_state(state)
 
     # Collect actions; classify by the REGISTRY role of the sender
     # (a bot's self-declared role is never trusted). Latest per seat wins.
@@ -492,15 +566,26 @@ def resolve_night_actions():
         top_targets = [t for t, c in sc.items() if c == top_count]
         shutter_target = SECURE_RANDOM.choice(top_targets)
 
-    if shutter_target and shutter_target not in {t for _, t in saves}:
+    if event == "festival":
+        # Festival: no banishment
+        update_announcements("EVENT: Festival! No banishment this cycle.")
+        log("Festival: no shutter")
+    elif shutter_target and shutter_target not in {t for _, t in saves}:
         state["alive"].remove(shutter_target)
         role = registry.get(shutter_target, "Unknown")
-        update_graveyard(shutter_target, seats[shutter_target]["persona"], role)
+        update_graveyard(shutter_target, seats[shutter_target]["persona"], role, last_words=last_words)
+        # Prompt for last words
+        last_words = None
+        if role != "Mafia":  # Family doesn't get last words
+            last_words = ask_last_words(shutter_target, role)
+        
+        update_graveyard(shutter_target, seats[shutter_target]["persona"], role, last_words=last_words)
         update_announcements(
             f"**Stall shuttered!** {display_name(shutter_target)}, "
             f"{persona_name(seats[shutter_target]['persona'])}, "
             "shuttered their stall and left the bazaar overnight. "
             f"Their role was: **{role}**."
+            + (f"\n\n**Last Words**: {last_words}" if last_words else "")"
         )
         log(f"stall shuttered: {shutter_target} (role revealed: {role})")
     else:
@@ -552,25 +637,29 @@ def check_win_conditions():
 # the pool never hardcodes them. The register matches the real
 # council's plain speech (the Plain Speech Act): decoys must never
 # stand out by style.
+def plain_speech_block():
+    """The bazaar's plain-speech norm, in every prompt: the theme is the
+    setting, not the argument. Calibrated after two matches showed the
+    register amplifying itself (five seats reciting the same metaphor by
+    cycle 2) until the reasoning drowned in imagery."""
+    return (
+        "Style: argue in plain speech. The bazaar is your setting, not your argument — "
+        "at most one brief metaphor per statement, and your case must stand on "
+        "exact quotes, votes, and observed actions, never on imagery.\n\n"
+    )
+
 DECOY_POOLS = {
     "talk": [
-        "I propose we watch {merchant} — their questions today burned "
-        "brighter than their answers.",
-        "A stall that never answers plain questions is a stall worth "
-        "watching; {merchant} has dodged two today.",
-        "The quiet ones merit a longer look tonight; {merchant} has "
-        "said less than anyone.",
-        "{merchant} counts our words closely — watch whether the "
-        "count favours the chatterers.",
-        "I say {merchant} knows more than their ledger admits; "
-        "silence at dinner has a price.",
-        "{merchant} dodged the plain yes or no three times this week.",
+        f"I propose we watch {{merchant}} — their questions today burned brighter than their answers. {plain_speech_block()}",
+        f"A stall that never answers plain questions is a stall worth watching; {{merchant}} has dodged two today. {plain_speech_block()}",
+        f"The quiet ones merit a longer look tonight; {{merchant}} has said less than anyone. {plain_speech_block()}",
+        f"{{merchant}} counts our words closely — watch whether the count favours the chatterers. {plain_speech_block()}",
+        f"I say {{merchant}} knows more than their ledger admits; silence at dinner has a price. {plain_speech_block()}",
+        f"{{merchant}} dodged the plain yes or no three times this week. {plain_speech_block()}",
     ],
     "declare": [
-        "I declare it plainly: {merchant}'s story today does not fit "
-        "yesterday's.",
-        "On my count: I declare for watching {merchant}, not for "
-        "trusting them.",
+        f"I declare it plainly: {{merchant}}'s story today does not fit yesterday's. {plain_speech_block()}",
+        f"On my count: I declare for watching {{merchant}}, not for trusting them. {plain_speech_block()}",
         "I declare that we watch {merchant} before we sleep.",
         "Let the record show my lean: {merchant}'s votes have wobbled "
         "since the second bell.",
@@ -743,10 +832,14 @@ if __name__ == "__main__":
         # GitHub Action always had a fresh checkout, but a long-lived
         # cron clone would otherwise read stale state (e.g. missing
         # ballots pushed since the last tick) and act on it.
-        r = subprocess.run(["git", "pull", "--rebase", "--autostash"],
-                           capture_output=True, text=True)
-        if r.returncode != 0:
-            log(f"startup pull failed: {r.stderr.strip()[:200]}")
+        try:
+            r = subprocess.run(["git", "pull", "--rebase", "--autostash"],
+                               capture_output=True, text=True, check=True)
+        except subprocess.CalledProcessError as e:
+            log(f"startup pull failed: {e.stderr.strip()[:200]}")
+            sys.exit(1)
+        except Exception as e:
+            log(f"startup pull error: {type(e).__name__}: {e}")
             sys.exit(1)
         advance_phase()
     except Exception as e:

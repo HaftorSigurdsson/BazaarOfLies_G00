@@ -1,17 +1,13 @@
-import json
-import os
-import re
-from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple, Union
 
 
-def read_state() -> dict:
+def read_state() -> Dict[str, Union[int, str, List[str], Dict]]:
     """Read the current game state from state.json."""
     with open("gameplay/state.json", "r") as f:
         return json.load(f)
 
 
-def write_state(state: dict) -> None:
+def write_state(state: Dict[str, Union[int, str, List[str], Dict]]) -> None:
     """Write the game state to state.json."""
     with open("gameplay/state.json", "w") as f:
         json.dump(state, f, indent=2)
@@ -28,16 +24,18 @@ def update_announcements(message: str) -> None:
 _PERSONA_NAME_RE = re.compile(r"^[Yy]ou are ([^.,;]+)")
 
 
-def persona_name(persona: str) -> str:
+def persona_name(persona: Optional[str]) -> str:
     """Short merchant name from a persona prompt.
 
     'You are The Carpet Weaver. You see the pattern...' → 'The Carpet Weaver'.
     Never dump whole persona paragraphs into announcements or the graveyard.
     """
-    m = _PERSONA_NAME_RE.match(persona or "")
+    if not persona:
+        return "Unknown merchant"
+    m = _PERSONA_NAME_RE.match(persona)
     if m:
         return m.group(1).strip()
-    return (persona or "").strip()[:24] or "Unknown merchant"
+    return persona.strip()[:24] or "Unknown merchant"
 
 
 GRAVEYARD_TEMPLATE = """# Bazaar Graveyard
@@ -62,7 +60,7 @@ def update_graveyard(seat: str, persona: str, role: str,
     if not os.path.exists(path):
         with open(path, "w") as f:
             f.write(GRAVEYARD_TEMPLATE)
-    with open(path) as f:
+    with open(path, "r") as f:
         lines = f.read().splitlines()
     idx = next((i for i, l in enumerate(lines) if l.startswith("|---")), None)
     insert_at = idx + 1 if idx is not None else len(lines)
@@ -71,26 +69,27 @@ def update_graveyard(seat: str, persona: str, role: str,
         f.write("\n".join(lines) + "\n")
 
 
-def get_seats() -> Dict[str, dict]:
+def get_seats() -> Dict[str, Dict[str, Union[str, int]]]:
     """Load seat data from setup/seats.json."""
     with open("setup/seats.json", "r") as f:
         return json.load(f)["seats"]
 
 
-def display_name(seat: str) -> str:
+def display_name(seat: Optional[str]) -> str:
     """The merchant's public name label, alone: 'Gandalf'.
 
     Names are arbitrary labels — never the seat number in prose. Machine
     files (ballots, dossiers, state, transcripts) always store the bare
     seat ID ('seat-01'); only prose layers display the name. Seat numbers
-    are bookkeeping, never speech."""
+    are bookkeeping, never speech.
+    """
     if not seat:          # e.g. an asleep night action has no target
         return "—"
     name = get_seats().get(seat, {}).get("name")
     return name or seat
 
 
-def seat_from_label(text: str) -> Optional[str]:
+def seat_from_label(text: Optional[str]) -> Optional[str]:
     """Seat ID from any label form: 'seat-01', 'Gandalf (1)', '(10)', or a
     plain merchant NAME ('Gandalf', '...as Gandalf said...'). Names are
     unique across seats, so the first name found wins. Backward compatible
@@ -154,7 +153,7 @@ def _parse_ts(value):
         return None
 
 
-def day_region(state: dict):
+def day_region(state: Dict[str, Union[int, str, Dict, List]]) -> Tuple[str, str]:
     """(label, flavour) for the current in-theme time of day, from the
     arena clock. Falls back to a neutral region if the clock is missing."""
     now = datetime.now(timezone.utc)
