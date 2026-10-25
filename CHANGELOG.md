@@ -95,6 +95,11 @@ All notable changes to this project will be documented in this file.
 - **Docs aligned with the contained night**: `rules.md`'s night phase describes the uniform chat/actions/packets/results and the decoy chorus; `encryption.md` documents the symmetric fixed-size chat channel (`seal_chat`/`open_chat`, the `night_channel_key`, decoys); the repo map gains `night/chat/`; `operations.md`'s vault note and `FUTURE.md`'s evidence table point at the in-repo channel and the truth archive. `mkdocs build --strict` passes.
 
 
+## [2.11.5] - 2026-10-25
+### Changed
+- **The library is per-match**: `gameplay/library/` joins the reset's artifact wipe — each match's pressed PDFs are that match's reading copies, and a fresh match starts with an empty shelf (`.gitkeep` kept, as everywhere). Match 1's PDFs were removed by hand; to keep a match's PDFs, copy them out of the library before resetting. The recaps and judgments in markdown remain the permanent record; docs updated.
+
+
 ## [2.11.4] - 2026-10-25
 ### Changed
 - **The Herald prints names alone** — `display_name` drops the seat-number brackets ("Gandalf", not "Gandalf (1)"), matching the Elder Council; raw GM text (announcements, ballot tables, graveyard) still carries the IDs and `seat_from_label` still parses them. System prompt updated to attribute statements by name only.

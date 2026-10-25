@@ -42,6 +42,9 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Directories whose CONTENTS are pure match artifacts. Kept (with a
 # .gitkeep) but emptied. statements/ and day-*.jsonl are the village's
 # public record of the finished match — history is in the recaps.
+# The library joins them: each match's pressed PDFs are that match's
+# reading copy — copy them out of gameplay/library/ before resetting if
+# you want to keep them.
 ARTIFACT_DIRS = [
     "gameplay/votes",
     "gameplay/night",
@@ -50,6 +53,7 @@ ARTIFACT_DIRS = [
     "gameplay/deals",
     "gameplay/herald",
     "gameplay/village/statements",
+    "gameplay/library",
 ]
 
 # Folders that must always exist and carry a .gitkeep so git keeps them.
