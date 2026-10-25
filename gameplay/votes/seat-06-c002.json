@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 2,
+  "epoch": "30fdc33a",
+  "seat": "seat-06",
+  "target": "seat-09",
+  "rationale": "He dodged the Compact’s clause test nine times and never quoted the clause he invoked.",
+  "ts": "2026-10-25T23:40:58Z"
+ },
+ "sig": "hWT3BUCIFVEUQUdqlmWsUBN7syj0hMfadt7vlYobI57bSgwgqAfYy6PdM+L9QSuPx6nYg2/xNwNKP6KObm5XAw=="
+}
