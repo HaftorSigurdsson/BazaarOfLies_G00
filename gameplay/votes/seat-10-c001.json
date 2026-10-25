@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 1,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-10",
+  "target": "seat-10",
+  "rationale": "His silence after demanding proof is the bazaar’s loudest ledger entry.",
+  "ts": "2026-10-25T18:45:25Z"
+ },
+ "sig": "7MMy1tD6Bkn1R3vJMXA0UceyrrUQcXX7OYCZfBY3gsx2sf9uNXeHvlmAZgpjkAUxODM5QqzczXNij0SWOeSODA=="
+}
