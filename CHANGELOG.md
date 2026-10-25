@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.13.3] - 2026-10-25
+### Added
+- **The morning paper earns its price**: mornings now run at the full 5200-character budget (parity with evenings) and carry two new mandated sections — **"The Night Watch"** (what the night's one true fact means for the day ahead) and **"The State of the Bazaar"** (a measured standing-commentary on the machine-computed **public ledger**: how many of the three Family remain by the departed's revealed roles, whether the Doctor or Detective still stands — every departure reveals a role, so the graveyard is exact — each side's risks, and one framed prediction; never speculating about a living merchant).
+- **Last Words printed as a proper section**, machine-appended verbatim to morning editions; each farewell runs exactly once (the Herald journal tracks what has been printed, marked only after a successful push).
+- **Yesterday's Market**: the morning digest quotes the previous cycle's two most recent closing exchanges verbatim (machine-chosen — the quote can never be invented or edited).
+### Fixed
+- **The cron GM can now collect last words**: the crontab line sources `MISTRAL_API_KEY` from the operator's env file (same vault pattern as the GM key — no literal secret). Night 1's departed (Elsa, a Villager) lost her farewell to the missing key.
+
 ## [2.13.2] - 2026-10-25
 ### Fixed
 - **The press, repaired** (`src/town-press.py`): standalone **BOLD** lines are now recognised as section heads (the first one becomes the front-page headline — previously they ran inline as a "run-on blob" and the fpdf2 engine printed literal asterisks); machine-appended sections ("The Tally", "Editor's Note") can no longer be promoted to the banner headline; the `*Vol. N — Match M, Cycle C*` dateline is dropped instead of leaking through as a stray ruled head; short italic lines render as decks/attributions, not section heads; `latex_escape` is single-pass (the sequential replaces corrupted braces); the fpdf2 fallback strips markdown and measures subheads at render size.

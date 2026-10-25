@@ -19,6 +19,14 @@ daily. The Herald is a FACTS-ONLY publication:
     print yet);
   - merchants appear by NAME ALONE — seat numbers never appear in the
     paper;
+  - morning editions carry 'THE NIGHT WATCH' (what the night's one fact
+    means for the day ahead) and 'THE STATE OF THE BAZAAR' — a measured
+    standing-commentary on the public ledger (Family remaining by the
+    departed's revealed roles, whether the Doctor or Detective still
+    stands, each side's risks) closing with one framed prediction; the
+    departed's LAST WORDS are machine-appended verbatim (each farewell
+    printed exactly once, journal-tracked), and yesterday's closing
+    exchanges are quoted from the digest;
   - evening editions are the fuller paper: the word on the street with
     brief verbatim quotes from the day's statements;
   - when public statements exist, a 'Letter to the Editor' section closes
@@ -71,7 +79,13 @@ MODEL = "mistral-large-latest"
 POLL_SECONDS = 30
 JITTER_SECONDS = 5
 PUSH_ATTEMPTS = 5
-EDITION_MAX_CHARS = {"morning": 3600, "evening": 5200}   # fuller evenings
+EDITION_MAX_CHARS = {"morning": 5200, "evening": 5200}   # full papers, both ends
+                                                        # of the day (the morning
+                                                        # gained the Night Watch,
+                                                        # the ledger commentary,
+                                                        # last words, and the
+                                                        # yesterday's-market
+                                                        # quotes)
 ANNOUNCEMENT_HIGHLIGHTS = 6
 BALLOT_TABLES_MAX = 2
 
@@ -145,6 +159,21 @@ HERALD_SYSTEM = (
     "the Street' section with brief verbatim quotes from two or three of "
     "the day's statements (attributed by name, never edited, uncommented) "
     "and a few lines on what the day's discussion turned on. "
+    "In MORNING editions, include two sections: 'THE NIGHT WATCH' — a "
+    "short piece on what the night's one true fact means for the day "
+    "ahead (flavour drawn from the digest only, never invented) — and "
+    "'THE STATE OF THE BAZAAR' — a measured standing-commentary built "
+    "STRICTLY on the digest's public ledger: how many of the three "
+    "Family remain by the departed's revealed roles, whether the Doctor "
+    "or Detective still stands (every departure reveals a role, so the "
+    "graveyard is exact), what this means for each side's risks, and "
+    "close with one measured prediction of the day's likely turning. "
+    "Predictions are the editor's judgement of odds — frame them as "
+    "such ('the ledger favours…', 'the risk lies in…') and NEVER "
+    "speculate about the role or allegiance of any LIVING merchant. "
+    "If the paper prints a 'Last Words' section, you may reference the "
+    "farewell in at most one line — the section itself carries the words "
+    "verbatim. "
     "If the digest contains statements, close with a 'Letter to the "
     "Editor' section: quote one of the statements verbatim, attributed "
     "to its seat, introduced by at most one neutral line — never edit the "
@@ -304,10 +333,14 @@ def announcements_since(journal):
     return blocks[-ANNOUNCEMENT_HIGHLIGHTS:]
 
 
-def read_statements(state):
-    """The current cycle's public statement records, oldest first."""
-    cycle, epoch = state["cycle"], state.get("epoch")
-    dawn = state.get("clock", {}).get("dawn")
+def read_statements(state, cycle=None, ignore_dawn=False):
+    """The given cycle's public statement records, oldest first. Defaults to
+    the current cycle with the dawn cutoff (statements from an earlier run
+    of the cycle are ghosts); `ignore_dawn=True` reads a finished cycle
+    (yesterday's market) whole."""
+    cycle = state["cycle"] if cycle is None else cycle
+    epoch = state.get("epoch")
+    dawn = None if ignore_dawn else state.get("clock", {}).get("dawn")
     recs = {}
     sources = []
     sdir = "gameplay/village/statements"
@@ -584,15 +617,6 @@ def generate_by_the_numbers(state: dict, part: str) -> str:
     return "## By the Numbers\n\n" + "\n".join(numbers) + "\n"
 
 
-def read_last_words():
-    """Read last words from gameplay/village/last_words.md."""
-    try:
-        with open("gameplay/village/last_words.md", "r") as f:
-            return f.read()
-    except OSError:
-        return ""
-
-
 def read_historian_summary(cycle):
     """Read Historian's summary for the given cycle."""
     try:
@@ -600,6 +624,88 @@ def read_historian_summary(cycle):
             return f.read()
     except OSError:
         return ""
+
+
+def public_ledger_block(state):
+    """Machine-computed standings from public facts alone. Every departure
+    reveals a role, so the graveyard is exact: the town may count the
+    Family that remain and know whether the Doctor or Detective still
+    stands. Nothing here speculates about a living merchant."""
+    roll = graveyard_roll()
+    roles = [e.split(" — ")[1].split(",")[0].strip() for e in roll
+             if " — " in e] if roll else []
+    n_mafia = roles.count("Mafia")
+    alive_n = len(state.get("alive", []))
+    lines = ["Public ledger (computed from official obituaries — "
+             f"{alive_n} merchants alive; departed: "
+             + ("; ".join(roll) if roll else "none") + ")."]
+    lines.append(f"By the Compact the Family numbers three; {n_mafia} "
+                 f"{'is' if n_mafia == 1 else 'are'} publicly known departed, "
+                 f"so {3 - n_mafia} of the three remain.")
+    if "Doctor" in roles:
+        lines.append("The Doctor is publicly among the departed — the town "
+                     "has no night shield; every dusk vote carries full weight.")
+    else:
+        lines.append("No Doctor is listed among the departed — by the "
+                     "graveyard's arithmetic the Doctor still trades among "
+                     "the living.")
+    if "Detective" in roles:
+        lines.append("The Detective is publicly among the departed — the "
+                     "town has no night eye.")
+    else:
+        lines.append("No Detective is listed among the departed — the "
+                     "Detective's findings may still arrive at dawn.")
+    streak = quiet_night_streak()
+    if streak:
+        lines.append(f"Quiet nights in a row: {streak}.")
+    return "\n".join(lines)
+
+
+def yesterday_market_block(state):
+    """The previous cycle's closing exchanges, verbatim — the paper's memory
+    of yesterday's market. The two most recent statements from distinct
+    seats, chosen by machine so the quote can never be invented or edited."""
+    cycle = int(state.get("cycle") or 0)
+    if cycle < 2:
+        return ""
+    recs = read_statements(state, cycle=cycle - 1, ignore_dawn=True)
+    if not recs:
+        return ""
+    picked, seats = [], set()
+    for r in reversed(recs):
+        if r.get("seat") in seats:
+            continue
+        seats.add(r.get("seat"))
+        picked.append(r)
+        if len(picked) == 2:
+            break
+    lines = [f"Yesterday's market (cycle {cycle - 1:03d}) — the closing "
+             "exchanges, verbatim:"]
+    for r in reversed(picked):
+        who = (display_name(r["seat"]) if r.get("seat")
+               else "an unsigned merchant")
+        lines.append(f"{who}: {r['text']}")
+    return "\n".join(lines)
+
+
+def last_words_sections(journal):
+    """Un-printed last words from village/last_words.md, as (heading, body)
+    pairs — the paper carries each farewell exactly once; the journal
+    remembers which farewells have already run."""
+    try:
+        text = open("gameplay/village/last_words.md").read()
+    except OSError:
+        return []
+    printed = journal.get("last_words_printed", [])
+    out = []
+    for block in text.split("## ")[1:]:
+        parts = block.split("\n", 1)
+        heading = parts[0].strip()
+        body = parts[1].strip() if len(parts) > 1 else ""
+        if heading in printed:
+            continue
+        out.append((heading, body))
+    return out
 
 
 def facts_digest(state, part):
@@ -626,12 +732,14 @@ def facts_digest(state, part):
         historian_summary = read_historian_summary(state["cycle"])
         if historian_summary:
             digest.append("\n\n## The Historian's Chronicle\n\n" + historian_summary)
-    
-    # Add last words (morning editions only, after banishment)
+
+    # Morning standings: the public ledger (machine arithmetic the paper's
+    # commentary must stand on) and yesterday's closing exchanges.
     if part == "morning":
-        last_words = read_last_words()
-        if last_words:
-            digest.append("\n\n## Last Words\n\n" + last_words)
+        digest.append("\n\n" + public_ledger_block(state))
+        yesterday = yesterday_market_block(state)
+        if yesterday:
+            digest.append("\n\n" + yesterday)
     
     if part == "evening":
         tallies = vote_history()
@@ -756,6 +864,16 @@ def print_edition(state, part, journal):
         body = chron.split("\n\n", 1)[1].strip() if "\n\n" in chron else chron.strip()
         edition += "\n\n## The Historian's Chronicle\n\n" + body + "\n"
 
+    # Last Words, machine-appended to morning editions: the departed's
+    # farewell, verbatim, each printed exactly once (the journal remembers
+    # what has run). The headings are only marked as printed after the
+    # edition is safely committed and pushed.
+    farewells = last_words_sections(journal) if part == "morning" else []
+    if farewells:
+        edition += ("\n\n## Last Words\n\n"
+                    + "\n\n".join(f"**{h}**\n\n{b}" for h, b in farewells)
+                    + "\n")
+
     # The Editor's Note closes the paper: the one opinion column, labelled.
     edition += "\n\n---\n\n" + generate_editors_note(state, part)
     
@@ -786,6 +904,10 @@ def print_edition(state, part, journal):
     if not args.dry_run:
         commit_and_push([path] + ([pdf_path] if pdf_path else []),
                         f"Herald {part} edition c{cycle:03d}")
+        # Only now are the farewells marked as printed — a failed push must
+        # leave them queued for the next attempt.
+        journal.setdefault("last_words_printed", []).extend(
+            h for h, _ in farewells)
         mark_edition(journal, epoch, cycle, part)
         save_journal(journal)
         log(f"printed {part} edition for cycle {cycle:03d}")
