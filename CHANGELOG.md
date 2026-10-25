@@ -95,6 +95,12 @@ All notable changes to this project will be documented in this file.
 - **Docs aligned with the contained night**: `rules.md`'s night phase describes the uniform chat/actions/packets/results and the decoy chorus; `encryption.md` documents the symmetric fixed-size chat channel (`seal_chat`/`open_chat`, the `night_channel_key`, decoys); the repo map gains `night/chat/`; `operations.md`'s vault note and `FUTURE.md`'s evidence table point at the in-repo channel and the truth archive. `mkdocs build --strict` passes.
 
 
+## [2.11.7] - 2026-10-25
+### Fixed
+- **GM nightfall crash (`NameError: priv`)**: the voting→night transition called `publish_night_packets(state, priv)` with an undefined `priv` — first live nightfall of the contained night froze the tally: cycle 1's banishment, night state, and night packets were stranded uncommitted in the GM clone while the arena still said "voting". The call now passes `get_gm_private_key()`. Recovered live: rescue-commit of the stranded state, manual packet publication, and a five-minute night extension (in-theme announcement: "the lamps burn five minutes longer").
+- **`commit_and_push` could strand a committed push**: after a rejected push the retry loop re-checked the staged diff — which is empty because the work is already committed — logged "nothing to publish", and returned with the commit unpushed (this is what kept the night extension off the remote). The loop now commits once and keeps pull+push rounds until the push lands.
+
+
 ## [2.11.6] - 2026-10-25
 ### Fixed
 - **Statements no longer cut mid-sentence**: the model was told "1200 chars max" but overshot when heated, and the hard slice chopped statements mid-word ("the bazaar does not trade in va"). The prompt now demands strictly under 1200 characters (aim 900, end on a complete sentence — "the town bell cuts anything longer and your final point is lost with it"), and a new `trim_statement` caps at the last complete sentence within the budget (falling back to the last word) instead of an arbitrary character.
