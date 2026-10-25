@@ -63,3 +63,32 @@ The discussion ends. The bazaar votes!
 **Voting ends at:** 2026-10-25T19:45:02.127758+00:00
 
 ---
+**2026-10-25T19:50:02Z**
+**Banishment!** Batman, The Coppersmith, has been banished from the bazaar.
+Their role was: **Villager**.
+
+**Ballots cast this cycle (signed and public):**
+
+| Merchant | Voted for | Reason |
+|---|---|---|
+| Gandalf | Batman | Your eight calls for falsifiable claims today stand beside a blank ledger. |
+| Hermione | Batman | His eight calls for dated accusations today stand beside a blank ledger—eight demands, zero accusations from his own hand. |
+| Yoda | Batman | Eight calls for falsifiable claims with zero accusations from your own ledger. |
+| Batman | Hermione | Hermione traded silk today while demanding falsifiable claims, and never walked the test she called for. |
+| Ripley | Batman | Eight calls for dated accusations, zero accusations from your own hand. |
+| Neo | Batman | Your silence after eight calls for dated accusations is louder than any ledger entry. |
+| Morpheus | Batman | Eight calls for falsifiable claims, zero accusations from your own hand—silence after such volume is louder than any ledger entry. |
+| Inigo | Batman | Your eight calls for “falsifiable claims” today carried zero accusations from your own ledger—eight demands, zero names. |
+
+(10 ballot(s) rejected: forged, stale, or from another epoch — not counted.)
+
+**Last words of Batman:**
+"Remember this day, and the choices that led you here—for they will shape what comes next."
+
+---
+**2026-10-25T19:50:02Z**
+**Match 3, Cycle 2**
+The sun sets. The bazaar sleeps. Night actions begin!
+**Night ends at:** 2026-10-25T20:05:01.986274+00:00
+
+---
