@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 1,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-05",
+  "target": "seat-10",
+  "rationale": "His own dates measured sweetness twice yet never named a merchant or quoted a Family trick—two dated dodges the bazaar cannot reward.",
+  "ts": "2026-10-25T18:45:30Z"
+ },
+ "sig": "SHnugrnsVB0wJDeOhJFXHhMc5Ov/DnS9NWLE8jv4qg+V+KSyFgUlGwTG8h6lR9U9+b9JGVjfrQI57C4G6BH+Cg=="
+}
