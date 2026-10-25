@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 2,
+  "epoch": "165f13bd",
+  "seat": "seat-10",
+  "target": "seat-07",
+  "rationale": "Elsa, your silence on who you fear tonight hums louder than any riddle.",
+  "ts": "2026-10-25T13:45:32Z"
+ },
+ "sig": "SY7KYWVazm0i/z6uQvzqb8xviReElJk6+wtjBVMELAIYJJ9DFIqM3hqlBuFsi4jjVDFMRZxAP7haSt1iyYlXBQ=="
+}
