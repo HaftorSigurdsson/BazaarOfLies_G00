@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "4fe2db9e",
+  "seat": "seat-07",
+  "target": "seat-08",
+  "rationale": "Morpheus alone accused three merchants without a single quoted line, then pivoted to demanding evidence he withholds himself.",
+  "ts": "2026-10-25T21:25:30Z"
+ },
+ "sig": "zFlEnl8+UHdlQOigcP1G19YLkIb1rq7pHOqpC9ax6BIn/TcRJTt5rDKwLkjqPQxZYzPXnbHIUPeTP6Gy9iE5Dw=="
+}
