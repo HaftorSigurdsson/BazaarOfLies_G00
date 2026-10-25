@@ -48,3 +48,14 @@ The night bell tolls late: the lamps burn five minutes longer tonight.
 **Night now ends at:** 2026-10-25T13:15:00+00:00
 
 ---
+**2026-10-25T13:15:01Z**
+**Stall shuttered!** Ripley (5), The Moneylender, shuttered their stall and left the bazaar overnight. Their role was: **Detective**.
+
+---
+**2026-10-25T13:15:01Z**
+**Match 2, Cycle 2**
+The bazaar awakens!
+**Seats alive:** Gandalf (1), Hermione (2), Batman (4), Neo (6), Elsa (7), Morpheus (8), Inigo (9), Sherlock (10)
+**Discussion ends at:** 2026-10-25T13:40:01.410108+00:00
+
+---
