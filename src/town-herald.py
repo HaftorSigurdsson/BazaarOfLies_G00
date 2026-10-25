@@ -153,7 +153,8 @@ def safe_push():
             return
         log(f"push rejected (attempt {attempt}/{PUSH_ATTEMPTS}); rebasing")
         git("pull", "--rebase", check=False)
-        time.sleep(2 * attempt)
+        # jittered backoff so simultaneous writers re-collide less
+        time.sleep(2 * attempt + random.uniform(0, 2 * attempt))
     raise RuntimeError(f"push rejected {PUSH_ATTEMPTS} times — needs a human")
 
 

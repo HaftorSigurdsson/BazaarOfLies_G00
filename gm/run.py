@@ -189,7 +189,8 @@ def advance_phase():
             f"**Discussion ends at:** {state['clock']['discussion_deadline']}"
         )
         deal_roles()
-        commit_and_push("match 1 dealt, cycle 1 discussion opens")
+        commit_and_push(
+            f"match {state['match']} dealt, cycle 1 discussion opens")
 
     elif phase == "discussion":
         deadline = datetime.fromisoformat(state["clock"]["discussion_deadline"])

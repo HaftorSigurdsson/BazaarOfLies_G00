@@ -125,7 +125,10 @@ def safe_push():
             return
         log(f"push rejected (attempt {attempt}/{PUSH_ATTEMPTS}); rebasing")
         git("pull", "--rebase", check=False)
-        time.sleep(2 * attempt)
+        # jittered backoff: after a deal-time thundering herd (ten bots
+        # pushing at once) deterministic retries re-collide; the jitter
+        # spreads the herd out
+        time.sleep(2 * attempt + random.uniform(0, 2 * attempt))
     raise RuntimeError(f"push rejected {PUSH_ATTEMPTS} times — needs a human")
 
 
