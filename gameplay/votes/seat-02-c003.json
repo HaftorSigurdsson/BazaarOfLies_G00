@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 3,
+  "cycle": 3,
+  "epoch": "ecfd8a9e",
+  "seat": "seat-02",
+  "target": "seat-01",
+  "rationale": "Eleven calls for \"Family tricks\" yet not one dated accusation from your own hand.",
+  "ts": "2026-10-25T20:35:13Z"
+ },
+ "sig": "3Gjj1AXlUTWU1uR9Wfl8oHGkuhpQaiXgkaegFHyjsSTH7k3w0SPwU3qn7rh+eOD01OZ9SubFv1VEeNJ4+qMUBg=="
+}
