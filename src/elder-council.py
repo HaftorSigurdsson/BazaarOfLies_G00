@@ -37,24 +37,25 @@ from crypto import decrypt_payload, load_gm_private_key  # noqa: E402
 from nacl.public import PrivateKey  # noqa: E402
 from mistralai.client import Mistral  # noqa: E402
 
-MODEL = "mistral-small-2603"
+MODEL = "mistral-large-latest"
 VAULT = os.path.join(os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__)))), ".bazaar")
 GM_PRIV_FILE = os.path.join(VAULT, "gm_private_key.txt")
 FAMILY_DIR = os.path.join(VAULT, "family")
-REASONING_EFFORT = "high"
-
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 
 def ask(system, user, max_tokens=4096):
+    # No reasoning_effort: it belongs to the reasoning models; the API
+    # rejects it on mistral-large. The Council runs once per match —
+    # let the model think in prose.
     r = client.chat.complete(
         model=MODEL,
         messages=[{"role": "system", "content": system},
                   {"role": "user", "content": user}],
-        temperature=0.5, reasoning_effort=REASONING_EFFORT, max_tokens=max_tokens)
+        temperature=0.5, max_tokens=max_tokens)
     content = r.choices[0].message.content
-    if isinstance(content, list):                      # high-effort chunks
+    if isinstance(content, list):                      # chunked content shapes
         parts = [c.text for c in content
                  if getattr(c, "type", None) == "text" and getattr(c, "text", None)]
         return "\n".join(parts).strip()
@@ -322,13 +323,14 @@ def verdict_draft(rec, match_no):
     return ask(system, user)
 
 
-def final_judgment(match_no, timeline, family_digest,
+def final_judgment(match_no, case, timeline, family_digest,
                    detective_note, drafts):
     system = COUNCIL_VOICE + (
         "\nYou now write the FULL judgment of the match, 900-1400 words, "
         "markdown, weaving the ten verdict drafts into one document. Cite "
         "the drafts' quotes. Structure exactly:\n"
-        "# The Judgment of the Council of Elders — Match <N>\n"
+        "# The Judgment of the Council of Elders — <THE CASE NAME GIVEN BELOW>\n"
+        "A dateline line: the match number and its dates.\n"
         "A formal preamble (the Council convenes, the match reviewed).\n"
         "## The History\n The match's arc, cycle by cycle, brief.\n"
         "## The Main Arguments\n The best cases made on each side — the "
@@ -343,7 +345,9 @@ def final_judgment(match_no, timeline, family_digest,
         "- The Most Damning Quote of the match.\n"
         "## The Closing\n One short paragraph; the bazaar rests.")
     verdicts = "\n\n".join(drafts)
-    user = (f"THE AUTHORITATIVE TIMELINE OF MATCH {match_no} (restate this "
+    user = (f"THE CASE NAME of the matter (use it verbatim in the heading, "
+            f"after the dash): **{case}\n\n"
+            f"THE AUTHORITATIVE TIMELINE OF MATCH {match_no} (restate this "
             f"exactly in the History):\n{timeline}\n\n"
             f"THE FAMILY'S CANDLELIGHT COUNCIL (the secrets):\n{family_digest}\n\n"
             f"{detective_note}\n\n"
@@ -352,6 +356,94 @@ def final_judgment(match_no, timeline, family_digest,
             "Write the full judgment now. Every award justification must "
             "agree with the timeline's mechanisms.")
     return ask(system, user, max_tokens=8192)
+
+
+
+# ------------------------------------------------------ title & bilag ---
+
+def case_name(match_no, timeline, graveyard):
+    """A fitting case name for the heading — the Council's own name for
+    the matter, in-theme, drawn from the outcome."""
+    system = COUNCIL_VOICE + (
+        "\nName this matter as a court would: a case name of 4-8 words, "
+        "in-theme, that captures the match's outcome and its dominant "
+        "theme. Output ONLY the case name — no preamble, no quotes, no "
+        "punctuation at the end.")
+    user = (f"Match {match_no}. The timeline:\n{timeline}\n\n"
+            "Give the matter its name.")
+    return ask(system, user, max_tokens=60)
+
+
+def parse_merit(draft):
+    m = re.search(r"Merit\D{0,12}(\d+)\s*/\s*10", draft)
+    return int(m.group(1)) if m else None
+
+
+def bilag_record(match_no, seats, graveyard, ballots, statements,
+                 night_actions, family_msgs):
+    """Bilag A — The Record: pure facts, computed, no model. The match's
+    dates, duration, volumes, ledger of departures, and vote tallies."""
+    tss = [m for m in re.findall(r"\*\*(\d{4}-\d{2}-\d{2}T[\d:]+Z)\*\*",
+                                 open("gameplay/village/announcements.md").read())]
+    started, ended = (min(tss), max(tss)) if tss else ("unknown", "unknown")
+    duration = ""
+    try:
+        from datetime import datetime
+        d = (datetime.fromisoformat(ended.replace("Z", "+00:00"))
+             - datetime.fromisoformat(started.replace("Z", "+00:00")))
+        hours, rem = divmod(int(d.total_seconds()), 3600)
+        duration = f"{hours}h {rem // 60:02d}m"
+    except Exception:
+        pass
+    lines = [f"## Bilag A — The Record",
+             "",
+             f"**Match {match_no}** — began {started}, ended {ended}"
+             + (f" (duration {duration})" if duration else "") + ".",
+             "",
+             f"Volumes of the record: {sum(len(v) for v in statements.values())} "
+             f"statements, {sum(len(v) for v in ballots.values())} ballots, "
+             f"{len(night_actions)} night actions, "
+             f"{len(family_msgs)} Family council messages, "
+             f"{len(graveyard)} departures.",
+             "",
+             "**The ledger of departures**",
+             "",
+             "| Cycle | Merchant | Mechanism | True role |",
+             "|---|---|---|---|"]
+    for g in graveyard:
+        lines.append(f"| {g['cycle']} | {g['seat_label']} | {g['by']} | {g['role']} |")
+    lines += ["", "**Vote tallies by cycle**", ""]
+    for cyc in sorted(ballots):
+        tally = {}
+        for b in ballots[cyc]:
+            tally[b["target"]] = tally.get(b["target"], 0) + 1
+        names = ", ".join(f"{t} {n}" for t, n in
+                          sorted(tally.items(), key=lambda kv: -kv[1]))
+        lines.append(f"- cycle {cyc}: {names}")
+    return "\n".join(lines)
+
+
+def bilag_ratings(seat_order, drafts, records):
+    """Bilag B — The Ratings: the verdicts' merit scores, best to worst,
+    in a table. Parsed from the drafts; the numbers are the Council's."""
+    rows = []
+    for seat, draft in zip(seat_order, drafts):
+        rec = records[seat]
+        merit = parse_merit(draft)
+        rows.append((merit if merit is not None else -1, seat, rec))
+    rows.sort(key=lambda r: (-r[0], r[1]))
+    lines = ["## Bilag B — The Ratings",
+             "",
+             "The verdicts' merit ratings, from finest thread to most frayed:",
+             "",
+             "| Rank | Merchant | True role | Fate | Merit |",
+             "|---|---|---|---|---|"]
+    for rank, (_, seat, rec) in enumerate(rows, 1):
+        merit = parse_merit(drafts[seat_order.index(seat)])
+        lines.append(f"| {rank} | {rec['name']} | {rec['role']} | "
+                     f"{rec['fate'].split(' (')[0]} | "
+                     f"{merit if merit is not None else '—'}/10 |")
+    return "\n".join(lines)
 
 
 def main():
@@ -407,14 +499,27 @@ def main():
                     f"{r.get('target')} — finding: {r.get('result')}"
                     for r in detective_results))
 
+    print("  the matter is named...")
+    case = case_name(args.match, timeline, graveyard)
+    print(f"  case name: {case!r}")
+
     print("  final judgment call...")
-    judgment = final_judgment(args.match, timeline,
+    judgment = final_judgment(args.match, case, timeline,
                               family_digest, detective_note, drafts)
+
+    judgment = re.sub(r"^```[a-z]*\s*\n", "", judgment.strip())
+    judgment = re.sub(r"\n```\s*$", "", judgment.strip())
+
+    seat_order = sorted(records)
+    doc = (judgment + "\n\n---\n\n"
+           + bilag_record(args.match, seats, graveyard, ballots, statements,
+                          night_actions, family_msgs) + "\n\n---\n\n"
+           + bilag_ratings(seat_order, drafts, records) + "\n")
 
     out = f"gameplay/village/match-{args.match:02d}-judgment.md"
     with open(out, "w") as f:
-        f.write(judgment + "\n")
-    print(f"judgment written -> {out} ({len(judgment)} chars)")
+        f.write(doc)
+    print(f"judgment written -> {out} ({len(doc)} chars)")
     return 0
 
 

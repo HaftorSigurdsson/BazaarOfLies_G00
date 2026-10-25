@@ -15,6 +15,16 @@ All notable changes to this project will be documented in this file.
 - **The Elder Council** (`src/elder-council.py`, `src/elder-press.py`) — the arena's fourth institution, built and trialed on match 1: a post-match historian-judge that compiles the complete record (roles, graveyard, published ballots with computed vote tallies, 320 statements, decrypted night actions, the Detective's never-delivered sealed result, the Family's candlelight council) and delivers a **court-style judgment** — history, main arguments, per-seat verdicts with merit ratings, and the awards (MVP, Golden Sacrifice, Worst Misjudgment, Best Lie, Most Damning Quote) — as markdown plus a **3-page court-document PDF**. Ground discipline enforced: an authoritative per-cycle timeline (tallies + departure mechanisms) is restated faithfully; the trial judgment's history matches the GM's own log. Match 1's verdict: MVP Batman (a villager), Golden Sacrifice Elsa the Detective.
 - **Truth archive** (`gm/run.py` `write_truth_archive`): at match end the registry and every sealed night action are decrypted and committed (`match-XX-truth.md`) before the next deal can overwrite `gm/roles.enc` — the Council judges from the authoritative record.
 
+
+## [2.9.1] - 2026-10-25
+### Changed
+- **The Council speaks with the large model** (`mistral-large-latest`) — the judgment is written once per match, so gravitas is worth the tokens. `reasoning_effort` dropped: the API rejects it on large ("not enabled for this model"); the Council thinks in prose.
+- **The matter gets its name**: a case-name call now titles the judgment after the outcome and theme — match 1 was named *"Mafia Shadows Over Stalled Stalls"* — with a dateline line beneath.
+### Added
+- **Bilag A — The Record** (computed, model-free): the match's start and end times, duration, volumes of the record, the ledger of departures, and every vote tally by cycle.
+- **Bilag B — The Ratings**: the verdicts' merit scores parsed from the drafts and ranked best-to-worst in a table — the Council's numbers, typeset by machine so no rating can drift.
+- **The elder press renders markdown tables** (ruled LaTeX tabulars) and strips wrapping code fences from model output (large liked to gift-wrap its judgment).
+
 ## [Unreleased]
 ### Added
 - **`FUTURE.md` (The Early Bell)**: a designed-not-built motion mechanic — "I move the lamps be lit: <target>" rings the vote early on a strict majority of living seats, gated to Afternoon tea onward so evidence gets built first; the 5-minute vote window survives. Intended as a double-edged mechanic (the Family can rush a fake consensus), with guard rails, a five-step implementation plan, and open questions for the next session.

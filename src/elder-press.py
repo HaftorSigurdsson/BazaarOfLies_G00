@@ -44,10 +44,36 @@ def latex_inline(text):
     return text
 
 
+def _table_tex(rows):
+    """Markdown table rows -> a ruled LaTeX tabular (left-aligned)."""
+    header = [c.strip() for c in rows[0].strip("|").split("|")]
+    body = []
+    for r in rows[2:]:                      # skip the --- separator
+        body.append([c.strip() for c in r.strip("|").split("|")])
+    cols = "l" * len(header)
+    out = [r"\begin{center}\begin{tabular}{" + cols + "}",
+           r"\hline",
+           " & ".join(latex_inline(c) for c in header) + r" \\",
+           r"\hline"]
+    for row in body:
+        cells = row + [""] * (len(header) - len(row))
+        out.append(" & ".join(latex_inline(c) for c in cells[:len(header)])
+                   + r" \\")
+    out += [r"\hline", r"\end{tabular}\end{center}"]
+    return "\n".join(out)
+
+
 def md_to_tex(md):
     out, in_quote, in_item = [], False, False
+    table = []
     for raw in md.splitlines():
         s = raw.strip()
+        if s.startswith("|"):
+            table.append(s)
+            continue
+        if table:
+            out.append(_table_tex(table))
+            table = []
         if in_quote and not s.startswith(">"):
             out.append(r"\end{quote}")
             in_quote = False
@@ -78,6 +104,8 @@ def md_to_tex(md):
             out.append(r"\noindent\rule{\textwidth}{0.4pt}")
         else:
             out.append(latex_inline(s))
+    if table:
+        out.append(_table_tex(table))
     if in_quote:
         out.append(r"\end{quote}")
     if in_item:
