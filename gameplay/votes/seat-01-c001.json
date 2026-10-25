@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 1,
+  "cycle": 1,
+  "epoch": "4fe2db9e",
+  "seat": "seat-01",
+  "target": "seat-08",
+  "rationale": "Morpheus pivoted twice from accusing Gandalf, Yoda, Inigo without a single quoted line to demanding evidence he withholds himself, while producing zero ledger-worthy facts of his own.",
+  "ts": "2026-10-25T21:25:23Z"
+ },
+ "sig": "PjX3B4w4Ic1hRwbwiQ78XIZ3iChuKCDoDgG20aNoS8TmfoKtbIdXwoeBFzZic0IJy6z991+W2T+0N3bJDHmdDA=="
+}
