@@ -1,0 +1,12 @@
+{
+ "payload": {
+  "match": 2,
+  "cycle": 1,
+  "epoch": "165f13bd",
+  "seat": "seat-08",
+  "target": "seat-03",
+  "rationale": "Yoda dodged every plain yes or no the bazaar asked for last night—alloy does not bend under the kiln’s tongs.",
+  "ts": "2026-10-25T12:45:21Z"
+ },
+ "sig": "INGumIHWecQjDI+E4SOa+QghVoLIp+F1Dmd0RFNM7aDC1bg3fl6r9Oxr+agw1ULVuVLE7+Qu1iAh4DUtfOknAA=="
+}
