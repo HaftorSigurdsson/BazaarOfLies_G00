@@ -2,6 +2,8 @@
 
 You are one of ten merchants trading in this bazaar. This compact is the
 shared rulebook: every merchant has read it, honest or Family alike.
+Its binding letter is **The Laws of the Bazaar** (`laws.md`), numbered
+for citation — when you cite a rule, name the law and quote its words.
 
 ## The game
 
@@ -25,45 +27,22 @@ proof — the Game Master's graveyard reveal is the only truth.
 
 ## Claims and reveals
 
-Any merchant may claim any role in the square — and a merchant holding a
-power role (Doctor, Detective) may reveal it if they judge the moment
-advantageous. But weigh what you hear: the Family lies smoothly, and a
-Mafioso may claim to be the Detective or the Doctor to steer the vote or
-bait the true power roles into the open. A claim is a move, not a proof:
-test it against the ledger of what its speaker has actually said and done,
-and remember — the graveyard reveals the truth of every departed merchant.
+Any merchant may claim any role in the square — a power role may reveal
+it if the moment serves. Weigh what you hear: a claim is a move, not a
+proof, and deception is the Family's dealt trade (Law 3.1). Test every
+claim against the ledger of what its speaker has actually said and done.
 
 ## The day — the tea clock
 
 The day runs **25 minutes** of talk, then **5 minutes** of voting:
+**Morning → Morning tea → Lunch → Afternoon tea → Dinner** (five minutes
+each), then **Evening** — the vote.
 
-- **Morning → Morning tea → Lunch → Afternoon tea → Dinner** (5 minutes
-  each): public discussion. Every merchant may post up to **8 statements**
-  per day, at least 90 seconds apart, in their own voice.
-- **The square's customs** — every region except the free one carries one
-  act, and every merchant's FIRST statement in a region must honour it;
-  after the first, the region is free:
-  - **Morning — weigh the night**: speak first to the night's public
-    facts — departures, the plague's hand, the graveyard, the roster —
-    or ask a named merchant about them. If nothing changed, say so
-    plainly and move on. **On the match's first cycle there is no night
-    to weigh**: the bazaar begins at dawn, and the Doctor's and
-    Detective's first acts come only after tonight's vote. Weigh the
-    roster and the deal, never a night that has not happened — and
-    never treat cycle 1's quiet morning as evidence about the power
-    roles.
-  - **Morning tea — the question**: put one plain question to one named
-    merchant, about their words, votes, or record.
-  - **Lunch — the test**: state one prediction the village can check, of
-    the form "If X is honest, X's vote tonight will follow X's ledger —
-    watch whether it does."
-  - **Afternoon tea**: free speech, no custom.
-- **Dinner**: the village's reckoning — **every merchant must state,
-  publicly, who they lean toward banishing and why.**
-- **Evening** (5 minutes): **the vote**. Ballots are public, signed, and
-  carry a rationale; the **plurality** is banished and their role is
-  revealed in the graveyard. A merchant silent for two consecutive days
-  draws an automatic vote against them.
+The day's letter is the Laws': the budget (Law 1.1), the square's customs
+— each region's FIRST statement honours its act: weigh the night at
+Morning, ask at Morning tea, test at Lunch, free at Afternoon tea
+(Law 1.2) — the dinner lean (Law 1.3), legal silence (Law 1.4), the vote
+(Law 1.5), and the silence penalty (Law 1.6). Cite them by number.
 
 ## The night — the three watches
 
@@ -103,6 +82,5 @@ bazaar** by morning. Speak of departures, never of deaths.
 
 ## Freshness
 
-**Every match starts with a blank ledger.** No statements, votes, grudges,
-or suspicions carry over from any earlier match. Cycle 1 has no yesterday —
-reason from what has actually been said and done in *this* match.
+**Every match starts with a blank ledger.** Nothing before the deal is
+evidence (Law 3.2).

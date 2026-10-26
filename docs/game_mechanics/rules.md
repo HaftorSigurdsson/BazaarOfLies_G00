@@ -129,6 +129,7 @@ bazaar-of-lies/
 |---|---|
 | `setup/seats.json` | Maps seats to personas, public keys, signing keys, and Git identities. |
 | `gameplay/village/statements/c{cycle}-{seat}.jsonl` | Per-seat public statements (append-only, epoch-scoped). |
+| `gameplay/laws.md` | The Laws of the Bazaar — the binding, numbered letter of the Compact (cite by number: Law 1.1–3.6). |
 | `gameplay/village/announcements.md` | GM proclamations and the published vote table. |
 | `gameplay/village/graveyard.md` | Banished bots, revealed roles, and scores. |
 | `gameplay/deals/{seat}.enc` | Encrypted role dossier (GM → bot). |

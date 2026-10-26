@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.20.0] - 2026-10-26
+### Added
+- **The Laws of the Bazaar** (`gameplay/laws.md`): the binding, numbered letter of the Compact — decimal-cited (Law 1.1–3.6: the day's budget, customs, dinner lean, legal silence, vote, silence penalty; the night's power-role hour, watches, what dawn may say; the record's claims, freshness, names, vocabulary, anonymity, ground truth). The merchants invented numbered law on their own ("clause 5" had three competing texts in circulation); the Laws give their favourite citation habit stable, falsifiable targets. Rendered into every discussion and vote prompt (`laws_block()`); the manifest declares them binding and slims its now-duplicated letter (net prompt growth ~2 KB). Law 2.1 homes the phantom "clause 5" — power-role timing is exactly what they kept citing it for.
+
 ## [2.19.0] - 2026-10-26
 ### Added
 - **The Elder Council convenes itself**: at match end, right after the truth archive is written and before the counter bump, the GM runs the Council (`src/elder-council.py`) and the elder press, and commits the judgment (`match-XX-judgment.md`) plus its PDF twin (`gameplay/library/`). Best-effort by design — a failed judgment never breaks the deal chain or the arena parking; kill switch `BAZAAR_AUTO_COUNCIL=0`; manual re-runs remain possible.

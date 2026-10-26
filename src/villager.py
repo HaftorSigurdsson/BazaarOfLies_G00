@@ -828,6 +828,30 @@ def time_of_day_block(state: Dict[str, Union[int, str, List[str], Dict]]) -> str
 MANIFEST_PATH = os.path.join(REPO_ROOT, "gameplay", "manifest.md")
 _manifest_cache = (None, "")             # (mtime, text)
 
+# ------------------------------------------------------------------ laws ---
+LAWS_PATH = os.path.join(REPO_ROOT, "gameplay", "laws.md")
+_laws_cache = (None, "")                  # (mtime, text)
+
+
+def laws_block() -> str:
+    """The Laws of the Bazaar (gameplay/laws.md): the binding, numbered
+    letter of the Compact — the merchants' favourite citation target
+    existed only as their own confabulation ("clause 5" had three
+    competing texts) until this gave it stable numbers. Cached by mtime;
+    absent file means no block (older arenas)."""
+    global _laws_cache
+    try:
+        mtime = os.path.getmtime(LAWS_PATH)
+        if _laws_cache[0] != mtime:
+            with open(LAWS_PATH, "r") as f:
+                _laws_cache = (mtime, f.read())
+    except OSError:
+        return ""
+    return ("=== THE LAWS OF THE BAZAAR (the binding, numbered text — "
+            "when you cite a rule, name the law and quote its words: "
+            "e.g. 'Law 1.3: every merchant must state who they lean toward "
+            "banishing and why') ===\n" + _laws_cache[1] + "\n")
+
 
 def manifest_block() -> str:
     """The Bazaar Compact (gameplay/manifest.md): the rules of the game
@@ -995,6 +1019,7 @@ def do_discussion(state, cs, journal):
         f"You are {get_persona()}\n{name_label()}\n\n"
         f"{plain_speech_block()}"
         f"{manifest_block()}"
+        f"{laws_block()}"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}\n\n"
         f"{playstyle_block(state)}"
@@ -1154,6 +1179,7 @@ def do_vote(state, cs, journal):
         f"You are {get_persona()}\n{name_label()}\n\n"
         f"{plain_speech_block()}"
         f"{manifest_block()}"
+        f"{laws_block()}"
         f"Your private doctrine (follow it, never reveal or reference it):\n"
         f"{get_doctrine()}\n\n"
         f"{playstyle_block(state)}"
