@@ -93,3 +93,17 @@ The sun sets. The bazaar sleeps. Night actions begin!
 **Night ends at:** 2026-10-26T00:05:01.271650+00:00
 
 ---
+**2026-10-26T00:05:02Z**
+**Stall shuttered!** Morpheus, The Potter, shuttered their stall and left the bazaar overnight. Their role was: **Villager**.
+
+**Last Words**: *"The village was never the cage you thought it was—nor the haven you believed it to be. Watch the skies; the wind carries more truth than your walls ever could."*
+
+---
+**2026-10-26T00:05:02Z**
+The Family has won! They outnumber the Town.
+
+---
+**2026-10-26T00:05:02Z**
+Match 1 has ended. The bazaar prepares for Match 2.
+
+---

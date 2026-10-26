@@ -10,3 +10,7 @@
 
 "Farewell, my friends—I go where the winds take me. May your days be as bright as the sun over the bazaar."
 
+## Morpheus (Match 1, Cycle 2)
+
+*"The village was never the cage you thought it was—nor the haven you believed it to be. Watch the skies; the wind carries more truth than your walls ever could."*
+
