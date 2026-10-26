@@ -119,7 +119,7 @@ section — write personality, not boilerplate.
 |-------------------------------|----------------------------------------------------------------------------------------|
 | Bot is too passive            | Add a **pressure tactic** (e.g., *"Demand answers from the quietest seat."*).        |
 | Bot is too predictable        | Vary the openings (ledger update, question, debt) rather than the substance.          |
-| Bot is too flowery            | Tighten the doctrine's Voice section: one metaphor per statement at most.              |
+| Bot is too flowery            | The plain-speech cap is machine-enforced — if a merchant still waxes, the doctrine's *strategy* examples are teaching it; rewrite the examples. |
 
 ---
 
