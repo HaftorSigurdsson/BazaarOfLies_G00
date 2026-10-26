@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.18.2] - 2026-10-26
+### Fixed
+- **The Elder Council could not convene** (`src/elder-council.py`): two stale imports from the pre-package era — `sys.path.insert(0, "gm")` pointed at the package's own directory instead of the arena root, and `from crypto/utils import ...` predates the `gm.crypto`/`gm.utils` refactor. The Council now runs from any cwd; its first working session judged Match 1 ("The Family's Parity Gambit Triumphs", `match-01-judgment.md`).
+
 ## [2.18.1] - 2026-10-25
 ### Fixed
 - **The self-vote** (`do_vote`): match 1 cycle 1 saw a ballot resolve to the voter's own seat while his public statement named Batman — parse_seat_id faithfully answered the model's own name. A ballot for your own stall is now rejected and retried.

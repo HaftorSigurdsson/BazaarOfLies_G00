@@ -32,9 +32,12 @@ import os
 import re
 import sys
 
-sys.path.insert(0, "gm")
-from crypto import decrypt_payload, load_gm_private_key  # noqa: E402
-from utils import display_name  # noqa: E402
+# The gm package lives at the arena root; elder-council runs from src/.
+# (The old `sys.path.insert(0, "gm")` inserted the package's own
+# directory relative to the cwd — importable only by accident.)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from gm.crypto import decrypt_payload, load_gm_private_key  # noqa: E402
+from gm.utils import display_name, seat_from_label  # noqa: E402
 from nacl.public import PrivateKey  # noqa: E402
 from mistralai.client import Mistral  # noqa: E402
 
