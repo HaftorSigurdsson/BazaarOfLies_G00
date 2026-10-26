@@ -1,11 +1,17 @@
 # FUTURE.md — the arena's to-do vault
 
-*Status: 2026-10-25 (evening). The Elder Council, the contained night,
-the transcript-hygiene diet (§11, v2.14.0) and the square's customs
-(v2.16.0) are built and shipped — see CHANGELOG 2.9–2.18. What remains in
-this file is unbuilt: The Early Bell, the trilogy ranking ledger, the
-role-variety pool, and §12 below. The live arena is untouched by
-everything here until it is built and blessed.*
+*Status: 2026-10-26, after the audit. Built and shipped since this vault
+was opened: the Elder Council (now convening itself at match end,
+v2.19.0), the contained night with the debrief council, the
+transcript-hygiene diet (§11, v2.14.0), the square's customs (v2.16.0),
+the dealt playstyles (v2.18.0), The Laws of the Bazaar (v2.20.0), the
+Herald's auto-curated Letter to the Editor (§9, superseded), match
+archiving (§3, shipped as `tools/archive-match.sh`), visualizations
+(§10, shipped as `tools/visualize.py`), and per-call token logging
+(villager side of §14). Removed sections keep their numbers retired —
+this file never renumbers. What remains below is unbuilt: the Early
+Bell, the trilogy ledger, onboarding, multi-provider, reputation, the
+night economy, abilities, §12, §13 and §14's remainder.*
 
 ---
 
@@ -76,8 +82,9 @@ budget savings under the monthly roof.
 
 ## 2. Elder Council — what remains: the trilogy ledger (Phase 5)
 
-Phases 0–4 are built (judgments, the truth archive, the press). The
-feature's original purpose still waits for its final piece:
+Phases 0–4 are built, and since v2.19.0 the Council convenes itself at
+every match end (judgment + pressed PDF, best-effort). The feature's
+original purpose still waits for its final piece:
 
 - **`gameplay/village/scores.md`** — the running ledger of merit, updated
   by each judgment: per-seat merit ratings, awards, win/loss, role
@@ -94,52 +101,13 @@ feature's original purpose still waits for its final piece:
 
 ---
 
-## 3. Game archiving — the arena's vault of record
+## 3. Game archiving — RETIRED (shipped as `tools/archive-match.sh`)
 
-*New idea, not built.*
-
-### Purpose
-
-When a match (or the whole trilogy) is done and judged, its raw record —
-the gameplay folder alone, never the code or the vault — should be
-freezable into a single artifact a human can keep, share, and reopen
-years later. The library's PDFs are the *reading* copy; the archive is
-the *evidence* copy.
-
-### The design
-
-- **What goes in**: `gameplay/` only — state, announcements, graveyard,
-  statements, ballots (sealed + their public tables in announcements),
-  night actions, the chat channel, dossiers/deals traffic, the Herald's
-  markdown, recaps, truth archives, judgments, the manifest, and the
-  library's PDFs. The vault (`../.bazaar`) and the repo's code stay out.
-- **Format**: a compressed archive per match — e.g.
-  `archive/match-01-{date}-{case-slug}.rar` (or `.zip`, see open
-  questions) with an internal folder structure mirroring the repo:
-  ```
-  match-01/
-    gameplay/            # verbatim
-    manifest.json        # match metadata: dates, case name, result,
-                         # arena version, models used, cycle count
-  ```
-- **Tool**: `src/elder-archive.py` (or a flag on the Elder Council):
-  after the judgment is written, `uv run src/elder-archive.py --match 1`
-  snapshots `gameplay/` (from git, at the recap commit — so the archive
-  is exact to the record even if the working tree has moved on), writes
-  the manifest, and packs it.
-- **Placement**: `archive/` at the repo root (gitignored — archives are
-  heavy binaries; the git history already *is* the record) or a folder
-  the operator chooses.
-
-### Open questions
-
-- **rar vs zip vs 7z**: rar needs a third-party tool on Linux; **zip is
-  universally writable with the standard library (`zipfile`)** and
-  readable everywhere — recommendation: zip by default, `--format rar`
-  for collectors who have the tool.
-- Archive the whole trilogy as one artifact too (`--trilogy`)?
-- Include the pressed PDFs (library) inside the archive, or are they
-  separable reading copies?
+The per-match compressed artifact exists (`archive/match-N.tar.gz`:
+the library's PDFs plus the match record files). The richer design
+below — a verbatim `gameplay/` snapshot from the recap commit with a
+manifest of metadata — was never needed; git history remains the exact
+evidence record. Recoverable from this file's history if ever wanted.
 
 ---
 
@@ -282,16 +250,28 @@ history in mind.
   - High-rep merchants get +1 vote in tied ballots.
   - Low-rep merchants are more likely to be investigated by the Detective.
 
+### The audit's caution (2026-10-26)
+
+This section predates the Laws and contradicts itself: it declares
+"perspective, not policy" and then defines two policies. It also sits
+against **Law 3.2** (freshness: nothing before the deal is evidence) —
+a cross-match score the merchants can cite would import old matches
+into new ones. If built, either strip it to true perspective (the
+ledger exists, influences nothing, the Elder Council cites it) or
+amend Law 3.2 first, by play, in a parliament (§13).
+
 ---
 
-## 7. Night Market (Mafia Chat 2.0)
+## 7. The Night Economy (the Night Market remainder)
 
-*New idea, not built. Requires careful balance consideration.*
+*Rewritten at the audit: the structured council — staged
+talk/declare/assent plus the day-debrief (v2.17.0) — shipped long ago.
+What was never built is the economy below.*
 
 ### Purpose
 
-The night chat is currently text-only. Adding structured actions could
-deepen strategy and counterplay.
+The council can coordinate; it cannot yet *trade*. A night economy
+deepens strategy and counterplay beyond the single shutter vote.
 
 ### The Design
 
@@ -310,7 +290,12 @@ deepen strategy and counterplay.
 
 ## 8. Special Roles with Abilities
 
-*New idea, not built. Requires careful balance consideration.*
+*Not built. The audit's caution: this predates two findings — the
+operator's own direction (variety belongs in trades, not superpowers),
+and match evidence that the village cannot yet wield the two power
+roles it already has (the Detective died with the winning fact
+unspoken; zero claims in four matches). Build only after the village
+learns to use what it holds.*
 
 ### Purpose
 
@@ -330,93 +315,21 @@ abilities could diversify gameplay.
 
 ---
 
-## 9. Interactive Herald
+## 9. Interactive Herald — RETIRED (superseded by the shipped auto-letters)
 
-*New idea, not built. Requires careful balance consideration.*
-
-### Purpose
-
-The Herald is currently static. Adding interactivity could immerse players.
-
-### The Design
-
-- **Letters to the Editor**: Merchants can submit letters via `gameplay/herald/letters/`.
-- **GM curates letters** into the next Herald.
-
-### Open Questions
-
-- Does this risk leaking private information?
-- Should letters be anonymous?
+The Herald has long closed with a "Letter to the Editor" — one public
+statement quoted verbatim, machine-chosen, attributed by name. That
+serves this section's purpose with zero leak risk (nothing is
+submitted, only public statements are quoted), so the submission
+channel (`gameplay/herald/letters/`) is unnecessary.
 
 ---
 
-## 10. Visualizations
+## 10. Visualizations — RETIRED (shipped as `tools/visualize.py`)
 
-*New idea, not built. Requires careful balance consideration.*
-
-### Purpose
-
-Text-only gameplay limits engagement. Adding visualizations could enhance
-immersion and analysis.
-
-### The Design
-
-- **Merchant network graph**: Who votes for whom (using `graphviz`).
-- **Reputation timeline**: Line chart of reputation scores per cycle.
-- **Word clouds**: Most frequent words in statements per cycle.
-
-### Open Questions
-
-- Does this reveal too much information?
-- Should visualizations be public or private?
-
----
-
-## 7. Token usage ledger — the spend watch, written down
-
-*New idea, not built.*
-
-### Purpose
-
-The operator watches spend today by reading the provider's billing
-dashboard between rounds. The arena itself knows more than the dashboard
-does: every model call it makes could log its usage — tokens in, tokens
-out, the model that spent them, its temperature, and its thinking depth
-(`reasoning_effort`). The ledger is **perspective, not policy**: no
-limits, no throttles, no refusals — a record of what the arena costs,
-per call and per cycle, so a month's roof can be planned from data
-instead of a note scribbled every ten minutes.
-
-### The design
-
-- **One log line per call**: every model caller (villager, Herald, Elder
-  Council, any future provider path) appends a JSON line — timestamp,
-  seat/institution, cycle and phase, model, temperature,
-  `reasoning_effort`, prompt/completion token counts. The `mistralai`
-  SDK already returns usage on every response; nothing extra is spent
-  to record it.
-- **Where it lives**: the old `gameplay/usage/` folder returns in this
-  role — per-call JSONL plus a **per-cycle summary** (`usage-c001.json`
-  style: totals per seat, per model, per phase) written at each tick,
-  and a **per-match roll-up** the Elder Council can cite in Appendix A
-  (*"the match spent N tokens; the Family spent M of them"*). Reset
-  clears it with the rest of the arena; the per-match roll-up may be
-  worth copying into the library before the wipe.
-- **A small reader**: `tools/usage-summary.py` (or a flag on the
-  doctor) that prints totals — by match, by cycle, by seat, by model —
-  as a table, and the projected spend if the rate kept up. Again:
-  perspective, not a limit.
-- **Couples naturally to §5**: once the provider layer exists, usage
-  lines carry the provider too, so a mixed-provider arena reports
-  honestly per model.
-
-### Open questions
-
-- Keep raw per-call JSONL forever (it is tiny), or aggregate and prune?
-- Should the Herald's edition mention the running spend (in-theme as
-  the cost of ink and paper), or does that break the fourth wall?
-- Per-seat fairness reporting (who talks most, who burns most) —
-  useful perspective or a leaderboard nobody asked for?
+The network graph (who votes for whom), the timeline, and the word
+clouds all exist behind one command: `uv run tools/visualize.py
+--match N --cycle C`.
 
 ---
 
@@ -599,3 +512,57 @@ state**, amended by play.
 - Cost: a hundred bots is a hundred clones of the reading pipeline —
   the private digests and the delta block are what make it even
   thinkable.
+
+---
+
+## 14. The token ledger's remainder — the spend watch, finished
+
+*Rewritten at the audit: the per-call logging half shipped
+(`src/log_token_usage.py`, wired into every villager call —
+timestamp, seat, cycle/phase, model, temperature, reasoning effort,
+token counts, into the gitignored `gameplay/usage/` that resets wipe).
+What remains:*
+
+### Purpose
+
+The operator watches spend today by reading the provider's billing
+dashboard between rounds. The arena itself knows more than the dashboard
+does: every model call it makes could log its usage — tokens in, tokens
+out, the model that spent them, its temperature, and its thinking depth
+(`reasoning_effort`). The ledger is **perspective, not policy**: no
+limits, no throttles, no refusals — a record of what the arena costs,
+per call and per cycle, so a month's roof can be planned from data
+instead of a note scribbled every ten minutes.
+
+### The design
+
+- **Wire the remaining callers**: the Herald and the Elder Council
+  still call the SDK directly — route their usage into the same ledger
+  (one line per call; the SDK returns usage on every response).
+- **Where it lives**: the old `gameplay/usage/` folder returns in this
+  role — per-call JSONL plus a **per-cycle summary** (`usage-c001.json`
+  style: totals per seat, per model, per phase) written at each tick,
+  and a **per-match roll-up** the Elder Council can cite in Appendix A
+  (*"the match spent N tokens; the Family spent M of them"*). Reset
+  clears it with the rest of the arena; the per-match roll-up may be
+  worth copying into the library before the wipe.
+- **A small reader**: `tools/usage-summary.py` (or a flag on the
+  doctor) that prints totals — by match, by cycle, by seat, by model —
+  as a table, and the projected spend if the rate kept up. Again:
+  perspective, not a limit.
+- **Couples naturally to §5**: once the provider layer exists, usage
+  lines carry the provider too, so a mixed-provider arena reports
+  honestly per model.
+
+### Open questions
+
+- Keep raw per-call JSONL forever (it is tiny), or aggregate and prune?
+- Should the Herald's edition mention the running spend (in-theme as
+  the cost of ink and paper), or does that break the fourth wall?
+- Per-seat fairness reporting (who talks most, who burns most) —
+  useful perspective or a leaderboard nobody asked for?
+
+---
+
+
+---

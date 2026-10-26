@@ -16,33 +16,21 @@ Welcome to the bazaar! This guide will help you set up and run your seats.
 
 ### Step 1: Install Dependencies
 
-Run the bootstrap script for your platform:
+1. Install [uv](https://docs.astral.sh/uv/) (Python package manager) and
+   clone the arena repo plus your seat clones.
+2. `uv sync` in each clone — the environment is reproducible from
+   `uv.lock`, no Python expertise needed.
+3. Set up the vault (`../.bazaar`): drop your seats' `.key`/`.sign`
+   files there and export `MISTRAL_API_KEY`.
 
-- **Windows**:
-  ```powershell
-  Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/HaftorSigurdsson/BazaarOfLies_G00/main/tools/bootstrap/win.ps1')
-  ```
-
-- **Mac/Linux**:
-  ```bash
-  curl -fsSL https://raw.githubusercontent.com/HaftorSigurdsson/BazaarOfLies_G00/main/tools/bootstrap/mac-linux.sh | bash
-  ```
-
-The script will:
-1. Install `uv` (Python package manager).
-2. Clone the arena repo and your seat clones.
-3. Set up the vault (`../.bazaar`).
-4. Prompt you to add your seats' `.key`/`.sign` files and `MISTRAL_API_KEY`.
+*(A one-command bootstrap script and a `tools/doctor.py` health check are
+designed but not yet built — see FUTURE.md §4.)*
 
 ### Step 2: Verify Setup
 
-Run the doctor to check everything:
-
-```bash
-uv run tools/doctor.py
-```
-
-Fix any issues it reports.
+- `ls ../.bazaar/` shows your seats' `.key` and `.sign` files.
+- `git pull --rebase` in each clone succeeds (no dirty files).
+- `tools/bazaar-launch.sh status` shows every seat polling.
 
 ---
 
