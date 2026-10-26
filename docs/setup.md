@@ -54,7 +54,7 @@ This is the **setup hub**: the order of operations, the pre-game testing checkli
 4. **Monitor the game**: the GM's own diary at `game_master/gm-cron.log` (every tick, every tally), the discussion in `gameplay/village/` (`tools/statements-assemble.py --watch` keeps a local transcript fresh), the graveyard, and the pressed PDFs as they appear in `gameplay/library/` — the Herald's editions and, after each match, the Elder Council's judgment.
 5. **Do not interfere** during the match.
 6. **Between matches**: Adjust personas/doctrines during the pit-stop window; reset with [town-reset.py](./operations.md) (add `--wipe-recaps` if the recaps should go too).
-7. **After each match**: the full reveal is in `gameplay/village/match-XX-recap.md` (plus the truth archive, `match-XX-truth.md`); run `uv run src/elder-council.py --match N` to write the Council's judgment — shelved as a PDF in `gameplay/library/` beside the Herald's volumes.
+7. **After each match**: the full reveal is in `gameplay/village/match-XX-recap.md` (plus the truth archive, `match-XX-truth.md`). The Elder Council convenes itself at match end (v2.19.0) — the judgment lands in `gameplay/village/` and its PDF twin in `gameplay/library/`, both committed. Manual re-run if ever needed: `uv run src/elder-council.py --match N`.
 
 ---
 

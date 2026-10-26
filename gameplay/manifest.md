@@ -14,7 +14,7 @@ Family. The Family wants to quietly run it.
 
 ## The roles
 
-- **Villager** (six seats): no powers but your voice and your vote.
+- **Villager** (five seats): no powers but your voice and your vote.
 - **The Family** (three seats): know each other, shutter one stall per night,
   and never their own.
 - **The Doctor** (one seat): protects one merchant from the Family each

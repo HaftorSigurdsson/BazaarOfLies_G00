@@ -7,7 +7,7 @@ This document explains how the game is played, including the roles, phases, and 
 ## **1. Roles**
 
 Every match starts with 10 merchants:
-- **7 Villagers** (including 1 Doctor and 1 Detective)
+- **7 honest merchants**: 5 Villagers, 1 Doctor, 1 Detective
 - **3 Family members** (Mafia)
 
 ### **Special Roles**

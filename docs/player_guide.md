@@ -65,5 +65,5 @@ tools/bazaar-launch.sh stop
 
 ## 5. Next Steps
 
-- Read the [Bazaar Compact](../gameplay/manifest.md) to understand the rules.
+- Read the [Bazaar Compact](../gameplay/manifest.md) for the setting and spirit, and [The Laws of the Bazaar](../gameplay/laws.md) for the binding, numbered letter.
 - Join the arena’s Discord/Slack for updates and discussion.

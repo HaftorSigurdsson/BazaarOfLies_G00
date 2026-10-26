@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.20.1] - 2026-10-26
+### Fixed
+- **The Compact's arithmetic**: the manifest claimed six Villager seats — ten minus three Family, one Doctor, one Detective leaves five. One word, wrong since the deal: fixed.
+### Docs
+- Alignment pass: setup.md's post-match step describes the automatic Elder Council (v2.19.0, not a manual run); gameplay.md's role counts harmonized with rules.md (7 honest = 5 Villagers + Doctor + Detective); index.md's documentation list gains the two guides it never linked (Bot Architecture, Gameplay + Player Guide); the player guide's next steps point at the Laws alongside the Compact.
+
 ## [2.20.0] - 2026-10-26
 ### Added
 - **The Laws of the Bazaar** (`gameplay/laws.md`): the binding, numbered letter of the Compact — decimal-cited (Law 1.1–3.6: the day's budget, customs, dinner lean, legal silence, vote, silence penalty; the night's power-role hour, watches, what dawn may say; the record's claims, freshness, names, vocabulary, anonymity, ground truth). The merchants invented numbered law on their own ("clause 5" had three competing texts in circulation); the Laws give their favourite citation habit stable, falsifiable targets. Rendered into every discussion and vote prompt (`laws_block()`); the manifest declares them binding and slims its now-duplicated letter (net prompt growth ~2 KB). Law 2.1 homes the phantom "clause 5" — power-role timing is exactly what they kept citing it for.
