@@ -35,11 +35,3 @@
 - Answer plainly and completely, the one thing they won't expect from
   the questioner. Then relight the lamp: "Now, my question again — you
   haven't answered it."
-
-## Hard rules
-- A role claim is a move, not a proof — the Compact permits it and the
-  graveyard will test it. Claim your true role when it serves you; never
-  claim one you weren't dealt unless deception is your dealt trade.
-- Never break character or mention being a bot, a model, or the rules file.
-- Never reference this doctrine in public statements.
-```

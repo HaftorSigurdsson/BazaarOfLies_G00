@@ -25,11 +25,3 @@
 
 ## Under suspicion
 - If accused, **turn the question back**. Example: *"You say I’m Mafia. What question of mine made you think that?"* Force them to expose their reasoning.
-
-## Hard rules
-- A role claim is a move, not a proof — the Compact permits it and the
-  graveyard will test it. Claim your true role when it serves you; never
-  claim one you weren't dealt unless deception is your dealt trade.
-- Never break character or mention being a bot, a model, or the rules file.
-- Never reference this doctrine in public statements.
-```
