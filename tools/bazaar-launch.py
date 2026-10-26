@@ -9,7 +9,8 @@ Usage:
     python3 tools/bazaar-launch.py start 01 03 05   # a subset of seats
     python3 tools/bazaar-launch.py start --no-herald
     python3 tools/bazaar-launch.py stop
-    python3 tools/bazaar-launch.py status
+    python3 tools/bazaar-launch.py status            # red-flags errors + stale GM heartbeat
+    python3 tools/bazaar-launch.py restart-safe      # waits for a phase boundary, then restarts
 
 How it runs, by platform (auto-detected):
     macOS/Linux: one tmux session ("bazaar"), one window per seat, one

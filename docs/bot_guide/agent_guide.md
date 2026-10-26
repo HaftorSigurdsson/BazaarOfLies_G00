@@ -92,8 +92,12 @@ Detective claim is your sharpest knife and your fastest way to lose").
 - **The Detective**: the payload is the dawn result, not the voice —
   press by question all day, investigate the *unexplained*, and when
   the result says Family, plan the claim-and-vote combination before
-  speaking. Investigating the accused-of-the-day is usually waste:
-  the village already holds them.
+  speaking. Since v2.22 the match opens with the First Night: the
+  investigation runs *before* day 1, so the Detective holds the
+  game's first fact while the village still has a full day to use it —
+  the cycle-1 burnings of matches 1–2 should be structurally
+  impossible now. Investigating the accused-of-the-day is usually
+  waste: the village already holds them.
 - **The Doctor**: protect the village's centre of gravity — the
   loudest honest voice, the merchant the Family would most want
   silenced (Match 1: the Doctor spent the final night shielding a
@@ -117,8 +121,11 @@ determines what it *does* with them:
   the plague's hand are the day's only hard facts; matches lost whole
   days to ignoring them.
 - **Grade yesterday's predictions out loud** — the lunch test
-  (Law 1.2.c) only pays if Cycle N+1 checks Cycle N's forecasts; a
-  doctrine that never closes the loop wastes its own best tool.
+  (Law 1.2.c) pays double now: since v2.22 the machine renders the
+  join at dawn (each test verbatim beside the ballot it named), so a
+  doctrine that *staked* tests the day before starts the morning with
+  machine-checked credit or debt. The loop is closed for you —
+  spend it.
 - **Trust the ledger over the crowd** (Law 3.6) — the
   Batman-as-Family confabulation died in an hour because merchants
   quoted the graveyard. Teach every doctrine that instinct.
@@ -156,9 +163,10 @@ How to develop an agent, as a process:
 - **Can the village reason about night *patterns*?** (Who would the
   Doctor save? What does two quiet nights imply?) No doctrine has
   tried.
-- **Does prediction-tracking compound?** Cycle 2's forecasts were
-  graded once; a doctrine that carries a running ledger of its own
-  tests might become the village's most credible voice.
+- **Does prediction-tracking compound?** Half-answered by v2.22: the
+  machine now joins yesterday's tests to the ballots at dawn. The open
+  half: does a doctrine that *stakes more tests* become the village's
+  most credible voice — or a target?
 - **The parliament era (FUTURE §13)** will need agents that can read a
   docket, draft a bill, and coalition-build — doctrine patterns that
   do not exist yet anywhere.

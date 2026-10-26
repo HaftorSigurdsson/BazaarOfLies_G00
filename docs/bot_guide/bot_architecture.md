@@ -40,9 +40,9 @@ Every act is two-stage: a **private thinking call** first (temperature 0.3, neve
 
 | Phase       | Action                                                                                     |
 |-------------|--------------------------------------------------------------------------------------------|
-| Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 90 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl` — each record carries the merchant's `name` (null on anonymous cycles, mirroring the seat). The **first statement of each region honours the square's custom** (§2.3). A merchant with nothing new may answer `NO STATEMENT`: silence keeps the budget and the pacing (the dinner lean is still mandatory). |
+| Discussion  | Post up to 8 public statements (≤ 1200 chars each, ≥ 90 s apart) to `gameplay/village/statements/c{cycle}-{seat}.jsonl` — each record carries the merchant's `name` (null on anonymous cycles, mirroring the seat). The **first statement of each region honours the square's custom** (§2.3). A merchant with nothing new may answer `NO STATEMENT`: silence keeps the budget and the pacing (the dinner lean is still mandatory). A failed model call never posts — the act aborts and retries next poll. |
 | Voting      | Submit a **public signed ballot** (Ed25519) to `gameplay/votes/` — the GM verifies signatures and publishes the vote table. A ballot resolving to the voter's own seat is invalid and retried (v2.18.1). |
-| Night       | Perform role action (shutter, investigate, or protect), **sealed** to the GM’s public key. Private GM results are persisted to the notebook verbatim — a Detective's findings survive past the prompt that delivered them. |
+| Night       | Perform role action (shutter, investigate, or protect), **sealed** to the GM’s public key. The match opens with the First Night (cycle 0): the power roles act, the Family councils but its hand stays, and the Watchman's stall carries the dawn (Law 2.1). Private GM results are persisted to the notebook verbatim — a Detective's findings survive past the prompt that delivered them. |
 
 ---
 
@@ -72,12 +72,14 @@ Tuning knobs in `src/villager.py`: `TRANSCRIPT_WINDOW`, `DIGEST_BATCH`, `DIGEST_
 ## **2.3 The Square's Customs and the Dealt Playstyle (v2.16/v2.18)**
 The dinner lean — the one forced output act the game always had — proved that a forced concrete act cannot be answered with meta-commentary. The tea clock now carries one custom per region, owed by every merchant's **first** statement there (tracked per cycle in the journal, `custom_done`):
 
-- **Morning — weigh the night**: react to the night's public facts (departures, the plague's hand, the graveyard, the roster) or ask a named merchant about them; on the match's **first cycle there is no night to weigh** — power roles act only after the first vote, and cycle 1's quiet morning is not evidence about them.
+- **Morning — weigh the night**: react to the night's public facts (departures, the plague's hand, the graveyard, the roster) or ask a named merchant about them. Since v2.22 the match opens with the **First Night** (cycle 0): the power roles act before the first vote and the Watchman's stall at the gate is the first shutter — so cycle 1's morning weighs a real night.
 - **Morning tea — the question**: one plain question to one named merchant.
 - **Lunch — the test**: one checkable prediction ("If X is honest, X's vote tonight will follow X's ledger — watch it").
 - **Afternoon tea**: free. **Dinner**: the existing mandatory lean.
 
 The customs are public game law (the manifest, "The square's customs") and are surfaced in both the private-thinking and the statement prompts when due. They exist to starve the chorus: match 1 cycle 1 saw the village grade each other's *predictions* against the Compact's text instead of chanting about manners.
+
+**Yesterday's tests, machine-joined** (v2.22): at dawn, from cycle 2 onward, the discussion and vote prompts carry the previous cycle's lunch tests verbatim beside the ballots they named — the merchants stake the predictions, `yesterday_tests_block()` renders the join, the village draws the conclusions. The prediction culture's loop is closed by the machine.
 
 The **dealt playstyle** (sealed in the dossier at the deal) is the complementary private lever: role survival styles arrived after two consecutive matches saw the village banish its own Detective on cycle 1. The GM deals them in `gm/run.py` (`PLAYSTYLES`); the bots render them into discussion and vote prompts (`playstyle_block`). Dossiers dealt before v2.18 carry no `playstyle` field — the block simply renders empty.
 

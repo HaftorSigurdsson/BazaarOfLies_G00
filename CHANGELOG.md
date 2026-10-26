@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.22.1] - 2026-10-26
+### Docs
+- The v2.22.0 sweep: bot guide (First Night in the Morning custom and the night row, the tests-join in §2.3, failed-call retry in the discussion row), agent guide (the Detective's pre-day-1 result, the machine-closed prediction loop, the half-answered open question), operations (regression suite in the tooling table, the grounded Council), rules.md's last "no night to weigh" corrected, and the launcher's usage docstring gains `restart-safe`.
+
 ## [2.22.0] - 2026-10-26
 ### Added
 - **The First Night** (the day-1 fix): the match now opens with cycle 0 — the Doctor protects and the Detective investigates for real before the first vote, the Family councils but its hand stays, and the **Watchman's stall** (the unclaimed stall at the gate, never one of the ten) is the first shutter. Day 1 finally opens with a real night to weigh and the Detective's first result in hand — after three matches where day 1 was evidence-free and the village burned its investigator. Law 2.1 rewritten; the manifest, rules, gameplay and operations docs carry the new structure.
