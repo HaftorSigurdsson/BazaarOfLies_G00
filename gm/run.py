@@ -957,6 +957,40 @@ def write_truth_archive(state, registry, priv):
     log(f"truth archive written for match {state['match']}")
 
 
+def run_elder_council(match_no):
+    """The Elder Council convenes itself when the match concludes: the
+    judgment (src/elder-council.py, evidence from the just-written truth
+    archive) plus the pressed PDF (src/elder-press.py), both committed.
+    Best-effort by design — a failed judgment must never break the deal
+    chain or the arena parking. Kill switch: BAZAAR_AUTO_COUNCIL=0."""
+    if os.environ.get("BAZAAR_AUTO_COUNCIL", "1") == "0":
+        log("auto council disabled (BAZAAR_AUTO_COUNCIL=0)")
+        return
+    try:
+        r = subprocess.run(
+            [sys.executable, "src/elder-council.py", "--match", str(match_no)],
+            capture_output=True, text=True, timeout=1800)
+        if r.returncode != 0:
+            log(f"elder council failed: {(r.stderr or '').strip()[:200]}")
+            return
+        judgment = f"gameplay/village/match-{match_no:02d}-judgment.md"
+        if not os.path.exists(judgment):
+            log("elder council wrote no judgment")
+            return
+        commit_and_push([judgment], f"Elder Council judgment for match {match_no:02d}")
+        pr = subprocess.run([sys.executable, "src/elder-press.py", judgment],
+                            capture_output=True, text=True, timeout=600)
+        pdf = f"gameplay/library/match-{match_no:02d}-judgment.pdf"
+        if pr.returncode == 0 and os.path.exists(pdf):
+            commit_and_push([pdf], f"Elder press: match {match_no:02d} judgment")
+        else:
+            log(f"elder press failed: {(pr.stderr or '').strip()[:200]}")
+        log("elder council concluded: judgment written and pressed")
+    except Exception as e:
+        log(f"elder council error (the match record is safe): "
+            f"{type(e).__name__}: {e}")
+
+
 def end_match():
     priv = get_gm_private_key()
     state = read_state()
@@ -975,6 +1009,10 @@ def end_match():
     # before the next deal overwrites gm/roles.enc — the Elder Council
     # judges from this, not from prose paraphrase.
     write_truth_archive(state, registry, priv)
+
+    # The Council convenes while the truth archive is fresh — before the
+    # counter bump, so the judgment lands in this match's record.
+    run_elder_council(state["match"])
 
     state["match"] += 1
     state["cycle"] = 0

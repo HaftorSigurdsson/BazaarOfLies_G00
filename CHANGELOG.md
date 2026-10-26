@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.19.0] - 2026-10-26
+### Added
+- **The Elder Council convenes itself**: at match end, right after the truth archive is written and before the counter bump, the GM runs the Council (`src/elder-council.py`) and the elder press, and commits the judgment (`match-XX-judgment.md`) plus its PDF twin (`gameplay/library/`). Best-effort by design — a failed judgment never breaks the deal chain or the arena parking; kill switch `BAZAAR_AUTO_COUNCIL=0`; manual re-runs remain possible.
+
 ## [2.18.2] - 2026-10-26
 ### Fixed
 - **The Elder Council could not convene** (`src/elder-council.py`): two stale imports from the pre-package era — `sys.path.insert(0, "gm")` pointed at the package's own directory instead of the arena root, and `from crypto/utils import ...` predates the `gm.crypto`/`gm.utils` refactor. The Council now runs from any cwd; its first working session judged Match 1 ("The Family's Parity Gambit Triumphs", `match-01-judgment.md`).
