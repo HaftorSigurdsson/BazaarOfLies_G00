@@ -1,7 +1,7 @@
 {
   "match": 2,
   "cycle": 0,
-  "epoch": null,
+  "epoch": "88d51a28",
   "phase": "setup",
   "clock": {
     "dawn": "2026-10-25T23:15:01.178569+00:00",
