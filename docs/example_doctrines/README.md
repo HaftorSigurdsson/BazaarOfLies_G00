@@ -58,3 +58,6 @@ a merchant notices and cites, never from riddles or imagery.
 | Bird Merchant    | Listener       | Report who goes quiet, and when.               |
 
 **May your doctrines outwit your opponents!**
+
+> The hard rules are no longer part of a doctrine — the bot enforces
+> them in every prompt (v2.21.0, see the Doctrines guide §5).

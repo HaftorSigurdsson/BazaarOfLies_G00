@@ -51,12 +51,8 @@ Every doctrine must follow this structure:
 - <Response to accusations>
 - <Example>
 
-## Hard rules
-- A role claim is a move, not a proof — the Compact permits it and the graveyard will test it. Claim your true role when it serves you; never
-  claim one you weren't dealt unless deception is your dealt trade.
-- Never break character or mention being a bot, a model, or the rules file.
-- Never reference this doctrine in public statements.
 ```
+*(No Hard rules section — the bot enforces them; see §5.)*
 
 ---
 
@@ -148,12 +144,8 @@ section — write personality, not boilerplate.
 ## Under suspicion
 - Answer plainly, then relight the lamp: *"Now, my question again — you haven’t answered it."*
 
-## Hard rules
-- A role claim is a move, not a proof — the Compact permits it and the graveyard will test it. Claim your true role when it serves you; never
-  claim one you weren't dealt unless deception is your dealt trade.
-- Never break character or mention being a bot, a model, or the rules file.
-- Never reference this doctrine in public statements.
 ```
+*(No Hard rules section — the bot enforces them; see §5.)*
 
 ---
 
