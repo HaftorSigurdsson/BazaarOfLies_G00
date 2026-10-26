@@ -60,6 +60,8 @@ A **trilogy** consists of **3 matches**, each lasting up to **24 cycles** (1 day
    - The **plurality target** is banished, and their role is revealed in `graveyard.md`.
 
 ### **2.3 Night Phase (15 minutes — The night, Night snacks, The night watch, 5 minutes each)**
+
+The match opens with the **First Night** (cycle 0): the power roles act for real, the Family councils but its hand stays — the Watchman's unclaimed stall at the gate is the first shutter, and no merchant leaves before the first vote (Law 2.1).
 - **The night is uniform** (anti-snooping by construction): every living seat posts one **sealed chat file per watch** to `gameplay/night/chat/` and submits exactly one sealed **night action at the last watch** — villagers included (a sealed "asleep" payload), so the tree never reveals who holds a night role. Every seat also receives a sealed **night packet** at nightfall and a **result file** at dawn; only the Detective's result is real. Chat files are fixed-size symmetric ciphertext: the Family's real council talk and everyone else's GM-minted decoys are byte-identical and both open under the family key — even a key-holding snoop cannot tell the three real voices from the seven decoys.
 - **Mafia**: the candlelight council rides the chat channel — *The night* proposes (receipts demanded), *Night snacks* declares (weighing the cousins' proposals), *The night watch* assents and submits the **stall to shutter** (sealed to the GM; the GM **discards submissions targeting a fellow Family member**, registry-checked, ties broken with a secure-random draw). The victim's stall is found shuttered at dawn and they have left the bazaar.
 - **Detective**: Submit an **investigation target** (sealed); the GM responds with "Family" or "not Family".

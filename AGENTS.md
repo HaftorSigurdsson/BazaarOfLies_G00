@@ -33,8 +33,10 @@ Guidelines for AI coding agents (and helpful humans) working in this repository.
   must stay out of the repo (see `.gitignore`; private keys live in
   `../.bazaar` (sibling of the arena, never in the tree)).
 - **Verify your work.** Run the relevant checks before declaring done:
-  `uv run python -m py_compile src/*.py gm/*.py` for syntax, the
-  project's smoke tests / manual runs for behaviour. Read the output —
+  `uv run python -m py_compile src/*.py gm/*.py` for syntax, and the
+  regression suite `uv run python -m unittest discover -s tests` (20
+  tests over the deterministic core: seat parsing, ghost guards, the
+  diet, the delta, the tests-join, the Laws). Read the output —
   do not claim "tested" without an executed check.
 - **Respect the game data.** `gameplay/` is live game state written by
   bots and the GM. Never hand-edit it as part of a code change; resets

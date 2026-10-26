@@ -719,6 +719,52 @@ def digest_aged_statements(state, journal=None):
         f"into your private notes")
 
 
+def yesterday_tests_block(state):
+    """The previous cycle's tests (Law 1.2.c: 'If X is honest, X's vote
+    tonight will...'), machine-joined to the ballots they named — the delta
+    block's twin for the prediction culture. The merchants stake the tests;
+    the machine renders the join (test verbatim + the named merchant's
+    actual ballot); the village draws the conclusion. No NLP verdicts, no
+    confabulation — only what was said and what was voted."""
+    cycle = state.get("cycle", 0)
+    if cycle < 2:
+        return ""                 # yesterday had no vote to grade against
+    prev = cycle - 1
+    recs = recent_statement_records(prev, state.get("epoch"))
+    ballots = {}                  # voter name -> ballot target (public)
+    for path in sorted(glob.glob(f"gameplay/votes/*-c{prev:03d}.json")):
+        try:
+            with open(path) as f:
+                b = json.load(f)["payload"]
+        except (OSError, json.JSONDecodeError, KeyError):
+            continue
+        target = b.get("target")
+        ballots[display_name(b.get("seat"))] = (
+            display_name(target) if str(target).startswith("seat-")
+            else (target or "—"))
+    rows, seen = [], set()
+    for r in recs:
+        for m in re.finditer(
+                r"[Ii]f ([A-Z][a-z]+) is honest[^.!?]{0,160}?vote[^.!?]{0,160}",
+                r.get("text") or ""):
+            test = " ".join(m.group(0).split())
+            key = (r.get("seat"), test[:80])
+            if key in seen:
+                continue
+            seen.add(key)
+            who = m.group(1)
+            vote = ballots.get(who, "(no ballot found)")
+            author = r.get("name") or "an anonymous merchant"
+            rows.append(f"- {author} tested: \u201c{test}\u201d — "
+                        f"{who}'s ballot: {vote}.")
+    if not rows:
+        return ""
+    lines = "\n".join(rows[:8])
+    return (f"\nYesterday's tests (cycle {prev}), machine-joined to the "
+            f"ballots — judge them yourself: a failed test is evidence, "
+            f"a passed one is credit:\n{lines}\n\n")
+
+
 def transcript_block(state, since_iso=None):
     """The day's talk, on a diet (FUTURE.md §11): the K most recent
     statements verbatim, plus the latest word from every merchant the window
@@ -1038,6 +1084,7 @@ def do_discussion(state, cs, journal):
         f"{playstyle_block(state)}"
         f"Public facts:\n{public_facts_block(state)}\n"
         f"{delta_block(state, journal)}"
+        f"{yesterday_tests_block(state)}"
         f"{time_of_day_block(state)}"
         f"{herald_paper(state['cycle'], 'morning')}"
         f"Village transcript so far today:\n{transcript_block(state, since_iso)}"
@@ -1096,6 +1143,11 @@ def do_discussion(state, cs, journal):
         phase="discussion",
     )
     statement = trim_statement(statement)
+    if not statement:
+        # a failed/blank model call must never enter the public record —
+        # retry next poll instead of posting emptiness
+        log("model returned no statement — retrying next poll")
+        return
     if statement and not statement.strip().upper().startswith("NO STATEMENT"):
         # some models write a full statement and then append the silence
         # token as a sign-off ("... nothing changed. NO STATEMENT") — strip
@@ -1199,6 +1251,7 @@ def do_vote(state, cs, journal):
         f"{playstyle_block(state)}"
         f"Public facts:\n{public_facts_block(state)}\n"
         f"{delta_block(state, journal)}"
+        f"{yesterday_tests_block(state)}"
         f"{time_of_day_block(state)}\n"
         f"{herald_paper(state['cycle'], 'morning')}\n"
         f"Village transcript so far today:\n{transcript_block(state, since_iso)}\n"
@@ -1479,6 +1532,7 @@ def do_night(state, cs, journal):
 
     guidance = ""
     proposals_block = ""
+    first_night = (state.get("cycle", 0) == 0)
     if role == "Mafia":
         teammates = ", ".join(display_name(s)
                               for s in sorted(dossier.get("teammates", []))) \
@@ -1487,6 +1541,12 @@ def do_night(state, cs, journal):
                     "them. Choose a living merchant who is NOT Family and "
                     "shutter their stall tonight: by morning they will have "
                     "left the bazaar.")
+        if first_night:
+            guidance = (f"Your Family: {teammates}. THE FIRST NIGHT: the "
+                         "Family watches — no stall shutters tonight and no "
+                         "declared target will act. Council as usual: weigh "
+                         "the fresh roster, learn your cousins' reads, and "
+                         "declare a target to size up the village's dawn.")
         if mates and dossier.get("night_channel_key"):
             council = family_watch(state, dossier, mates, 3, journal)
             if council:
@@ -1499,6 +1559,11 @@ def do_night(state, cs, journal):
         guidance = ("Choose a living merchant to investigate tonight — whose "
                     "loyalty do you most need to know? Prefer merchants your "
                     "notebook ledger rates as uncertain.")
+        if first_night:
+            guidance += (" THE FIRST NIGHT: this is the game's first fact — "
+                         "your result arrives with the first dawn, and day "
+                         "one can open with it. Choose the merchant the "
+                         "village is most likely to press tomorrow.")
     elif role == "Doctor":
         guidance = ("Choose a living merchant to protect tonight — who is "
                     "most likely to be targeted in the dark? Consider who "

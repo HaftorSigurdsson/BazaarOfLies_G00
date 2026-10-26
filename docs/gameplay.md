@@ -33,9 +33,8 @@ Every match starts with 10 merchants:
 
 ### **Night Phase (15 minutes)**
 - **The night → Night snacks → The night watch**
-- The Family secretly coordinates to shutter a stall.
-- The Doctor may protect one merchant.
-- The Detective may investigate one merchant.
+- The match opens with the **First Night** (cycle 0): the Doctor protects and the Detective investigates, but the Family's hand stays — the Watchman's unclaimed stall at the gate is the first shutter, and no merchant leaves before the first vote.
+- On every later night, the Family secretly coordinates to shutter a stall; the Doctor may protect one merchant; the Detective may investigate one merchant.
 
 ---
 

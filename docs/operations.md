@@ -152,7 +152,7 @@ The original bash version (`setup/reset_match.sh`) does the same wipe; `src/town
 ---
 
 ## **6. Match Lifecycle**
-1. **Deal**: GM mints a fresh **epoch** and deals roles (encrypted dossiers per seat). A **Historian** is randomly assigned from the Villagers.
+1. **Deal → the First Night** (v2.22): the GM mints a fresh **epoch**, deals roles (encrypted dossiers per seat; a **Historian** is randomly assigned from the Villagers), and opens cycle 0 — the first night. The power roles act (Doctor protects, Detective investigates — the game's first fact arrives with the first dawn), the Family councils but no merchant's stall shutters; the Watchman's unclaimed stall at the gate carries the dawn instead. Day 1 follows with real night facts to weigh.
 2. **Day** (25 + 5 minutes): Dawn announcement → discussion across the five tea-clock regions (public statements in `gameplay/village/statements/`) → the **Evening** vote (public signed ballots in `gameplay/votes/`) → tally + banishment.
    - **The square's customs** (v2.16.0): each merchant's FIRST statement in a region honours its custom — **Morning: weigh the night** (react to the night's public facts), **Morning tea: one question to one named merchant**, **Lunch: one checkable prediction** ("If X is honest, X's vote tonight will follow X's ledger — watch it"). Afternoon tea is free; **Dinner remains the reckoning** — every merchant must state their lean, budget-exempt.
    - **Anonymous Statements**: On a random cycle (2–4), all statements are published without seat IDs (labeled "Anonymous Merchant" in the Herald; the statement records carry `seat: null, name: null`). Retirement is proposed in FUTURE.md §12.
@@ -173,7 +173,7 @@ Every deal mints an **epoch**. Ballots, night actions, statements and journal ke
 ---
 
 ## **7. Rules of the Road**
-- **Bots must be restarted together** (plus the Herald window) after any bot change: `tools/bazaar-launch.sh stop && tools/bazaar-launch.sh start` (the launcher is cross-platform Python — `tools/bazaar-launch.py` — which starts the Herald window too; on Windows invoke the `.py` directly).
+- **Bots must be restarted together** (plus the Herald window) after any bot change: `tools/bazaar-launch.sh stop && tools/bazaar-launch.sh start` (the launcher is cross-platform Python — `tools/bazaar-launch.py` — which starts the Herald window too; on Windows invoke the `.py` directly). `start` also **refuses to launch into a stale `uv.lock`** (the crash-loop of 2026-10-25/26), and `restart-safe` waits for a phase boundary (setup/halted or the night's last watch) before restarting — never mid-discussion or mid-vote. `status` red-flags erroring panes and a stale GM heartbeat.
 - A missed ballot = **abstain**. A missed night action = **silence**. A missed statement = **quiet**. A bot silent for **2 consecutive days** receives an automatic vote (GM penalty for silence).
 - **Token spend** is watched on the Mistral console, not enforced in code (the historical "10,000 tokens per bot per cycle" figure was aspirational) — at the current pace a 45-minute cycle costs well under a unit of currency, and a full 24-cycle match lands in single digits. The Elder Council runs on mistral-large once per match.
 - **Never commit private keys** (`*.key`, `*.sign`) — `.gitignore` covers `*.key`; keep the vault outside the repo (`../.bazaar`, holding seat keys, signing keys, the GM private key, journals, and the Herald's volume counter — the Family's council channel now lives in the repo itself, sealed and decoy-padded).

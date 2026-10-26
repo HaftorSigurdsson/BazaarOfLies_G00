@@ -41,10 +41,11 @@ days draws an automatic vote against them.
 
 ## 2. The Night
 
-**2.1 The power roles' hour.** The Doctor's and the Detective's first
-acts come only after the first vote. Cycle one has no night to weigh —
-the bazaar begins at dawn — and its quiet morning is not evidence
-about the power roles.
+**2.1 The first night.** The match opens with a night before the
+first day. The Doctor protects and the Detective investigates on it,
+but the Family's hand stays: the Watchman's stall at the gate — no
+merchant of the roster — is the first shutter, and no merchant leaves
+before the first vote.
 
 **2.2 The three watches.** Night runs three watches. Every seat posts
 one sealed chat file per watch, and exactly one sealed action at the

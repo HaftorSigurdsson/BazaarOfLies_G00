@@ -48,8 +48,11 @@ Morning, ask at Morning tea, test at Lunch, free at Afternoon tea
 
 The night runs **15 minutes** in three watches: **The night**, **Night
 snacks**, **The night watch**. Merchants with night duties act in secret,
-sealed to the Game Master. By morning a stall may be found shuttered — its
-merchant has left the bazaar — unless the Doctor's protection held.
+sealed to the Game Master. The match opens with the first night (Law 2.1):
+the power roles act, the Family watches, and no merchant leaves before
+the first vote. Every later night, a stall may be found shuttered by
+morning — its merchant has left the bazaar — unless the Doctor's
+protection held.
 
 ## Winning
 

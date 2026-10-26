@@ -49,7 +49,7 @@ FAMILY_DIR = os.path.join(VAULT, "family")
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
 
 
-def ask(system, user, max_tokens=4096):
+def ask(system, user, max_tokens=4096, temperature=0.5):
     # No reasoning_effort: it belongs to the reasoning models; the API
     # rejects it on mistral-large. The Council runs once per match —
     # let the model think in prose.
@@ -57,7 +57,7 @@ def ask(system, user, max_tokens=4096):
         model=MODEL,
         messages=[{"role": "system", "content": system},
                   {"role": "user", "content": user}],
-        temperature=0.5, max_tokens=max_tokens)
+        temperature=temperature, max_tokens=max_tokens)
     content = r.choices[0].message.content
     if isinstance(content, list):                      # chunked content shapes
         parts = [c.text for c in content
@@ -389,13 +389,67 @@ COUNCIL_VOICE = (
     "never delivered to the bazaar, but it is not unopened to you.")
 
 
-def verdict_draft(rec, match_no):
+def fact_sheet(match_no, graveyard, ballots, night_actions,
+               detective_results, roles):
+    """The machine-computed facts of the match — the ONLY assertions about
+    departures, votes, night actions and survivals the Council may make.
+    Its first session (match 1) confabulated twice ('the Family shuttered
+    the Detective's stall' — he survived), so the judgment calls now ride
+    on a deterministic sheet and a hard grounding rule."""
+    lines = [f"FACT SHEET (match {match_no}) — machine-computed; every "
+             f"factual claim must match this exactly:"]
+    if graveyard:
+        lines.append("Departures (cycle | merchant | mechanism | true role):")
+        for r in graveyard:
+            lines.append(f"  - {r['cycle']} | {r['seat_label']} | "
+                          f"{r['by']} | {r['role']}")
+    for cyc in sorted(ballots):
+        tally = {}
+        for b in ballots[cyc]:
+            t = b.get("target_name") or b.get("target") or "?"
+            tally[t] = tally.get(t, 0) + 1
+        rows = ", ".join(f"{n} = {c}" for n, c in
+                         sorted(tally.items(), key=lambda kv: -kv[1]))
+        lines.append(f"Cycle {cyc} vote tally: {rows}")
+        for b in ballots[cyc]:
+            lines.append(f"  ballot: {b.get('seat_name', b.get('seat'))} → "
+                         f"{b.get('target_name', b.get('target'))}")
+    if night_actions:
+        lines.append("Night actions (as decrypted):")
+        for a in night_actions:
+            lines.append(f"  - cycle {a.get('cycle')}: "
+                         f"{plain(display_name(a.get('seat')))} "
+                         f"({a.get('role', '?')}) → "
+                         f"{plain(display_name(a.get('target'))) if a.get('target') else '—'}")
+    if detective_results:
+        lines.append("Detective results (sealed at the time):")
+        for r in detective_results:
+            lines.append(f"  - cycle {r.get('cycle')}: investigated "
+                         f"{r.get('target')} — finding: {r.get('result')}")
+    dead = {plain(r["seat_label"]) for r in graveyard}
+    lines.append("Survived to the match's end: "
+                 + ", ".join(plain(display_name(s)) for s in sorted(roles)
+                             if plain(display_name(s)) not in dead))
+    return "\n".join(lines)
+
+
+GROUNDING_RULE = (
+    "\nGROUNDING RULE: the Fact Sheet below is the complete truth of "
+    "departures, ballots, night actions and survivals. Every factual claim "
+    "must match it exactly — never state that a merchant was shuttered, "
+    "banished, investigated or protected unless the sheet or the quoted "
+    "record says so; never invent departures, vote counts or findings. "
+    "If a detail is not in the sheet or the record, leave it out.\n\n")
+
+
+def verdict_draft(rec, match_no, facts):
     system = COUNCIL_VOICE + (
         "\nYou are drafting the verdict for ONE merchant of the match below. "
         "Judge how well they played their true role — not whether they won. "
         "Rate merit 0-10 (the town's scale: 0 certain Family, 10 certain "
         "honest — you invert it into merit: how well they played).")
-    user = (f"RECORD OF THE MERCHANT (match {match_no}):\n\n{render_record(rec)}\n\n"
+    user = (GROUNDING_RULE + f"FACT SHEET:\n{facts}\n\n"
+            f"RECORD OF THE MERCHANT (match {match_no}):\n\n{render_record(rec)}\n\n"
             "Draft the verdict for this merchant, markdown, exactly these "
             "sections:\n"
             "### <Name> (<seat>) — <role>\n"
@@ -404,11 +458,11 @@ def verdict_draft(rec, match_no):
             "it was strong.\n"
             "**Worst move:** one quoted line or act, and its cost.\n"
             "**Merit: X/10** — one sentence of justification.")
-    return ask(system, user)
+    return ask(system, user, temperature=0.3)
 
 
 def final_judgment(match_no, case, timeline, family_digest,
-                   detective_note, drafts):
+                   detective_note, drafts, facts):
     system = COUNCIL_VOICE + (
         "\nYou now write the FULL judgment of the match, 900-1400 words, "
         "markdown, weaving the ten verdict drafts into one document. Cite "
@@ -437,7 +491,8 @@ def final_judgment(match_no, case, timeline, family_digest,
         "- The Most Damning Quote of the match.\n"
         "## The Closing\n One short paragraph; the bazaar rests.")
     verdicts = "\n\n".join(drafts)
-    user = (f"THE CASE NAME of the matter (use it verbatim in the heading, "
+    user = (GROUNDING_RULE + f"FACT SHEET:\n{facts}\n\n"
+            f"THE CASE NAME of the matter (use it verbatim in the heading, "
             f"after the dash): **{case}\n\n"
             f"THE AUTHORITATIVE TIMELINE OF MATCH {match_no} (restate this "
             f"exactly in the History):\n{timeline}\n\n"
@@ -584,11 +639,13 @@ def main():
     drafts = []
     for s in sorted(records):
         print(f"  verdict draft: {records[s]['name']}...")
-        drafts.append(verdict_draft(records[s], args.match))
+        drafts.append(verdict_draft(records[s], args.match, facts))
 
     timeline = build_timeline(graveyard, ballots, night_actions,
                               detective_results, family_msgs,
                               roles, seats)
+    facts = fact_sheet(args.match, graveyard, ballots, night_actions,
+                       detective_results, roles)
     family_digest = "\n".join(
         f"cycle {m.get('cycle')}"
         + (f" watch {m.get('watch')}" if m.get("watch") else "")
@@ -622,7 +679,8 @@ def main():
 
     print("  final judgment call...")
     judgment = final_judgment(args.match, case, timeline,
-                              family_digest, detective_note, drafts)
+                              family_digest, detective_note, drafts,
+                              facts)
 
     judgment = re.sub(r"^```[a-z]*\s*\n", "", judgment.strip())
     judgment = re.sub(r"\n```\s*$", "", judgment.strip())

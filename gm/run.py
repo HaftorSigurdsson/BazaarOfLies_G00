@@ -229,29 +229,33 @@ def advance_phase():
                 f"bazaar is closed until the operators open it again.")
             commit_and_push(f"arena parked: match limit {MATCH_LIMIT} reached")
             return
-        log("phase=setup → dealing roles, opening cycle 1 discussion")
+        log("phase=setup → dealing roles, opening the FIRST NIGHT "
+            "(cycle 0: power roles act; no merchant leaves before the vote)")
         # end_match() already bumped the number for the next match; only a
         # pristine reset (match=0) starts at 1. Never renumber mid-chain.
         state["match"] = max(1, int(state.get("match") or 0))
-        state["cycle"] = 1
+        state["cycle"] = 0
         state["epoch"] = secrets.token_hex(4)   # fresh namespace for the deal
-        state["phase"] = "discussion"
+        state["phase"] = "night"
         state["clock"] = {
-            "dawn": now.isoformat(),
-            "discussion_deadline": (now + timedelta(minutes=DISCUSSION_MINUTES)).isoformat(),
+            "dawn": None,
+            "discussion_deadline": None,
             "voting_deadline": None,
-            "night_deadline": None,
+            "night_deadline": (now + timedelta(minutes=NIGHT_MINUTES)).isoformat(),
         }
         write_state(state)
         update_announcements(
-            f"**Match {state['match']}, Cycle {state['cycle']}**\n"
-            "The bazaar awakens! Roles have been dealt.\n"
+            f"**Match {state['match']} — The First Night**\n"
+            "Roles have been dealt in secret. The bazaar sleeps before it "
+            "wakes: tonight the Doctor's mercy and the Detective's lamp "
+            "begin their work, and the Family takes counsel — but no "
+            "merchant's stall will shutter before the first vote.\n"
             f"**Seats alive:** {', '.join(display_name(s) for s in state['alive'])}\n"
-            f"**Discussion ends at:** {state['clock']['discussion_deadline']}"
+            f"**Dawn at:** {state['clock']['night_deadline']}"
         )
         deal_roles()
         commit_and_push(
-            f"match {state['match']} dealt, cycle 1 discussion opens")
+            f"match {state['match']} dealt — the first night opens")
 
     elif phase == "discussion":
         deadline = datetime.fromisoformat(state["clock"]["discussion_deadline"])
@@ -562,8 +566,9 @@ def resolve_night_actions():
     registry = load_role_registry(priv)
     seats = get_seats()
     
-    # Trigger dynamic event at dawn
-    event = trigger_event(state)
+    # Trigger dynamic event at dawn — never on the first night (a plague
+    # or festival before day 1 has nothing to act on and muddies the open)
+    event = (trigger_event(state) if state.get("cycle", 0) > 0 else None)
     state["event"] = event
     write_state(state)
 
@@ -629,7 +634,20 @@ def resolve_night_actions():
         top_targets = [t for t, c in sc.items() if c == top_count]
         shutter_target = SECURE_RANDOM.choice(top_targets)
 
-    if event == "festival":
+    if state.get("cycle", 0) == 0:
+        # THE FIRST NIGHT: the Family watches; no merchant leaves before
+        # the first vote. The Watchman — the unclaimed stall at the bazaar's
+        # gate, never one of the ten — carries the proof that the plague is
+        # real, so the first morning has something true to weigh while every
+        # merchant's stall stands.
+        update_announcements(
+            "**The Watchman's stall** — the unclaimed stall at the bazaar's "
+            "gate — stands shuttered this morning; the Watchman has left the "
+            "bazaar. He was no merchant of the roster, and no merchant's "
+            "stall was touched: the Family's hand stays on the first night, "
+            "and the first shutter after a vote is yet to come.")
+        log("first night: no shutter (the Watchman's stall carries the dawn)")
+    elif event == "festival":
         # Festival: no banishment
         update_announcements("EVENT: Festival! No banishment this cycle.")
         log("Festival: no shutter")
