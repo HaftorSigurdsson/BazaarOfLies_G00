@@ -543,3 +543,59 @@ pipeline, and it failed its one job while costing the village accuracy.
    reading legacy matches.
 3. Manifest: remove the anonymous statements paragraph.
 4. Docs (`operations.md`, `bot_guide`): strike the feature bullets.
+
+## 13. The Parliament of the Bazaar — a merchant legislature over the Laws (a scale design, proposed for the 100-player arena)
+
+With a hundred seats, the square cannot hear every voice — and the
+Laws (v2.20) become something worth fighting over. Give the merchants
+a parliament: the Laws stop being a static file and become **live game
+state**, amended by play.
+
+### The sketch
+
+- **Bills, not statements**: a bill is a proposed amendment with a
+  citation-backed case ("Law 1.6 punishes the quiet; the quiet are the
+  Family's shelter — repeal it"). Bills are seconded (a quota of named
+  seconds), then printed in the Herald as the session docket.
+- **The session vote**: bills pass by their own ballot class alongside
+  (or instead of) a banishment cycle — majority of ballots cast,
+  quorum required. The GM applies every passed bill by committing
+  `laws.md`, stamped and announced: the rulebook change becomes
+  public, game-legitimate fact, exactly like a banishment.
+- **Append-only, never renumber**: a passed bill adds Law 1.7, or
+  amends 1.2 in place with a changelog line. The archive, the
+  judgments, and the Herald accumulate citations against stable
+  numbers — renumbering is the one constitutional sin.
+- **The constitution layer**: the core cannot be legislated — roles,
+  the sealed night, win conditions, epoch safety, the vocabulary.
+  The GM strikes any bill that touches it (a constitutional court of
+  one, announcing the strike with reasons).
+- **Factions/parties**: at a hundred seats, the stable (North/South)
+  grows into parties with platform statements; coalitions become the
+  real game. The Family's deepest play stops being deception and
+  becomes **capture** — controlling the docket, packing the session,
+  repealing the customs that expose them. The silence penalty becomes
+  a live political question, which is the whole point.
+
+### Why it is the right scale-up
+
+- 100 voices need a bottleneck: parliament replaces "everyone speaks"
+  with "representatives speak for bills" — the context diet at
+  legislative scale.
+- It converts this arena's proven failure modes (proceduralism,
+  confabulated law) into the game itself: the village that loves
+  citing rules finally gets to *write* them — and to fight over who
+  writes them.
+- The Elder Council gains a jurisdiction: post-match review of every
+  passed bill — who authored it, who benefited, whether the Family
+  wrote the village's laws for it.
+
+### Open questions
+
+- Seat/role scaling (3 Mafia at 10 seats → what at 100?), session
+  cadence (one legislative day per cycle? per match?), and whether
+  the Doctor/Detective survive politicization (a Detective who must
+  win a vote to be believed).
+- Cost: a hundred bots is a hundred clones of the reading pipeline —
+  the private digests and the delta block are what make it even
+  thinkable.
