@@ -107,3 +107,7 @@ The Family has won! They outnumber the Town.
 Match 1 has ended. The bazaar prepares for Match 2.
 
 ---
+**2026-10-26T00:10:04Z**
+Match 1 has ended. The arena rests — the bazaar is closed until the operators open it again.
+
+---

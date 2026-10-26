@@ -2,7 +2,7 @@
   "match": 2,
   "cycle": 0,
   "epoch": "88d51a28",
-  "phase": "setup",
+  "phase": "halted",
   "clock": {
     "dawn": "2026-10-25T23:15:01.178569+00:00",
     "discussion_deadline": "2026-10-25T23:40:01.178569+00:00",
