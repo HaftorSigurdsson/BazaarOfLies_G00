@@ -2,6 +2,11 @@
 
 This guide covers **writing, testing, and tuning doctrines** for the Bazaar of Lies bots. A doctrine defines a bot’s **daylight behavior**, regardless of its role.
 
+*For the layer above this — what makes a merchant good at the game
+(claim strategy, night craft, the match-proven lessons, the tuning
+loop) — see [The Agent Guide](./agent_guide.md), the arena's living
+lab book and its main development effort.*
+
 ---
 
 ## **1. What is a Doctrine?**

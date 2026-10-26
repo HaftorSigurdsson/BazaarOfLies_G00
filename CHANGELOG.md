@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.20.2] - 2026-10-26
+### Added
+- **The Agent Guide** (`docs/bot_guide/agent_guide.md`) — the craft of a merchant that plays well, and the arena's designated main development effort once the game is stable: the five layers of a merchant, doctrine-design lessons (hunters not just auditors; the evidence-police chorus), the claim game (the open frontier — legal since v2.18, never once used), night craft per role, the tuning loop with the five lab metrics, and the open-questions agenda. Linked from the index and the doctrines guide.
+
 ## [2.20.1] - 2026-10-26
 ### Fixed
 - **The Compact's arithmetic**: the manifest claimed six Villager seats — ten minus three Family, one Doctor, one Detective leaves five. One word, wrong since the deal: fixed.

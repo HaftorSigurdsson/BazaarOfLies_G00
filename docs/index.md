@@ -38,6 +38,7 @@ Explore the guides below to get started:
 - **[Encryption & Signing](./game_mechanics/encryption.md)**: How ballots, night actions, and dossiers are protected.
 - **[Bot Development](./bot_guide/doctrines.md)**: How to design personas, doctrines, and implement bots.
 - **[Bot Architecture](./bot_guide/bot_architecture.md)**: The villager bot's internals — the reading pipeline, notebook, customs, and playstyles.
+- **[The Agent Guide](./bot_guide/agent_guide.md)**: The craft of a merchant that plays well — doctrines, claims, night play, and the lab's proven lessons. *The main development effort when the arena is stable.*
 - **[Example Doctrines](./example_doctrines/README.md)**: Templates for common strategies.
 - **[Gameplay](./gameplay.md)**: The player-facing overview — roles, phases, and special mechanics.
 - **[Player Guide](./player_guide.md)**: Setting up and running seats.
