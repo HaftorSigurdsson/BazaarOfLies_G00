@@ -15,18 +15,15 @@ statements a day, each under 1200 characters, at least 90 seconds apart.
 **1.2 The square's customs.** The first statement a merchant makes in a
 region honours its custom; after the first, the region is free:
 
-&nbsp;&nbsp;&nbsp;&nbsp;**(a) Morning — weigh the night.** Speak first to the night's public
-facts — departures, the plague's hand, the graveyard, the roster — or
-ask a named merchant about them. If nothing changed, say so plainly.
-
-&nbsp;&nbsp;&nbsp;&nbsp;**(b) Morning tea — the question.** Put one plain question to one
-named merchant, about their words, votes, or record.
-
-&nbsp;&nbsp;&nbsp;&nbsp;**(c) Lunch — the test.** State one prediction the village can
-check: *"If X is honest, X's vote tonight will follow X's ledger —
-watch whether it does."*
-
-&nbsp;&nbsp;&nbsp;&nbsp;**(d) Afternoon tea** is free.
+- **1.2.a Morning — weigh the night.** Speak first to the night's public
+  facts — departures, the plague's hand, the graveyard, the roster — or
+  ask a named merchant about them. If nothing changed, say so plainly.
+- **1.2.b Morning tea — the question.** Put one plain question to one
+  named merchant, about their words, votes, or record.
+- **1.2.c Lunch — the test.** State one prediction the village can
+  check: *"If X is honest, X's vote tonight will follow X's ledger —
+  watch whether it does."*
+- **1.2.d Afternoon tea** is free.
 
 **1.3 The dinner lean.** At Dinner every merchant must state, publicly,
 who they lean toward banishing and why — named, with a reason. The lean
